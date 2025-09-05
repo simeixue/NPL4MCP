@@ -1,0 +1,613 @@
+[
+  {
+    "server": "weather",
+    "name": "get_alerts",
+    "description": "Get weather alerts for a US state.\n\nArgs:\n    state: Two-letter US state code (e.g. CA, NY)\n",
+    "implementation": "async def get_alerts(state: str) -> str:\n    \"\"\"Get weather alerts for a US state.\n\n    Args:\n        state: Two-letter US state code (e.g. CA, NY)\n    \"\"\"\n    url = f\"{NWS_API_BASE}/alerts/active/area/{state}\"\n    data = await make_nws_request(url)\n\n    if not data or \"features\" not in data:\n        return \"Unable to fetch alerts or no alerts found.\"\n\n    if not data[\"features\"]:\n        return \"No active alerts for this state.\"\n\n    alerts = [format_alert(feature) for feature in data[\"features\"]]\n    return \"\\n---\\n\".join(alerts)\n\n\n\n# Dependency: format_alert (from /Users/xue/workspace/mcp_project/mcp_server_repos/weather/weather.py)\ndef format_alert(feature: dict) -> str:\n    \"\"\"Format an alert feature into a readable string.\"\"\"\n    props = feature[\"properties\"]\n    return f\"\"\"\nEvent: {props.get('event', 'Unknown')}\nArea: {props.get('areaDesc', 'Unknown')}\nSeverity: {props.get('severity', 'Unknown')}\nDescription: {props.get('description', 'No description available')}\nInstructions: {props.get('instruction', 'No specific instructions provided')}\n\"\"\"\n\n\n\n# Dependency: make_nws_request (from /Users/xue/workspace/mcp_project/mcp_server_repos/weather/weather.py)\nasync def make_nws_request(url: str) -> dict[str, Any] | None:\n    \"\"\"Make a request to the NWS API with proper error handling.\"\"\"\n    headers = {\n        \"User-Agent\": USER_AGENT,\n        \"Accept\": \"application/geo+json\"\n    }\n    async with httpx.AsyncClient() as client:\n        try:\n            response = await client.get(url, headers=headers, timeout=30.0)\n            response.raise_for_status()\n            return response.json()\n        except Exception:\n            return None",
+    "input_schema": {
+      "properties": {
+        "state": {
+          "title": "State",
+          "type": "string"
+        }
+      },
+      "required": [
+        "state"
+      ],
+      "title": "get_alertsArguments",
+      "type": "object"
+    },
+    "annotations": null
+  },
+  {
+    "server": "weather",
+    "name": "get_forecast",
+    "description": "Get weather forecast for a location.\n\nArgs:\n    latitude: Latitude of the location\n    longitude: Longitude of the location\n",
+    "implementation": "async def get_forecast(latitude: float, longitude: float) -> str:\n    \"\"\"Get weather forecast for a location.\n\n    Args:\n        latitude: Latitude of the location\n        longitude: Longitude of the location\n    \"\"\"\n    # First get the forecast grid endpoint\n    points_url = f\"{NWS_API_BASE}/points/{latitude},{longitude}\"\n    points_data = await make_nws_request(points_url)\n\n    if not points_data:\n        return \"Unable to fetch forecast data for this location.\"\n\n    # Get the forecast URL from the points response\n    forecast_url = points_data[\"properties\"][\"forecast\"]\n    forecast_data = await make_nws_request(forecast_url)\n\n    if not forecast_data:\n        return \"Unable to fetch detailed forecast.\"\n\n    # Format the periods into a readable forecast\n    periods = forecast_data[\"properties\"][\"periods\"]\n    forecasts = []\n    for period in periods[:5]:  # Only show next 5 periods\n        forecast = f\"\"\"\n{period['name']}:\nTemperature: {period['temperature']}°{period['temperatureUnit']}\nWind: {period['windSpeed']} {period['windDirection']}\nForecast: {period['detailedForecast']}\n\"\"\"\n        forecasts.append(forecast)\n\n    return \"\\n---\\n\".join(forecasts)\n\n\n\n# Dependency: make_nws_request (from /Users/xue/workspace/mcp_project/mcp_server_repos/weather/weather.py)\nasync def make_nws_request(url: str) -> dict[str, Any] | None:\n    \"\"\"Make a request to the NWS API with proper error handling.\"\"\"\n    headers = {\n        \"User-Agent\": USER_AGENT,\n        \"Accept\": \"application/geo+json\"\n    }\n    async with httpx.AsyncClient() as client:\n        try:\n            response = await client.get(url, headers=headers, timeout=30.0)\n            response.raise_for_status()\n            return response.json()\n        except Exception:\n            return None",
+    "input_schema": {
+      "properties": {
+        "latitude": {
+          "title": "Latitude",
+          "type": "number"
+        },
+        "longitude": {
+          "title": "Longitude",
+          "type": "number"
+        }
+      },
+      "required": [
+        "latitude",
+        "longitude"
+      ],
+      "title": "get_forecastArguments",
+      "type": "object"
+    },
+    "annotations": null
+  },
+  {
+    "server": "wikipedia-mcp",
+    "name": "search",
+    "description": null,
+    "implementation": "async ({ query }) => {\n    try {\n      const results = await searchWikipedia(query);\n      if (results.length === 0) {\n        return { content: [{ type: \"text\", text: \"No results found.\" }] };\n      }\n      return { content: results };\n    } catch (error) {\n      console.error(\"Error fetching from Wikipedia:\", error);\n      return {\n        content: [\n          {\n            type: \"text\",\n            text: `Error searching Wikipedia: ${error instanceof Error ? error.message : String(error)}`\n          }\n        ]\n      };\n    }\n  }",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string",
+          "description": "The search term for Wikipedia"
+        }
+      },
+      "required": [
+        "query"
+      ],
+      "additionalProperties": false,
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": null
+  },
+  {
+    "server": "wikipedia-mcp",
+    "name": "readArticle",
+    "description": null,
+    "implementation": "async ({ title, pageId }) => {\n    if (!title && !pageId) {\n      return {\n        content: [\n          {\n            type: \"text\",\n            text: \"Error: Either title or pageId must be provided.\"\n          }\n        ],\n        isError: true\n      };\n    }\n    try {\n      const markdown = await getWikipediaArticle({ title, pageId });\n      return { content: [{ type: \"text\", text: markdown }] };\n    } catch (error) {\n      console.error(\"Error fetching from Wikipedia:\", error);\n      return {\n        content: [\n          {\n            type: \"text\",\n            text: `Error reading Wikipedia article: ${error instanceof Error ? error.message : String(error)}`\n          }\n        ]\n      };\n    }\n  }",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "The title of the Wikipedia article to read"
+        },
+        "pageId": {
+          "type": "number",
+          "description": "The page ID of the Wikipedia article to read"
+        }
+      },
+      "additionalProperties": false,
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": null
+  },
+  {
+    "server": "amap-maps",
+    "name": "maps_regeocode",
+    "description": "将一个高德经纬度坐标转换为行政区划地址信息",
+    "implementation": "async function handleReGeocode(location) {\n    const url = new URL(\"https://restapi.amap.com/v3/geocode/regeo\");\n    url.searchParams.append(\"location\", location);\n    url.searchParams.append(\"key\", AMAP_MAPS_API_KEY);\n    url.searchParams.append(\"source\", \"ts_mcp\");\n    const response = await fetch(url.toString());\n    const data = await response.json();\n    if (data.status !== \"1\") {\n        return {\n            content: [{\n                    type: \"text\",\n                    text: `RGeocoding failed: ${data.info || data.infocode}`\n                }],\n            isError: true\n        };\n    }\n    return {\n        content: [{\n                type: \"text\",\n                text: JSON.stringify({\n                    provice: data.regeocode.addressComponent.province,\n                    city: data.regeocode.addressComponent.city,\n                    district: data.regeocode.addressComponent.district\n                }, null, 2)\n            }],\n        isError: false\n    };\n}",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "location": {
+          "type": "string",
+          "description": "经纬度"
+        }
+      },
+      "required": [
+        "location"
+      ]
+    },
+    "annotations": null
+  },
+  {
+    "server": "amap-maps",
+    "name": "maps_geo",
+    "description": "将详细的结构化地址转换为经纬度坐标。支持对地标性名胜景区、建筑物名称解析为经纬度坐标",
+    "implementation": "async function handleGeo(address, city, sig) {\n    const url = new URL(\"https://restapi.amap.com/v3/geocode/geo\");\n    url.searchParams.append(\"key\", AMAP_MAPS_API_KEY);\n    url.searchParams.append(\"address\", address);\n    url.searchParams.append(\"source\", \"ts_mcp\");\n    const response = await fetch(url.toString());\n    const data = await response.json();\n    if (data.status !== \"1\") {\n        return {\n            content: [{\n                    type: \"text\",\n                    text: `Geocoding failed: ${data.info || data.infocode}`\n                }],\n            isError: true\n        };\n    }\n    const geocodes = data.geocodes || [];\n    const res = geocodes.length > 0 ? geocodes.map((geo) => ({\n        country: geo.country,\n        province: geo.province,\n        city: geo.city,\n        citycode: geo.citycode,\n        district: geo.district,\n        street: geo.street,\n        number: geo.number,\n        adcode: geo.adcode,\n        location: geo.location,\n        level: geo.level\n    })) : [];\n    return {\n        content: [{\n                type: \"text\",\n                text: JSON.stringify({\n                    return: res\n                }, null, 2)\n            }],\n        isError: false\n    };\n}",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "address": {
+          "type": "string",
+          "description": "待解析的结构化地址信息"
+        },
+        "city": {
+          "type": "string",
+          "description": "指定查询的城市"
+        }
+      },
+      "required": [
+        "address"
+      ]
+    },
+    "annotations": null
+  },
+  {
+    "server": "amap-maps",
+    "name": "maps_ip_location",
+    "description": "IP 定位根据用户输入的 IP 地址，定位 IP 的所在位置",
+    "implementation": "async function handleIPLocation(ip) {\n    const url = new URL(\"https://restapi.amap.com/v3/ip\");\n    url.searchParams.append(\"ip\", ip);\n    url.searchParams.append(\"key\", AMAP_MAPS_API_KEY);\n    url.searchParams.append(\"source\", \"ts_mcp\");\n    const response = await fetch(url.toString());\n    const data = await response.json();\n    if (data.status !== \"1\") {\n        return {\n            content: [{\n                    type: \"text\",\n                    text: `IP Location failed: ${data.info || data.infocode}`\n                }],\n            isError: true\n        };\n    }\n    return {\n        content: [{\n                type: \"text\",\n                text: JSON.stringify({\n                    province: data.province,\n                    city: data.city,\n                    adcode: data.adcode,\n                    rectangle: data.rectangle\n                }, null, 2)\n            }],\n        isError: false\n    };\n}",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "ip": {
+          "type": "string",
+          "description": "IP地址"
+        }
+      },
+      "required": [
+        "ip"
+      ]
+    },
+    "annotations": null
+  },
+  {
+    "server": "amap-maps",
+    "name": "maps_weather",
+    "description": "根据城市名称或者标准adcode查询指定城市的天气",
+    "implementation": "async function handleWeather(city) {\n    const url = new URL(\"https://restapi.amap.com/v3/weather/weatherInfo\");\n    url.searchParams.append(\"city\", city);\n    url.searchParams.append(\"key\", AMAP_MAPS_API_KEY);\n    url.searchParams.append(\"source\", \"ts_mcp\");\n    url.searchParams.append(\"extensions\", \"all\");\n    const response = await fetch(url.toString());\n    const data = await response.json();\n    if (data.status !== \"1\") {\n        return {\n            content: [{\n                    type: \"text\",\n                    text: `Get weather failed: ${data.info || data.infocode}`\n                }],\n            isError: true\n        };\n    }\n    return {\n        content: [{\n                type: \"text\",\n                text: JSON.stringify({\n                    city: data.forecasts[0].city,\n                    forecasts: data.forecasts[0].casts\n                }, null, 2)\n            }],\n        isError: false\n    };\n}",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "city": {
+          "type": "string",
+          "description": "城市名称或者adcode"
+        }
+      },
+      "required": [
+        "city"
+      ]
+    },
+    "annotations": null
+  },
+  {
+    "server": "amap-maps",
+    "name": "maps_search_detail",
+    "description": "查询关键词搜或者周边搜获取到的POI ID的详细信息",
+    "implementation": "async function handleSearchDetail(id) {\n    const url = new URL(\"https://restapi.amap.com/v3/place/detail\");\n    url.searchParams.append(\"id\", id);\n    url.searchParams.append(\"key\", AMAP_MAPS_API_KEY);\n    url.searchParams.append(\"source\", \"ts_mcp\");\n    const response = await fetch(url.toString());\n    const data = await response.json();\n    if (data.status !== \"1\") {\n        return {\n            content: [{\n                    type: \"text\",\n                    text: `Get poi detail failed: ${data.info || data.infocode}`\n                }],\n            isError: true\n        };\n    }\n    let poi = data.pois[0];\n    return {\n        content: [{\n                type: \"text\",\n                text: JSON.stringify({\n                    id: poi.id,\n                    name: poi.name,\n                    location: poi.location,\n                    address: poi.address,\n                    business_area: poi.business_area,\n                    city: poi.cityname,\n                    type: poi.type,\n                    alias: poi.alias,\n                    ...poi.biz_ext\n                }, null, 2)\n            }],\n        isError: false\n    };\n}",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "关键词搜或者周边搜获取到的POI ID"
+        }
+      },
+      "required": [
+        "id"
+      ]
+    },
+    "annotations": null
+  },
+  {
+    "server": "amap-maps",
+    "name": "maps_bicycling",
+    "description": "骑行路径规划用于规划骑行通勤方案，规划时会考虑天桥、单行线、封路等情况。最大支持 500km 的骑行路线规划",
+    "implementation": "async function handleBicycling(origin, destination) {\n    const url = new URL(\"https://restapi.amap.com/v4/direction/bicycling\");\n    url.searchParams.append(\"key\", AMAP_MAPS_API_KEY);\n    url.searchParams.append(\"origin\", origin);\n    url.searchParams.append(\"destination\", destination);\n    url.searchParams.append(\"source\", \"ts_mcp\");\n    const response = await fetch(url.toString());\n    const data = await response.json();\n    if (data.errcode !== 0) {\n        return {\n            content: [{\n                    type: \"text\",\n                    text: `Direction bicycling failed: ${data.info || data.infocode}`\n                }],\n            isError: true\n        };\n    }\n    return {\n        content: [{\n                type: \"text\",\n                text: JSON.stringify({\n                    data: {\n                        origin: data.data.origin,\n                        destination: data.data.destination,\n                        paths: data.data.paths.map((path) => {\n                            return {\n                                distance: path.distance,\n                                duration: path.duration,\n                                steps: path.steps.map((step) => {\n                                    return {\n                                        instruction: step.instruction,\n                                        road: step.road,\n                                        distance: step.distance,\n                                        orientation: step.orientation,\n                                        duration: step.duration,\n                                    };\n                                })\n                            };\n                        })\n                    }\n                }, null, 2)\n            }],\n        isError: false\n    };\n}",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "origin": {
+          "type": "string",
+          "description": "出发点经纬度，坐标格式为：经度，纬度"
+        },
+        "destination": {
+          "type": "string",
+          "description": "目的地经纬度，坐标格式为：经度，纬度"
+        }
+      },
+      "required": [
+        "origin",
+        "destination"
+      ]
+    },
+    "annotations": null
+  },
+  {
+    "server": "amap-maps",
+    "name": "maps_direction_walking",
+    "description": "步行路径规划 API 可以根据输入起点终点经纬度坐标规划100km 以内的步行通勤方案，并且返回通勤方案的数据",
+    "implementation": "async function handleWalking(origin, destination) {\n    const url = new URL(\"https://restapi.amap.com/v3/direction/walking\");\n    url.searchParams.append(\"key\", AMAP_MAPS_API_KEY);\n    url.searchParams.append(\"origin\", origin);\n    url.searchParams.append(\"destination\", destination);\n    url.searchParams.append(\"source\", \"ts_mcp\");\n    const response = await fetch(url.toString());\n    const data = await response.json();\n    if (data.status !== \"1\") {\n        return {\n            content: [{\n                    type: \"text\",\n                    text: `Direction Walking failed: ${data.info || data.infocode}`\n                }],\n            isError: true\n        };\n    }\n    return {\n        content: [{\n                type: \"text\",\n                text: JSON.stringify({\n                    route: {\n                        origin: data.route.origin,\n                        destination: data.route.destination,\n                        paths: data.route.paths.map((path) => {\n                            return {\n                                distance: path.distance,\n                                duration: path.duration,\n                                steps: path.steps.map((step) => {\n                                    return {\n                                        instruction: step.instruction,\n                                        road: step.road,\n                                        distance: step.distance,\n                                        orientation: step.orientation,\n                                        duration: step.duration,\n                                    };\n                                })\n                            };\n                        })\n                    }\n                }, null, 2)\n            }],\n        isError: false\n    };\n}",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "origin": {
+          "type": "string",
+          "description": "出发点经度，纬度，坐标格式为：经度，纬度"
+        },
+        "destination": {
+          "type": "string",
+          "description": "目的地经度，纬度，坐标格式为：经度，纬度"
+        }
+      },
+      "required": [
+        "origin",
+        "destination"
+      ]
+    },
+    "annotations": null
+  },
+  {
+    "server": "amap-maps",
+    "name": "maps_direction_driving",
+    "description": "驾车路径规划 API 可以根据用户起终点经纬度坐标规划以小客车、轿车通勤出行的方案，并且返回通勤方案的数据。",
+    "implementation": "async function handleDriving(origin, destination) {\n    const url = new URL(\"https://restapi.amap.com/v3/direction/driving\");\n    url.searchParams.append(\"key\", AMAP_MAPS_API_KEY);\n    url.searchParams.append(\"origin\", origin);\n    url.searchParams.append(\"destination\", destination);\n    url.searchParams.append(\"source\", \"ts_mcp\");\n    const response = await fetch(url.toString());\n    const data = await response.json();\n    if (data.status !== \"1\") {\n        return {\n            content: [{\n                    type: \"text\",\n                    text: `Direction Driving failed: ${data.info || data.infocode}`\n                }],\n            isError: true\n        };\n    }\n    return {\n        content: [{\n                type: \"text\",\n                text: JSON.stringify({\n                    route: {\n                        origin: data.route.origin,\n                        destination: data.route.destination,\n                        paths: data.route.paths.map((path) => {\n                            return {\n                                path: path.path,\n                                distance: path.distance,\n                                duration: path.duration,\n                                steps: path.steps.map((step) => {\n                                    return {\n                                        instruction: step.instruction,\n                                        road: step.road,\n                                        distance: step.distance,\n                                        orientation: step.orientation,\n                                        duration: step.duration,\n                                    };\n                                })\n                            };\n                        })\n                    }\n                }, null, 2)\n            }],\n        isError: false\n    };\n}",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "origin": {
+          "type": "string",
+          "description": "出发点经度，纬度，坐标格式为：经度，纬度"
+        },
+        "destination": {
+          "type": "string",
+          "description": "目的地经度，纬度，坐标格式为：经度，纬度"
+        }
+      },
+      "required": [
+        "origin",
+        "destination"
+      ]
+    },
+    "annotations": null
+  },
+  {
+    "server": "amap-maps",
+    "name": "maps_direction_transit_integrated",
+    "description": "公交路径规划 API 可以根据用户起终点经纬度坐标规划综合各类公共（火车、公交、地铁）交通方式的通勤方案，并且返回通勤方案的数据，跨城场景下必须传起点城市与终点城市",
+    "implementation": "async function handleTransitIntegrated(origin, destination, city = \"\", cityd = \"\") {\n    const url = new URL(\"https://restapi.amap.com/v3/direction/transit/integrated\");\n    url.searchParams.append(\"key\", AMAP_MAPS_API_KEY);\n    url.searchParams.append(\"origin\", origin);\n    url.searchParams.append(\"destination\", destination);\n    url.searchParams.append(\"city\", city);\n    url.searchParams.append(\"cityd\", cityd);\n    url.searchParams.append(\"source\", \"ts_mcp\");\n    const response = await fetch(url.toString());\n    const data = await response.json();\n    if (data.status !== \"1\") {\n        return {\n            content: [{\n                    type: \"text\",\n                    text: `Direction Transit Integrated failed: ${data.info || data.infocode}`\n                }],\n            isError: true\n        };\n    }\n    return {\n        content: [{\n                type: \"text\",\n                text: JSON.stringify({\n                    route: {\n                        origin: data.route.origin,\n                        destination: data.route.destination,\n                        distance: data.route.distance,\n                        transits: data.route.transits ? data.route.transits.map((transit) => {\n                            return {\n                                duration: transit.duration,\n                                walking_distance: transit.walking_distance,\n                                segments: transit.segments ? transit.segments.map((segment) => {\n                                    return {\n                                        walking: {\n                                            origin: segment.walking.origin,\n                                            destination: segment.walking.destination,\n                                            distance: segment.walking.distance,\n                                            duration: segment.walking.duration,\n                                            steps: segment.walking && segment.walking.steps ? segment.walking.steps.map((step) => {\n                                                return {\n                                                    instruction: step.instruction,\n                                                    road: step.road,\n                                                    distance: step.distance,\n                                                    action: step.action,\n                                                    assistant_action: step.assistant_action\n                                                };\n                                            }) : [],\n                                        },\n                                        bus: {\n                                            buslines: segment.bus && segment.bus.buslines ? segment.bus.buslines.map((busline) => {\n                                                return {\n                                                    name: busline.name,\n                                                    departure_stop: {\n                                                        name: busline.departure_stop.name\n                                                    },\n                                                    arrival_stop: {\n                                                        name: busline.arrival_stop.name\n                                                    },\n                                                    distance: busline.distance,\n                                                    duration: busline.duration,\n                                                    via_stops: busline.via_stops ? busline.via_stops.map((via_stop) => {\n                                                        return {\n                                                            name: via_stop.name\n                                                        };\n                                                    }) : [],\n                                                };\n                                            }) : [],\n                                        },\n                                        entrance: {\n                                            name: segment.entrance.name\n                                        },\n                                        exit: {\n                                            name: segment.exit.name\n                                        },\n                                        railway: {\n                                            name: segment.railway.name,\n                                            trip: segment.railway.trip\n                                        }\n                                    };\n                                }) : [],\n                            };\n                        }) : [],\n                    }\n                }, null, 2)\n            }],\n        isError: false\n    };\n}",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "origin": {
+          "type": "string",
+          "description": "出发点经度，纬度，坐标格式为：经度，纬度"
+        },
+        "destination": {
+          "type": "string",
+          "description": "目的地经度，纬度，坐标格式为：经度，纬度"
+        },
+        "city": {
+          "type": "string",
+          "description": "公共交通规划起点城市"
+        },
+        "cityd": {
+          "type": "string",
+          "description": "公共交通规划终点城市"
+        }
+      },
+      "required": [
+        "origin",
+        "destination",
+        "city",
+        "cityd"
+      ]
+    },
+    "annotations": null
+  },
+  {
+    "server": "amap-maps",
+    "name": "maps_distance",
+    "description": "距离测量 API 可以测量两个经纬度坐标之间的距离,支持驾车、步行以及球面距离测量",
+    "implementation": "async function handleDistance(origins, destination, type = \"1\") {\n    const url = new URL(\"https://restapi.amap.com/v3/distance\");\n    url.searchParams.append(\"key\", AMAP_MAPS_API_KEY);\n    url.searchParams.append(\"origins\", origins);\n    url.searchParams.append(\"destination\", destination);\n    url.searchParams.append(\"type\", type);\n    url.searchParams.append(\"source\", \"ts_mcp\");\n    const response = await fetch(url.toString());\n    const data = await response.json();\n    if (data.status !== \"1\") {\n        return {\n            content: [{\n                    type: \"text\",\n                    text: `Direction Distance failed: ${data.info || data.infocode}`\n                }],\n            isError: true\n        };\n    }\n    return {\n        content: [{\n                type: \"text\",\n                text: JSON.stringify({\n                    results: data.results.map((result) => {\n                        return {\n                            origin_id: result.origin_id,\n                            dest_id: result.dest_id,\n                            distance: result.distance,\n                            duration: result.duration\n                        };\n                    })\n                }, null, 2)\n            }],\n        isError: false\n    };\n}",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "origins": {
+          "type": "string",
+          "description": "起点经度，纬度，可以传多个坐标，使用竖线隔离，比如120,30|120,31，坐标格式为：经度，纬度"
+        },
+        "destination": {
+          "type": "string",
+          "description": "终点经度，纬度，坐标格式为：经度，纬度"
+        },
+        "type": {
+          "type": "string",
+          "description": "距离测量类型,1代表驾车距离测量，0代表直线距离测量，3步行距离测量"
+        }
+      },
+      "required": [
+        "origins",
+        "destination"
+      ]
+    },
+    "annotations": null
+  },
+  {
+    "server": "amap-maps",
+    "name": "maps_text_search",
+    "description": "关键词搜，根据用户传入关键词，搜索出相关的POI",
+    "implementation": "async function handleTextSearch(keywords, city = \"\", citylimit = \"false\") {\n    const url = new URL(\"https://restapi.amap.com/v3/place/text\");\n    url.searchParams.append(\"key\", AMAP_MAPS_API_KEY);\n    url.searchParams.append(\"keywords\", keywords);\n    url.searchParams.append(\"city\", city);\n    url.searchParams.append(\"citylimit\", citylimit);\n    url.searchParams.append(\"source\", \"ts_mcp\");\n    const response = await fetch(url.toString());\n    const data = await response.json();\n    if (data.status !== \"1\") {\n        return {\n            content: [{\n                    type: \"text\",\n                    text: `Text Search failed: ${data.info || data.infocode}`\n                }],\n            isError: true\n        };\n    }\n    let resciytes = data.suggestion && data.suggestion.ciytes ? data.suggestion.ciytes.map((city) => {\n        return {\n            name: city.name\n        };\n    }) : [];\n    return {\n        content: [{\n                type: \"text\",\n                text: JSON.stringify({\n                    suggestion: {\n                        keywords: data.suggestion.keywords,\n                        ciytes: resciytes,\n                    },\n                    pois: data.pois.map((poi) => {\n                        return {\n                            id: poi.id,\n                            name: poi.name,\n                            address: poi.address,\n                            typecode: poi.typecode\n                        };\n                    })\n                }, null, 2)\n            }],\n        isError: false\n    };\n}",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "keywords": {
+          "type": "string",
+          "description": "搜索关键词"
+        },
+        "city": {
+          "type": "string",
+          "description": "查询城市"
+        },
+        "types": {
+          "type": "string",
+          "description": "POI类型，比如加油站"
+        }
+      },
+      "required": [
+        "keywords"
+      ]
+    },
+    "annotations": null
+  },
+  {
+    "server": "amap-maps",
+    "name": "maps_around_search",
+    "description": "周边搜，根据用户传入关键词以及坐标location，搜索出radius半径范围的POI",
+    "implementation": "async function handleAroundSearch(location, radius = \"1000\", keywords = \"\") {\n    const url = new URL(\"https://restapi.amap.com/v3/place/around\");\n    url.searchParams.append(\"key\", AMAP_MAPS_API_KEY);\n    url.searchParams.append(\"location\", location);\n    url.searchParams.append(\"radius\", radius);\n    url.searchParams.append(\"keywords\", keywords);\n    url.searchParams.append(\"source\", \"ts_mcp\");\n    const response = await fetch(url.toString());\n    const data = await response.json();\n    if (data.status !== \"1\") {\n        return {\n            content: [{\n                    type: \"text\",\n                    text: `Around Search failed: ${data.info || data.infocode}`\n                }],\n            isError: true\n        };\n    }\n    return {\n        content: [{\n                type: \"text\",\n                text: JSON.stringify({\n                    pois: data.pois.map((poi) => {\n                        return {\n                            id: poi.id,\n                            name: poi.name,\n                            address: poi.address,\n                            typecode: poi.typecode\n                        };\n                    })\n                }, null, 2)\n            }],\n        isError: false\n    };\n}",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "keywords": {
+          "type": "string",
+          "description": "搜索关键词"
+        },
+        "location": {
+          "type": "string",
+          "description": "中心点经度纬度"
+        },
+        "radius": {
+          "type": "string",
+          "description": "搜索半径"
+        }
+      },
+      "required": [
+        "location"
+      ]
+    },
+    "annotations": null
+  },
+  {
+    "server": "mcp-sequentialthinking-tools",
+    "name": "sequentialthinking_tools",
+    "description": "A detailed tool for dynamic and reflective problem-solving through thoughts.\nThis tool helps analyze problems through a flexible thinking process that can adapt and evolve.\nEach thought can build on, question, or revise previous insights as understanding deepens.\n\nIMPORTANT: This server facilitates sequential thinking with MCP tool coordination. The LLM analyzes available tools and their descriptions to make intelligent recommendations, which are then tracked and organized by this server.\n\nWhen to use this tool:\n- Breaking down complex problems into steps\n- Planning and design with room for revision\n- Analysis that might need course correction\n- Problems where the full scope might not be clear initially\n- Problems that require a multi-step solution\n- Tasks that need to maintain context over multiple steps\n- Situations where irrelevant information needs to be filtered out\n- When you need guidance on which tools to use and in what order\n\nKey features:\n- You can adjust total_thoughts up or down as you progress\n- You can question or revise previous thoughts\n- You can add more thoughts even after reaching what seemed like the end\n- You can express uncertainty and explore alternative approaches\n- Not every thought needs to build linearly - you can branch or backtrack\n- Generates a solution hypothesis\n- Verifies the hypothesis based on the Chain of Thought steps\n- Recommends appropriate tools for each step\n- Provides rationale for tool recommendations\n- Suggests tool execution order and parameters\n- Tracks previous recommendations and remaining steps\n\nParameters explained:\n- available_mcp_tools: Array of MCP tool names that are available for use (e.g., [\"mcp-omnisearch\", \"mcp-turso-cloud\"])\n- thought: Your current thinking step, which can include:\n* Regular analytical steps\n* Revisions of previous thoughts\n* Questions about previous decisions\n* Realizations about needing more analysis\n* Changes in approach\n* Hypothesis generation\n* Hypothesis verification\n* Tool recommendations and rationale\n- next_thought_needed: True if you need more thinking, even if at what seemed like the end\n- thought_number: Current number in sequence (can go beyond initial total if needed)\n- total_thoughts: Current estimate of thoughts needed (can be adjusted up/down)\n- is_revision: A boolean indicating if this thought revises previous thinking\n- revises_thought: If is_revision is true, which thought number is being reconsidered\n- branch_from_thought: If branching, which thought number is the branching point\n- branch_id: Identifier for the current branch (if any)\n- needs_more_thoughts: If reaching end but realizing more thoughts needed\n- current_step: Current step recommendation, including:\n* step_description: What needs to be done\n* recommended_tools: Tools recommended for this step\n* expected_outcome: What to expect from this step\n* next_step_conditions: Conditions to consider for the next step\n- previous_steps: Steps already recommended\n- remaining_steps: High-level descriptions of upcoming steps\n\nYou should:\n1. Start with an initial estimate of needed thoughts, but be ready to adjust\n2. Feel free to question or revise previous thoughts\n3. Don't hesitate to add more thoughts if needed, even at the \"end\"\n4. Express uncertainty when present\n5. Mark thoughts that revise previous thinking or branch into new paths\n6. Ignore information that is irrelevant to the current step\n7. Generate a solution hypothesis when appropriate\n8. Verify the hypothesis based on the Chain of Thought steps\n9. Consider available tools that could help with the current step\n10. Provide clear rationale for tool recommendations\n11. Suggest specific tool parameters when appropriate\n12. Consider alternative tools for each step\n13. Track progress through the recommended steps\n14. Provide a single, ideally correct answer as the final output\n15. Only set next_thought_needed to false when truly done and a satisfactory answer is reached",
+    "implementation": "<source code unavailable>",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "available_mcp_tools": {
+          "type": "array",
+          "description": "Array of MCP tool names available for use (e.g., [\"mcp-omnisearch\", \"mcp-turso-cloud\"])",
+          "items": {
+            "type": "string"
+          }
+        },
+        "thought": {
+          "type": "string",
+          "description": "Your current thinking step"
+        },
+        "next_thought_needed": {
+          "type": "boolean",
+          "description": "Whether another thought step is needed"
+        },
+        "thought_number": {
+          "type": "integer",
+          "description": "Current thought number",
+          "minimum": 1
+        },
+        "total_thoughts": {
+          "type": "integer",
+          "description": "Estimated total thoughts needed",
+          "minimum": 1
+        },
+        "is_revision": {
+          "type": "boolean",
+          "description": "Whether this revises previous thinking"
+        },
+        "revises_thought": {
+          "type": "integer",
+          "description": "Which thought is being reconsidered",
+          "minimum": 1
+        },
+        "branch_from_thought": {
+          "type": "integer",
+          "description": "Branching point thought number",
+          "minimum": 1
+        },
+        "branch_id": {
+          "type": "string",
+          "description": "Branch identifier"
+        },
+        "needs_more_thoughts": {
+          "type": "boolean",
+          "description": "If more thoughts are needed"
+        },
+        "current_step": {
+          "type": "object",
+          "description": "Current step recommendation",
+          "properties": {
+            "step_description": {
+              "type": "string",
+              "description": "What needs to be done"
+            },
+            "recommended_tools": {
+              "type": "array",
+              "description": "Tools recommended for this step",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "tool_name": {
+                    "type": "string",
+                    "description": "Name of the tool being recommended"
+                  },
+                  "confidence": {
+                    "type": "number",
+                    "description": "0-1 indicating confidence in recommendation",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "rationale": {
+                    "type": "string",
+                    "description": "Why this tool is recommended"
+                  },
+                  "priority": {
+                    "type": "number",
+                    "description": "Order in the recommendation sequence"
+                  },
+                  "suggested_inputs": {
+                    "type": "object",
+                    "description": "Optional suggested parameters"
+                  },
+                  "alternatives": {
+                    "type": "array",
+                    "description": "Alternative tools that could be used",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "tool_name",
+                  "confidence",
+                  "rationale",
+                  "priority"
+                ]
+              }
+            },
+            "expected_outcome": {
+              "type": "string",
+              "description": "What to expect from this step"
+            },
+            "next_step_conditions": {
+              "type": "array",
+              "description": "Conditions to consider for the next step",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "step_description",
+            "recommended_tools",
+            "expected_outcome"
+          ]
+        },
+        "previous_steps": {
+          "type": "array",
+          "description": "Steps already recommended",
+          "items": {
+            "type": "object",
+            "properties": {
+              "step_description": {
+                "type": "string",
+                "description": "What needs to be done"
+              },
+              "recommended_tools": {
+                "type": "array",
+                "description": "Tools recommended for this step",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "tool_name": {
+                      "type": "string",
+                      "description": "Name of the tool being recommended"
+                    },
+                    "confidence": {
+                      "type": "number",
+                      "description": "0-1 indicating confidence in recommendation",
+                      "minimum": 0,
+                      "maximum": 1
+                    },
+                    "rationale": {
+                      "type": "string",
+                      "description": "Why this tool is recommended"
+                    },
+                    "priority": {
+                      "type": "number",
+                      "description": "Order in the recommendation sequence"
+                    },
+                    "suggested_inputs": {
+                      "type": "object",
+                      "description": "Optional suggested parameters"
+                    },
+                    "alternatives": {
+                      "type": "array",
+                      "description": "Alternative tools that could be used",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "tool_name",
+                    "confidence",
+                    "rationale",
+                    "priority"
+                  ]
+                }
+              },
+              "expected_outcome": {
+                "type": "string",
+                "description": "What to expect from this step"
+              },
+              "next_step_conditions": {
+                "type": "array",
+                "description": "Conditions to consider for the next step",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "step_description",
+              "recommended_tools",
+              "expected_outcome"
+            ]
+          }
+        },
+        "remaining_steps": {
+          "type": "array",
+          "description": "High-level descriptions of upcoming steps",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "available_mcp_tools",
+        "thought",
+        "next_thought_needed",
+        "thought_number",
+        "total_thoughts"
+      ]
+    },
+    "annotations": null
+  },
+  {
+    "server": "mcp_calculate_server",
+    "name": "calculate_expression",
+    "description": "\ncalculate mathematical expressions using the `sympify` function from `sympy`, parse and compute the input mathematical expression string, supports direct calls to SymPy functions (automatically recognizes x, y, z as symbolic variables)\nParameters:\n    expression (str): Mathematical expression, e.g., \"223 - 344 * 6\" or \"sin(pi/2) + log(10)\".Replace special symbols with approximate values, e.g., pi → 3.1415\"\nExample expressions:\n    \"2 + 3*5\"                          # Basic arithmetic → 17\n    \"expand((x + 1)**2)\"               # Expand → x² + 2x + 1\n    \"diff(sin(x), x)\"                  # Derivative → cos(x)\n    \"integrate(exp(x), (x, 0, 1))\"      # Definite integral → E - 1\n    \"solve(x**2 - 4, x)\"               # Solve equation → [-2, 2]\n    \"limit(tan(x)/x, x, 0)\"            # Limit → 1\n    \"Sum(k, (k, 1, 10)).doit()\"        # Summation → 55\n    \"Matrix([[1, 2], [3, 4]]).inv()\"   # Matrix inverse → [[-2, 1], [3/2, -1/2]]\n    \"simplify((x**2 - 1)/(x + 1))\"     # Simplify → x - 1\n    \"factor(x**2 - 2*x - 15)\"          # Factorize → (x - 5)(x + 3)\n    \"series(cos(x), x, 0, 4)\"          # Taylor series → 1 - x²/2 + x⁴/24 + O(x⁴)\n    \"integrate(exp(-x**2)*sin(x), (x, -oo, oo))\"  # Complex integral\n    \"solve([x**2 + y**2 - 1, x + y - 1], [x, y])\"  # Solve system of equations\n    \"Matrix([[1, 2, 3], [4, 5, 6], [7, 8, 9]]).eigenvals()\"  # Matrix eigenvalues\nReturns:\n    str: Calculation result. If the expression cannot be parsed or computed, returns an error message (str).\n",
+    "implementation": "def calculate_expression(expression: str) -> str:\n    \"\"\"\ncalculate mathematical expressions using the `sympify` function from `sympy`, parse and compute the input mathematical expression string, supports direct calls to SymPy functions (automatically recognizes x, y, z as symbolic variables)\nParameters:\n    expression (str): Mathematical expression, e.g., \"223 - 344 * 6\" or \"sin(pi/2) + log(10)\".Replace special symbols with approximate values, e.g., pi → 3.1415\"\nExample expressions:\n    \"2 + 3*5\"                          # Basic arithmetic → 17\n    \"expand((x + 1)**2)\"               # Expand → x² + 2x + 1\n    \"diff(sin(x), x)\"                  # Derivative → cos(x)\n    \"integrate(exp(x), (x, 0, 1))\"      # Definite integral → E - 1\n    \"solve(x**2 - 4, x)\"               # Solve equation → [-2, 2]\n    \"limit(tan(x)/x, x, 0)\"            # Limit → 1\n    \"Sum(k, (k, 1, 10)).doit()\"        # Summation → 55\n    \"Matrix([[1, 2], [3, 4]]).inv()\"   # Matrix inverse → [[-2, 1], [3/2, -1/2]]\n    \"simplify((x**2 - 1)/(x + 1))\"     # Simplify → x - 1\n    \"factor(x**2 - 2*x - 15)\"          # Factorize → (x - 5)(x + 3)\n    \"series(cos(x), x, 0, 4)\"          # Taylor series → 1 - x²/2 + x⁴/24 + O(x⁴)\n    \"integrate(exp(-x**2)*sin(x), (x, -oo, oo))\"  # Complex integral\n    \"solve([x**2 + y**2 - 1, x + y - 1], [x, y])\"  # Solve system of equations\n    \"Matrix([[1, 2, 3], [4, 5, 6], [7, 8, 9]]).eigenvals()\"  # Matrix eigenvalues\nReturns:\n    str: Calculation result. If the expression cannot be parsed or computed, returns an error message (str).\n\"\"\"\n    try:\n        # Define common symbolic variables\n        x, y, z = sp.symbols('x y z')\n\n        # Create local namespace containing all sympy functions and symbolic variables\n        locals_dict = {**sp.__dict__, 'x': x, 'y': y, 'z': z}\n\n        # Special handling for various types of expressions\n\n        # 1. Handle complex integral expressions\n        if \"integrate\" in expression and (\"oo\" in expression or \"-oo\" in expression):\n            return handle_complex_integration(expression, locals_dict)\n\n        # 2. Handle system of equations solving expressions\n        elif \"solve(\" in expression and \"[\" in expression and \"]\" in expression:\n            return handle_equation_solving(expression, locals_dict)\n\n        # 3. Handle matrix eigenvalue calculation expressions\n        elif \"eigenvals\" in expression or \"eigenvects\" in expression:\n            return handle_matrix_eigenvalues(expression, locals_dict)\n\n        # 4. General expression calculation\n        else:\n            # First try to evaluate the expression directly\n            result = eval(expression, globals(), locals_dict)\n\n            # Process based on result type\n            return format_result(result)\n\n    except Exception as e:\n        return f\"Error: {e}\"\n\n\n\n# Dependency: format_result (from /Users/xue/workspace/mcp_project/mcp_server_repos/mcp_calculate_server/server.py)\ndef format_result(result):\n    \"\"\"Format output based on result type\"\"\"\n    try:\n        # Handle dictionary type results (e.g., eigenvalues)\n        if isinstance(result, dict):\n            formatted = \"{\"\n            for key, value in result.items():\n                # Try numerical computation\n                try:\n                    key_eval = key.evalf()\n                except:\n                    key_eval = key\n\n                formatted += f\"{key_eval}: {value}, \"\n\n            if formatted.endswith(\", \"):\n                formatted = formatted[:-2]\n\n            formatted += \"}\"\n            return formatted\n\n        # Handle list type results (e.g., solutions to equations)\n        elif isinstance(result, list):\n            formatted = \"[\"\n            for item in result:\n                # Check if it's a tuple (e.g., coordinate points)\n                if isinstance(item, tuple):\n                    coords = []\n                    for val in item:\n                        # Try numerical computation\n                        try:\n                            val_eval = val.evalf()\n                            coords.append(str(val_eval))\n                        except:\n                            coords.append(str(val))\n\n                    formatted += \"(\" + \", \".join(coords) + \"), \"\n                else:\n                    # Try numerical computation\n                    try:\n                        item_eval = item.evalf()\n                        formatted += f\"{item_eval}, \"\n                    except:\n                        formatted += f\"{item}, \"\n\n            if formatted.endswith(\", \"):\n                formatted = formatted[:-2]\n\n            formatted += \"]\"\n            return formatted\n\n        # Other types of results\n        else:\n            # Try numerical computation\n            try:\n                return str(result.evalf())\n            except:\n                return str(result)\n\n    except Exception as e:\n        return f\"Result formatting error: {e}, original result: {result}\"\n\n\n\n# Dependency: handle_complex_integration (from /Users/xue/workspace/mcp_project/mcp_server_repos/mcp_calculate_server/server.py)\ndef handle_complex_integration(expression, locals_dict):\n    \"\"\"Handle complex integral expressions\"\"\"\n    try:\n        # Check if it's an infinite integral\n        if \"-oo\" in expression or \"oo\" in expression:\n            # Try symbolic computation\n            expr = eval(expression, globals(), locals_dict)\n\n            # If it's an integral object but not computed\n            if isinstance(expr, sp.Integral):\n                try:\n                    # Try to perform the integral\n                    result = expr.doit()\n\n                    # Try to compute numerical result\n                    try:\n                        numerical = result.evalf()\n                        return str(numerical)\n                    except:\n                        return str(result)\n                except Exception as e:\n                    # If symbolic integration fails, try alternative methods\n                    try:\n                        # Extract integral expression information\n                        match = re.search(r\"integrate\\((.*?), \\((.*?), (.*?), (.*?)\\)\\)\", expression)\n                        if match:\n                            integrand, var, lower, upper = match.groups()\n\n                            # For infinite integrals, use finite approximation\n                            if (lower == \"-oo\" or lower == \"oo\") or (upper == \"oo\" or upper == \"-oo\"):\n                                # Replace infinity with a large value\n                                if lower == \"-oo\":\n                                    lower = \"-100\"\n                                elif lower == \"oo\":\n                                    lower = \"100\"\n\n                                if upper == \"-oo\":\n                                    upper = \"-100\"\n                                elif upper == \"oo\":\n                                    upper = \"100\"\n\n                                # Build finite range integral expression\n                                finite_expr = f\"integrate({integrand}, ({var}, {lower}, {upper}))\"\n                                result = eval(finite_expr, globals(), locals_dict)\n\n                                try:\n                                    numerical = result.evalf()\n                                    return f\"Approximate numerical result: {numerical} (using finite range integral)\"\n                                except:\n                                    return f\"Approximate result: {result} (using finite range integral)\"\n                    except Exception as e2:\n                        return f\"Integration error: {e}, finite approximation failed: {e2}\"\n\n            # Try to compute result directly\n            try:\n                numerical = expr.evalf()\n                return str(numerical)\n            except:\n                return str(expr)\n\n        # Regular integral\n        result = eval(expression, globals(), locals_dict)\n        return format_result(result)\n\n    except Exception as e:\n        return f\"Integration error: {e}\"\n\n\n\n# Dependency: format_result (from /Users/xue/workspace/mcp_project/mcp_server_repos/mcp_calculate_server/server.py)\ndef format_result(result):\n    \"\"\"Format output based on result type\"\"\"\n    try:\n        # Handle dictionary type results (e.g., eigenvalues)\n        if isinstance(result, dict):\n            formatted = \"{\"\n            for key, value in result.items():\n                # Try numerical computation\n                try:\n                    key_eval = key.evalf()\n                except:\n                    key_eval = key\n\n                formatted += f\"{key_eval}: {value}, \"\n\n            if formatted.endswith(\", \"):\n                formatted = formatted[:-2]\n\n            formatted += \"}\"\n            return formatted\n\n        # Handle list type results (e.g., solutions to equations)\n        elif isinstance(result, list):\n            formatted = \"[\"\n            for item in result:\n                # Check if it's a tuple (e.g., coordinate points)\n                if isinstance(item, tuple):\n                    coords = []\n                    for val in item:\n                        # Try numerical computation\n                        try:\n                            val_eval = val.evalf()\n                            coords.append(str(val_eval))\n                        except:\n                            coords.append(str(val))\n\n                    formatted += \"(\" + \", \".join(coords) + \"), \"\n                else:\n                    # Try numerical computation\n                    try:\n                        item_eval = item.evalf()\n                        formatted += f\"{item_eval}, \"\n                    except:\n                        formatted += f\"{item}, \"\n\n            if formatted.endswith(\", \"):\n                formatted = formatted[:-2]\n\n            formatted += \"]\"\n            return formatted\n\n        # Other types of results\n        else:\n            # Try numerical computation\n            try:\n                return str(result.evalf())\n            except:\n                return str(result)\n\n    except Exception as e:\n        return f\"Result formatting error: {e}, original result: {result}\"\n\n\n\n# Dependency: handle_equation_solving (from /Users/xue/workspace/mcp_project/mcp_server_repos/mcp_calculate_server/server.py)\ndef handle_equation_solving(expression, locals_dict):\n    \"\"\"Handle system of equations solving expressions\"\"\"\n    try:\n        # Compute result\n        result = eval(expression, globals(), locals_dict)\n\n        # Format result\n        return format_result(result)\n\n    except Exception as e:\n        return f\"Equation solving error: {e}\"\n\n\n\n# Dependency: format_result (from /Users/xue/workspace/mcp_project/mcp_server_repos/mcp_calculate_server/server.py)\ndef format_result(result):\n    \"\"\"Format output based on result type\"\"\"\n    try:\n        # Handle dictionary type results (e.g., eigenvalues)\n        if isinstance(result, dict):\n            formatted = \"{\"\n            for key, value in result.items():\n                # Try numerical computation\n                try:\n                    key_eval = key.evalf()\n                except:\n                    key_eval = key\n\n                formatted += f\"{key_eval}: {value}, \"\n\n            if formatted.endswith(\", \"):\n                formatted = formatted[:-2]\n\n            formatted += \"}\"\n            return formatted\n\n        # Handle list type results (e.g., solutions to equations)\n        elif isinstance(result, list):\n            formatted = \"[\"\n            for item in result:\n                # Check if it's a tuple (e.g., coordinate points)\n                if isinstance(item, tuple):\n                    coords = []\n                    for val in item:\n                        # Try numerical computation\n                        try:\n                            val_eval = val.evalf()\n                            coords.append(str(val_eval))\n                        except:\n                            coords.append(str(val))\n\n                    formatted += \"(\" + \", \".join(coords) + \"), \"\n                else:\n                    # Try numerical computation\n                    try:\n                        item_eval = item.evalf()\n                        formatted += f\"{item_eval}, \"\n                    except:\n                        formatted += f\"{item}, \"\n\n            if formatted.endswith(\", \"):\n                formatted = formatted[:-2]\n\n            formatted += \"]\"\n            return formatted\n\n        # Other types of results\n        else:\n            # Try numerical computation\n            try:\n                return str(result.evalf())\n            except:\n                return str(result)\n\n    except Exception as e:\n        return f\"Result formatting error: {e}, original result: {result}\"\n\n\n\n# Dependency: handle_matrix_eigenvalues (from /Users/xue/workspace/mcp_project/mcp_server_repos/mcp_calculate_server/server.py)\ndef handle_matrix_eigenvalues(expression, locals_dict):\n    \"\"\"Handle matrix eigenvalue calculation expressions\"\"\"\n    try:\n        # Extract matrix expression\n        matrix_expr = expression.split(\".eigen\")[0]\n        operation = \"eigenvals\" if \"eigenvals\" in expression else \"eigenvects\"\n\n        # Compute matrix\n        matrix = eval(matrix_expr, globals(), locals_dict)\n\n        # Compute eigenvalues or eigenvectors\n        if operation == \"eigenvals\":\n            result = matrix.eigenvals()\n        else:\n            result = matrix.eigenvects()\n\n        # Format result\n        return format_result(result)\n\n    except Exception as e:\n        return f\"Matrix eigenvalue calculation error: {e}\"\n\n\n\n# Dependency: format_result (from /Users/xue/workspace/mcp_project/mcp_server_repos/mcp_calculate_server/server.py)\ndef format_result(result):\n    \"\"\"Format output based on result type\"\"\"\n    try:\n        # Handle dictionary type results (e.g., eigenvalues)\n        if isinstance(result, dict):\n            formatted = \"{\"\n            for key, value in result.items():\n                # Try numerical computation\n                try:\n                    key_eval = key.evalf()\n                except:\n                    key_eval = key\n\n                formatted += f\"{key_eval}: {value}, \"\n\n            if formatted.endswith(\", \"):\n                formatted = formatted[:-2]\n\n            formatted += \"}\"\n            return formatted\n\n        # Handle list type results (e.g., solutions to equations)\n        elif isinstance(result, list):\n            formatted = \"[\"\n            for item in result:\n                # Check if it's a tuple (e.g., coordinate points)\n                if isinstance(item, tuple):\n                    coords = []\n                    for val in item:\n                        # Try numerical computation\n                        try:\n                            val_eval = val.evalf()\n                            coords.append(str(val_eval))\n                        except:\n                            coords.append(str(val))\n\n                    formatted += \"(\" + \", \".join(coords) + \"), \"\n                else:\n                    # Try numerical computation\n                    try:\n                        item_eval = item.evalf()\n                        formatted += f\"{item_eval}, \"\n                    except:\n                        formatted += f\"{item}, \"\n\n            if formatted.endswith(\", \"):\n                formatted = formatted[:-2]\n\n            formatted += \"]\"\n            return formatted\n\n        # Other types of results\n        else:\n            # Try numerical computation\n            try:\n                return str(result.evalf())\n            except:\n                return str(result)\n\n    except Exception as e:\n        return f\"Result formatting error: {e}, original result: {result}\"",
+    "input_schema": {
+      "properties": {
+        "expression": {
+          "title": "Expression",
+          "type": "string"
+        }
+      },
+      "required": [
+        "expression"
+      ],
+      "title": "calculate_expressionArguments",
+      "type": "object"
+    },
+    "annotations": null
+  }
+]
