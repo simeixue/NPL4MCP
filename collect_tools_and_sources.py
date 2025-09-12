@@ -239,9 +239,12 @@ def py_extract_from_root(root: str) -> Dict[str, str]:
     return out
 
 
+# ================= TS/JS 递归提取（同文件 + 跨文件） =================
+import os, re
+from typing import Dict, List, Optional, Set, Tuple
 
+MAX_JS_DEPTH = 64
 
-# ================= TS/JS 源码提取 =================
 def read_text(path: str) -> str:
     try:
         with open(path, "r", encoding="utf-8") as f:
@@ -291,225 +294,328 @@ def _split_top_args(s: str) -> List[str]:
     depth = {"(": 0, "{": 0, "[": 0}
     in_s, quote, in_sl, in_ml = False, "", False, False
     i, L = 0, len(s)
-
     while i < L:
         c = s[i]
-        p = s[i - 1] if i > 0 else ""
-
-        # 注释处理
+        p = s[i-1] if i > 0 else ""
         if not in_s:
-            if not in_ml and not in_sl and c == "/" and i + 1 < L and s[i + 1] == "/":
+            if not in_ml and not in_sl and c == "/" and i+1 < L and s[i+1] == "/":
                 in_sl = True; i += 2; continue
-            if not in_ml and not in_sl and c == "/" and i + 1 < L and s[i + 1] == "*":
+            if not in_ml and not in_sl and c == "/" and i+1 < L and s[i+1] == "*":
                 in_ml = True; i += 2; continue
-            if in_sl and c in "\r\n":
-                in_sl = False
-            if in_ml and c == "*" and i + 1 < L and s[i + 1] == "/":
+            if in_sl and c in "\r\n": in_sl = False
+            if in_ml and c == "*" and i+1 < L and s[i+1] == "/":
                 in_ml = False; i += 2; continue
-            if in_sl or in_ml:
-                i += 1; continue
-
-        # 字符串/模板字面量
+            if in_sl or in_ml: i += 1; continue
         if not in_s and c in ("'", '"', "`"):
             in_s, quote = True, c; i += 1; continue
         if in_s:
-            if quote == "`" and c == "$" and i + 1 < L and s[i + 1] == "{":
-                j = _match_balanced(s, i + 1, "{", "}")
+            if quote == "`" and c == "$" and i+1 < L and s[i+1] == "{":
+                j = _match_balanced(s, i+1, "{", "}")
                 if j < 0: return parts
                 i = j + 1; continue
             if c == quote and p != "\\":
                 in_s, quote = False, ""
             i += 1; continue
-
-        # 括号深度
-        if c in "({[":
-            depth[c] += 1
+        if c in "({[": depth[c] += 1
         elif c in ")}]":
-            opener = {")": "(", "}": "{", "]": "["}[c]
+            opener = {")":"(", "}":"{", "]":"["}[c]
             depth[opener] -= 1
-
-        # 顶层逗号分割
         if c == "," and all(v == 0 for v in depth.values()):
-            parts.append(s[last:i].trim() if hasattr(str, "trim") else s[last:i].strip())
-            last = i + 1
-
+            parts.append(s[last:i].strip()); last = i + 1
         i += 1
-
     tail = s[last:].strip()
-    if tail:
-        parts.append(tail)
+    if tail: parts.append(tail)
     return parts
-
 
 def _is_inline_func(arg: str) -> bool:
     a = arg.strip()
     return a.startswith("function") or "=>" in a
 
 def _slice_func(text: str, start: int) -> Optional[str]:
-    """
-    从 start 指向的内联函数起点（可能是 'async (' 或 'function'）切出完整实现。
-    关键点：总是先定位 '=>’，避免把参数解构的 '{ }' 当成函数体。
-    """
-    # 先找箭头。如果存在，按箭头函数处理。
     arrow_idx = text.find("=>", start)
     if arrow_idx >= 0:
         j = arrow_idx + 2
-        # 跳过空白
-        while j < len(text) and text[j].isspace():
-            j += 1
-        # 块体：'=> { ... }'
+        while j < len(text) and text[j].isspace(): j += 1
         if j < len(text) and text[j] == "{":
             end = _match_balanced(text, j, "{", "}")
-            return text[start:end + 1] if end >= 0 else None
-        # 表达式体：'=> expr'，取到分号或换行
+            return text[start:end+1] if end >= 0 else None
         m = re.search(r'[;\n]', text[j:])
         k = j + (m.start() if m else len(text) - j)
         return text[start:k]
-
-    # 否则按 'function (...) { ... }' 处理：从第一个 '{' 起做配对
     brace_idx = text.find("{", start)
     if brace_idx >= 0:
         end = _match_balanced(text, brace_idx, "{", "}")
-        return text[start:end + 1] if end >= 0 else None
+        return text[start:end+1] if end >= 0 else None
     return None
 
+# ---------- JS/TS 仓库索引 ----------
+def _is_js(path: str) -> bool:
+    return path.endswith((".js", ".ts", ".mjs", ".cjs")) and not os.path.basename(path).startswith(".")
 
-def _find_named_func(text: str, ident: str) -> Optional[str]:
-    for pat in [
-        rf'\bfunction\s+{re.escape(ident)}\s*\(',
-        rf'\b(?:export\s+)?(?:const|let|var)\s+{re.escape(ident)}\s*='
-    ]:
-        m = re.search(pat, text)
-        if m:
-            return _slice_func(text, m.start())
+def _module_path_from_import(import_str: str, cur_file: str, repo_root: str) -> Optional[str]:
+    """
+    解析 import 源，支持:
+      import x from './a/b'
+      import {y} from '../c'
+      const m = require('./d')
+    仅解析相对路径到 repo 内部文件；忽略包名。
+    """
+    src = import_str.strip().strip('"\'')
+    if src.startswith("."):
+        base = os.path.dirname(cur_file)
+        cand = os.path.normpath(os.path.join(base, src))
+        # 加扩展或目录索引
+        for ext in (".ts",".js",".mjs",".cjs"):
+            if os.path.isfile(cand+ext): return cand+ext
+        for idx in ("index.ts","index.js","index.mjs","index.cjs"):
+            if os.path.isfile(os.path.join(cand, idx)): return os.path.join(cand, idx)
     return None
 
-def js_extract_from_file(path: str) -> Dict[str, str]:
+def _collect_named_functions(text: str) -> Dict[str, Tuple[int,int]]:
     """
-    1) 提取 server.tool("name", [,schema], handler) 的实现
-    2) 提取分发器：switch (request.params.name) { case "xxx": return handleXxx(...); }
-       中 case 对应的实现（= 命名函数 handleXxx 的源码）
+    返回 {funcName: (start_idx, end_idx_inclusive)}
+    支持:
+      function foo(...) { ... }
+      async function foo(...) { ... }
+      const foo = (...) => { ... }
+      export const foo = ... => { ... }
     """
-    text = read_text(path)
-    out: Dict[str, str] = {}
+    res: Dict[str, Tuple[int,int]] = {}
 
-    # ---- 小工具：从 pos 起切出 { ... } 块 ----
-    def slice_block_from_pos(pos: int) -> Optional[str]:
-        if pos < 0 or pos >= len(text):
-            return None
-        brace = text.find("{", pos)
-        if brace < 0:
-            return None
-        end = _match_balanced(text, brace, "{", "}")
-        return text[pos:end + 1] if end >= 0 else None
-
-    # ---- 1) 先建“函数库”：命名函数与箭头函数 ----
-    func_src: Dict[str, str] = {}
-
-    # async function foo(...) { ... } / function foo(...) { ... }
     for m in re.finditer(r'\b(?:async\s+)?function\s+([A-Za-z_$][\w$]*)\s*\(', text):
         name = m.group(1)
-        body = slice_block_from_pos(m.start())
-        if body and name not in func_src:
-            func_src[name] = body.strip()
+        body = _slice_func(text, m.start())
+        if body:
+            res[name] = (m.start(), m.start() + len(body))
 
-    # export const|let|var foo = (...) => { ... }
-    for m in re.finditer(
-        r'\b(?:export\s+)?(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*(?:async\s+)?\([^)]*\)\s*=>',
-        text, re.S
-    ):
+    for m in re.finditer(r'\b(?:export\s+)?(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*(?:async\s+)?\([^)]*\)\s*=>', text, re.S):
         name = m.group(1)
-        body = slice_block_from_pos(m.start())
-        if body and name not in func_src:
-            func_src[name] = body.strip()
+        body = _slice_func(text, m.start())
+        if body:
+            res[name] = (m.start(), m.start() + len(body))
 
-    # ---- 2) 直接 server.tool(...) ----
+    return res
+
+def build_js_repo_index(repo_root: str):
+    """
+    返回:
+      file_text: {file_path: text}
+      file_funcs: {file_path: {func_name: (start,end)}}
+      import_graph: {file_path: {alias_or_spec: imported_file_path}}
+    """
+    file_text: Dict[str, str] = {}
+    file_funcs: Dict[str, Dict[str, Tuple[int,int]]] = {}
+    import_graph: Dict[str, Dict[str, str]] = {}
+
+    for dirpath, _, filenames in os.walk(repo_root):
+        for fn in filenames:
+            path = os.path.join(dirpath, fn)
+            if not _is_js(path):
+                continue
+            text = read_text(path)
+            file_text[path] = text
+            file_funcs[path] = _collect_named_functions(text)
+
+            imap: Dict[str, str] = {}
+            # ES imports
+            for m in re.finditer(r'^\s*import\s+([^;]+?)\s+from\s+([\'"][^\'"]+[\'"]);?', text, re.M):
+                spec, src = m.group(1), m.group(2)
+                target = _module_path_from_import(src, path, repo_root)
+                if not target: continue
+                # import foo from './x'
+                mdef = re.match(r'^\s*([A-Za-z_$][\w$]*)\s*(,|\s*$)', spec.strip())
+                if mdef:
+                    imap[mdef.group(1)] = target
+                # import * as ns from './x'
+                mns = re.search(r'\*\s+as\s+([A-Za-z_$][\w$]*)', spec)
+                if mns:
+                    imap[mns.group(1)] = target
+                # import {a as b, c} from ...
+                for ms in re.finditer(r'([A-Za-z_$][\w$]*)(?:\s+as\s+([A-Za-z_$][\w$]*))?', spec):
+                    orig, alias = ms.group(1), ms.group(2) or ms.group(1)
+                    # 排除前面的默认和 namespace 已处理位置可能重复
+                    imap[alias] = target
+            # CommonJS require
+            for m in re.finditer(r'^\s*(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*require\(\s*([\'"][^\'"]+[\'"])\s*\)', text, re.M):
+                alias, src = m.group(1), m.group(2)
+                target = _module_path_from_import(src, path, repo_root)
+                if target:
+                    imap[alias] = target
+
+            import_graph[path] = imap
+
+    return file_text, file_funcs, import_graph
+
+def _text_slice(text: str, span: Tuple[int,int]) -> str:
+    s, e = span
+    return text[s:e]
+
+def _find_calls_simple(body: str) -> Set[Tuple[str, Optional[str]]]:
+    """
+    只识别两类调用：
+      1) foo(    -> ('foo', None)
+      2) mod.func(  -> ('func', 'mod')
+    避免把 obj.method 当作库函数，保守处理。
+    """
+    called: Set[Tuple[str, Optional[str]]] = set()
+    # mod.func(
+    for m in re.finditer(r'\b([A-Za-z_$][\w$]*)\s*\.\s*([A-Za-z_$][\w$]*)\s*\(', body):
+        called.add((m.group(2), m.group(1)))
+    # foo(
+    for m in re.finditer(r'(?<!\.)\b([A-Za-z_$][\w$]*)\s*\(', body):
+        called.add((m.group(1), None))
+    # 排除常见内置/关键词
+    blacklist = {'if','for','while','switch','return','function','async','await','catch','then','map','filter','reduce','forEach','push','pop','slice','splice','JSON','parse','stringify','log','error'}
+    called = {(f,mod) for (f,mod) in called if f not in blacklist}
+    return called
+
+def _expand_js_function(repo_root: str,
+                        entry_file: str,
+                        file_text: Dict[str,str],
+                        file_funcs: Dict[str, Dict[str,Tuple[int,int]]],
+                        import_graph: Dict[str, Dict[str,str]],
+                        fname: str,
+                        visited: Set[Tuple[str,str]],
+                        depth: int = 0) -> str:
+    key = (entry_file, fname)
+    if key in visited:
+        return f"// [Cyclic dependency detected: {fname} in {entry_file}]"
+    if depth > MAX_JS_DEPTH:
+        return f"// [Max expansion depth reached at {fname}]"
+
+    funcs = file_funcs.get(entry_file, {})
+    if fname not in funcs:
+        return f"// [Function {fname} not found in {entry_file}]"
+    text = file_text.get(entry_file, "")
+    span = funcs[fname]
+    src = _text_slice(text, span).strip()
+
+    visited.add(key)
+    parts = [src]
+
+    body = src  # 粗略用全文片段查调用
+    calls = _find_calls_simple(body)
+
+    for callee, mod in sorted(calls):
+        target_file = None
+        if mod:
+            # 仅当 mod 是 import 别名才追
+            target_file = import_graph.get(entry_file, {}).get(mod)
+        else:
+            # 无模块前缀时，先在本文件找
+            if callee in funcs:
+                target_file = entry_file
+            else:
+                target_file = None  # 不做全局唯一名匹配，避免误报
+
+        if target_file and callee in file_funcs.get(target_file, {}):
+            dep = _expand_js_function(repo_root, target_file, file_text, file_funcs, import_graph, callee, visited, depth+1)
+            if dep:
+                parts.append(f"\n\n// Dependency: {callee} (from {target_file})\n{dep}")
+
+    visited.remove(key)
+    return "\n\n".join(parts)
+
+# ---------- 入口提取 ----------
+def _extract_server_tool_calls(text: str) -> Dict[str, str]:
+    out: Dict[str, str] = {}
     i = 0
     while True:
         start = text.find("server.tool(", i)
-        if start < 0:
-            break
+        if start < 0: break
         paren_open = start + len("server.tool")
         end = _match_balanced(text, paren_open, "(", ")")
         if end < 0:
             i = start + 1
             continue
-
-        args_text = text[paren_open + 1:end]
+        args_text = text[paren_open+1:end]
         args = _split_top_args(args_text)
         if len(args) >= 2:
             m_name = re.match(r"""['"]([^'"]+)['"]""", args[0].strip())
             if m_name:
-                tool_name = m_name.group(1)
+                tool = m_name.group(1)
                 handler_arg = args[-1].strip()
-                impl = None
                 if _is_inline_func(handler_arg):
-                    seg = text[paren_open + 1:end]
+                    seg = text[paren_open+1:end]
                     mm = re.search(r'(?:async\s+)?\([^)]*\)\s*=>\s*\{|(?:async\s+)?function\s*\([^)]*\)\s*\{', seg, re.S)
                     if mm:
-                        pos = (paren_open + 1) + mm.start()
+                        pos = (paren_open+1)+mm.start()
                         impl = _slice_func(text, pos)
+                    else:
+                        impl = None
                 else:
-                    ident_m = re.match(r'([A-Za-z_$][\w$]*)', handler_arg)
-                    if ident_m:
-                        impl = func_src.get(ident_m.group(1))
+                    m_ident = re.match(r'([A-Za-z_$][\w$]*)', handler_arg)
+                    impl = (tool, m_ident.group(1)) if m_ident else None  # 返回占位，后续用命名函数展开
                 if impl:
-                    out[tool_name] = impl.strip()
-
+                    out[tool] = impl
         i = end + 1
+    return out  # 值可能是字符串(内联源码) 或 元组(tool, handlerName)
 
-    # ---- 3) 分发器：switch (request.params.name) ----
-    # 找所有 switch(request.params.name){...} 体
+def _extract_switch_handlers(text: str) -> Dict[str, str]:
+    out: Dict[str, str] = {}
     for sw in re.finditer(r'switch\s*\(\s*request\.params\.name\s*\)\s*\{', text):
-        sw_open = sw.end() - 1
+        sw_open = sw.end()-1
         sw_close = _match_balanced(text, sw_open, "{", "}")
-        if sw_close < 0:
-            continue
-        body = text[sw_open + 1: sw_close]
-
-        # 遍历每个 case "tool_name":
+        if sw_close < 0: continue
+        body = text[sw_open+1:sw_close]
         for cm in re.finditer(r'case\s+["\']([^"\']+)["\']\s*:\s*', body):
-            tool_name = cm.group(1)
-            # 限定在该 case 到下一个 case/default 之间的片段内找 return handler(...)
+            tool = cm.group(1)
             seg_start = cm.end()
             next_m = re.search(r'\bcase\s+["\']|default\s*:', body[seg_start:])
             seg_end = seg_start + (next_m.start() if next_m else len(body[seg_start:]))
             segment = body[seg_start:seg_end]
-
-            impl = None
-            # return await foo(...); 或 return foo(...);
             call = re.search(r'\breturn\s+(?:await\s+)?([A-Za-z_$][\w$]*)\s*\(', segment)
             if call:
-                ident = call.group(1)
-                impl = func_src.get(ident)
+                out[tool] = ("_BY_NAME_", call.group(1))
+    return out  # 值为 ("_BY_NAME_", handlerName)
 
-            # 若没 return 调用，尝试 case 内联函数（少见）
-            if not impl:
-                inline = re.search(r'(?:async\s+)?\([^)]*\)\s*=>\s*\{|(?:async\s+)?function\s*\([^)]*\)\s*\{', segment)
-                if inline:
-                    # 回到全文定位再切片
-                    seg_global = text.find(segment, sw_open + 1)
-                    if seg_global >= 0:
-                        impl = _slice_func(text, seg_global + inline.start())
+def js_extract_from_file_with_repo(path: str, repo_root: str,
+                                   file_text: Dict[str,str],
+                                   file_funcs: Dict[str, Dict[str,Tuple[int,int]]],
+                                   import_graph: Dict[str, Dict[str,str]]) -> Dict[str, str]:
+    text = file_text.get(path) or read_text(path)
+    out: Dict[str, str] = {}
 
-            if impl and tool_name not in out:
-                out[tool_name] = impl.strip()
+    # 1) server.tool(...)
+    tools = _extract_server_tool_calls(text)
+    for tool, impl in tools.items():
+        if isinstance(impl, str):
+            # 内联函数，直接作为入口，再递归把子函数加进来（从当前文件名函数无法命名，递归不到）
+            out[tool] = impl.strip()
+        else:
+            # 命名处理器
+            _tag, handler = impl
+            if handler in file_funcs.get(path, {}):
+                code = _expand_js_function(repo_root, path, file_text, file_funcs, import_graph, handler, set(), 0)
+                out[tool] = code.strip()
+
+    # 2) 分发器 switch(request.params.name)
+    sw = _extract_switch_handlers(text)
+    for tool, tpl in sw.items():
+        _tag, handler = tpl
+        # 在当前文件或通过 import 的模块中寻找 handler
+        code = None
+        if handler in file_funcs.get(path, {}):
+            code = _expand_js_function(repo_root, path, file_text, file_funcs, import_graph, handler, set(), 0)
+        else:
+            # 尝试在 import 的别名模块里找同名函数
+            for alias, tfile in import_graph.get(path, {}).items():
+                if handler in file_funcs.get(tfile, {}):
+                    code = _expand_js_function(repo_root, tfile, file_text, file_funcs, import_graph, handler, set(), 0)
+                    break
+        if code:
+            out.setdefault(tool, code.strip())
 
     return out
 
-
-
-
 def js_extract_from_root(root: str) -> Dict[str, str]:
+    file_text, file_funcs, import_graph = build_js_repo_index(root)
     out: Dict[str, str] = {}
-    for dirpath, _, filenames in os.walk(root):
-        for fn in filenames:
-            if fn.endswith((".js", ".ts", ".mjs", ".cjs")):
-                path = os.path.join(dirpath, fn)
-                tools = js_extract_from_file(path)
-                if tools and DEBUG:
-                    dprint(f"[JS/TS] {path} -> {list(tools.keys())}")
-                out.update(tools)
+    for f in list(file_text.keys()):
+        tools = js_extract_from_file_with_repo(f, root, file_text, file_funcs, import_graph)
+        if tools and DEBUG:
+            dprint(f"[JS/TS] {f} -> {list(tools.keys())}")
+        out.update(tools)
     return out
 
 # ================= 索引并汇总 =================

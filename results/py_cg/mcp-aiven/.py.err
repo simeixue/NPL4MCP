@@ -1,0 +1,13 @@
+Code2Flow: Found 4 files from sources argument.
+Code2Flow: Processing 4 source file(s).
+Code2Flow:   /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-aiven/mcp_aiven/main.py
+Code2Flow:   /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-aiven/mcp_aiven/mcp_env.py
+Code2Flow:   /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-aiven/mcp_aiven/mcp_server.py
+Code2Flow:   /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-aiven/tests/test_example.py
+Code2Flow: Found groups ['File: main', 'File: mcp_env', 'Class: AivenConfig', 'File: mcp_server', 'File: test_example'].
+Code2Flow: Found nodes ['(global)', '(global)', '(global)', '(global)', 'AivenConfig.__init__', 'AivenConfig._validate_required_vars', 'AivenConfig.get_client_config', 'AivenConfig.token', 'AivenConfig.url', 'get_service_details', 'list_projects', 'list_services', 'main', 'test_example'].
+Code2Flow: Found calls ['AivenConfig()', 'FastMCP()', 'UNKNOWN_VAR.join()', 'ValueError()', 'aiven_client.get_projects()', 'aiven_client.get_service()', 'aiven_client.get_services()', 'aiven_client.set_auth_token()', 'client.AivenClient()', 'len()', 'load_dotenv()', 'logger.info()', 'logging.basicConfig()', 'logging.getLogger()', 'main()', 'mcp.run()', 'missing_vars.append()', 'os.getenv()', 'self._validate_required_vars()'].
+Code2Flow: Found variables ['FastMCP->UNKNOWN_MODULE', 'aiven_client-><Call owner_token=client token=AivenClient>', 'client->UNKNOWN_MODULE', 'config->AivenConfig', 'config->UNKNOWN_MODULE', 'dataclass->UNKNOWN_MODULE', 'load_dotenv->UNKNOWN_MODULE', 'logger-><Call owner_token=logging token=getLogger>', 'logging->UNKNOWN_MODULE', 'mcp-><Call owner_token=None token=FastMCP>', 'mcp->UNKNOWN_MODULE', 'os->UNKNOWN_MODULE', 'result-><Call owner_token=aiven_client token=get_service>', 'results-><Call owner_token=aiven_client token=get_projects>', 'results-><Call owner_token=aiven_client token=get_services>', 'self->AivenConfig'].
+Code2Flow: Generating output file...
+Code2Flow: Wrote output file '/Users/xue/workspace/mcp_project/NPL4MCP/results/py_cg/mcp-aiven/cg_py.json' with 5 nodes and 3 edges.
+Code2Flow: Code2flow finished processing in 0.00 seconds.
