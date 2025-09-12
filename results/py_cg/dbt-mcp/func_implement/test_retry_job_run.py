@@ -1,0 +1,18 @@
+# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/dbt-mcp/tests/unit/dbt_admin/test_client.py
+# module: tests.unit.dbt_admin.test_client
+# qname: tests.unit.dbt_admin.test_client.test_retry_job_run
+# lines: 355-368
+def test_retry_job_run(mock_request, client):
+    mock_response = Mock()
+    mock_response.json.return_value = {"data": {"id": 101, "status": "queued"}}
+    mock_response.raise_for_status.return_value = None
+    mock_request.return_value = mock_response
+
+    result = client.retry_job_run(12345, 100)
+
+    assert result == {"id": 101, "status": "queued"}
+    mock_request.assert_called_once_with(
+        "POST",
+        "https://cloud.getdbt.com/api/v2/accounts/12345/runs/100/retry/",
+        headers=client.headers,
+    )

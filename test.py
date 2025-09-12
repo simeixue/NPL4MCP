@@ -4,6 +4,8 @@ from fastmcp.tools import FunctionTool
 import inspect
 import asyncio
 from utils.file_util import FileUtil
+# 根目录
+REPO_BASE = "/Users/xue/workspace/mcp_project/mcp_server_pyrepos"
 
 # 工具对象序列化函数
 def serialize_tool(tool):
@@ -27,10 +29,27 @@ def serialize_tool(tool):
 
 config = {
     "mcpServers": {
-        "windows-cmd": {
-            "command": "node",
-            "args": ["/path/to/dist/index.js"]
+        "mcp-aiven": {
+            "command": "uv",
+            "args": [
+                "--directory",
+                f"{REPO_BASE}/mcp-aiven",
+                "run",
+                "--with-editable",
+                f"{REPO_BASE}/mcp-aiven",
+                "--python",
+                "3.13",
+                "mcp-aiven"
+            ],
+            "env": {
+                "AIVEN_BASE_URL": "https://api.aiven.io",
+                "AIVEN_TOKEN": "$AIVEN_TOKEN"
+            }
         },
+        # "windows-cmd": {
+        #     "command": "node",
+        #     "args": ["/path/to/dist/index.js"]
+        # },
         # "time": {
         #     "command": "uvx",
         #     "args": [
@@ -38,40 +57,40 @@ config = {
         #         "--local-timezone=America/New_York"
         #     ]
         # },
-        "amap-maps": {
-            "command": "npx",
-            "args": [
-                "-y",
-                "@amap/amap-maps-mcp-server"
-            ],
-            "env": {
-                "AMAP_MAPS_API_KEY": "c0b4b756aa82fdee14537edd073fc99f"
-            }
-        },
+        # "amap-maps": {
+        #     "command": "npx",
+        #     "args": [
+        #         "-y",
+        #         "@amap/amap-maps-mcp-server"
+        #     ],
+        #     "env": {
+        #         "AMAP_MAPS_API_KEY": "c0b4b756aa82fdee14537edd073fc99f"
+        #     }
+        # },
         
 
 
-        "weather": {
-            "command": "uv",
-            "args": [
-                "--directory",
-                "/Users/xue/workspace/mcp_project/weather",
-                "run",
-                "weather.py"
-            ]
-        },
-        "mcp-sequentialthinking-tools": {
-			"command": "npx",
-			"args": ["-y", "mcp-sequentialthinking-tools"]
-		},
-        "windows-cli": { #javascript
-            "command": "npx",
-            "args": ["-y", "@simonb97/server-win-cli"]
-        },
-        "Wikipedia": { #javascript
-            "command": "npx",
-            "args": ["-y", "wikipedia-mcp"]
-        },
+        # "weather": {
+        #     "command": "uv",
+        #     "args": [
+        #         "--directory",
+        #         "/Users/xue/workspace/mcp_project/weather",
+        #         "run",
+        #         "weather.py"
+        #     ]
+        # },
+        # "mcp-sequentialthinking-tools": {
+		# 	"command": "npx",
+		# 	"args": ["-y", "mcp-sequentialthinking-tools"]
+		# },
+        # "windows-cli": { #javascript
+        #     "command": "npx",
+        #     "args": ["-y", "@simonb97/server-win-cli"]
+        # },
+        # "Wikipedia": { #javascript
+        #     "command": "npx",
+        #     "args": ["-y", "wikipedia-mcp"]
+        # },
         # "calculate_expression1": {
         #     # "isActive": false,
         #     "command": "uv",

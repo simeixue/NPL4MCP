@@ -1,0 +1,940 @@
+[
+  {
+    "name": "mcp-aiven_list_projects",
+    "description": "",
+    "implementation": null,
+    "input_schema": {
+      "properties": {},
+      "title": "list_projectsArguments",
+      "type": "object"
+    },
+    "annotations": null
+  },
+  {
+    "name": "mcp-aiven_list_services",
+    "description": "",
+    "implementation": null,
+    "input_schema": {
+      "properties": {
+        "project_name": {
+          "title": "project_name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "project_name"
+      ],
+      "title": "list_servicesArguments",
+      "type": "object"
+    },
+    "annotations": null
+  },
+  {
+    "name": "mcp-aiven_get_service_details",
+    "description": "",
+    "implementation": null,
+    "input_schema": {
+      "properties": {
+        "project_name": {
+          "title": "project_name",
+          "type": "string"
+        },
+        "service_name": {
+          "title": "service_name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "project_name",
+        "service_name"
+      ],
+      "title": "get_service_detailsArguments",
+      "type": "object"
+    },
+    "annotations": null
+  },
+  {
+    "name": "chronulus-mcp_create_chronulus_session",
+    "description": "\nA tool that creates a new Chronulus Session and returns a session_id\n\nWhen to use this tool:\n- Use this tool when a user has requested a forecast or prediction for a new use case\n- Before calling this tool make sure you have enough information to write a well-defined situation and task. You might\nneed to ask clarifying questions in order to get this from the user.\n- The same session_id can be reused as long as the situation and task remain the same\n- If user wants to forecast a different use case, create a new session and then use that\n\nHow to use this tool:\n- To create a session, you need to provide a situation and task that describe the forecasting use case \n- If the user has not provided enough detail for you to decompose the use case into a \n    situation (broad or background context) and task (specific requirements for the forecast), \n    ask them to elaborate since more detail will result in a better / more accurate forecast.\n- Once created, this will generate a unique session_id that can be used to when calling other tools about this use case.\n",
+    "implementation": null,
+    "input_schema": {
+      "properties": {
+        "name": {
+          "description": "A short descriptive name for the use case defined in the session.",
+          "title": "Name",
+          "type": "string"
+        },
+        "situation": {
+          "description": "The broader context for the use case",
+          "title": "Situation",
+          "type": "string"
+        },
+        "task": {
+          "description": "Specific details on the forecasting or prediction task.",
+          "title": "Task",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "situation",
+        "task"
+      ],
+      "title": "create_chronulus_sessionArguments",
+      "type": "object"
+    },
+    "annotations": null
+  },
+  {
+    "name": "chronulus-mcp_create_forecasting_agent_and_get_forecast",
+    "description": "\nThis tool creates a NormalizedForecaster agent with your session and input data model and then provides a forecast input \ndata to the agent and returns the prediction data and text explanation from the agent.\n\nWhen to use this tool:\n- Use this tool to request a forecast from Chronulus\n- This tool is specifically made to forecast values between 0 and 1 and does not require historical data\n- The prediction can be thought of as seasonal weights, probabilities, or shares of something as in the decimal representation of a percent\n\nHow to use this tool:\n- First, make sure you have a session_id for the forecasting or prediction use case.\n- Next, think about the features / characteristics most suitable for producing the requested forecast and then \ncreate an input_data_model that corresponds to the input_data you will provide for the thing being forecasted.\n- Remember to pass all relevant information to Chronulus including text and images provided by the user. \n- If a user gives you files about a thing you are forecasting or predicting, you should pass these as inputs to the \nagent using one of the following types: \n    - ImageFromFile\n    - List[ImageFromFile]\n    - TextFromFile\n    - List[TextFromFile]\n    - PdfFromFile\n    - List[PdfFromFile]\n- If you have a large amount of text (over 500 words) to pass to the agent, you should use the Text or List[Text] field types\n- Finally, add information about the forecasting horizon and time scale requested by the user\n- Assume the dates and datetimes in the prediction results are already converted to the appropriate local timezone if location is a factor in the use case. So do not try to convert from UTC to local time when plotting.\n- When plotting the predictions, use a Rechart time series with the appropriate axes labeled and with the prediction explanation displayed as a caption below the plot\n",
+    "implementation": null,
+    "input_schema": {
+      "$defs": {
+        "InputField": {
+          "properties": {
+            "name": {
+              "description": "Field name. Should be a valid python variable name.",
+              "title": "Name",
+              "type": "string"
+            },
+            "description": {
+              "description": "A description of the value you will pass in the field.",
+              "title": "Description",
+              "type": "string"
+            },
+            "type": {
+              "default": "str",
+              "description": "The type of the field. \n        ImageFromFile takes a single named-argument, 'file_path' as input which should be absolute path to the image to be included. So you should provide this input as json, eg. {'file_path': '/path/to/image'}.\n        ",
+              "enum": [
+                "str",
+                "Text",
+                "List[Text]",
+                "TextFromFile",
+                "List[TextFromFile]",
+                "PdfFromFile",
+                "List[PdfFromFile]",
+                "ImageFromFile",
+                "List[ImageFromFile]"
+              ],
+              "title": "Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "description"
+          ],
+          "title": "InputField",
+          "type": "object"
+        }
+      },
+      "properties": {
+        "session_id": {
+          "description": "The session_id for the forecasting or prediction use case",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "input_data_model": {
+          "description": "Metadata on the fields you will include in the input_data.",
+          "items": {
+            "$ref": "#/$defs/InputField"
+          },
+          "title": "Input Data Model",
+          "type": "array"
+        },
+        "input_data": {
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            ]
+          },
+          "description": "The forecast inputs that you will pass to the chronulus agent to make the prediction. The keys of the dict should correspond to the InputField name you provided in input_fields.",
+          "title": "Input Data",
+          "type": "object"
+        },
+        "forecast_start_dt_str": {
+          "description": "The datetime str in '%Y-%m-%d %H:%M:%S' format of the first value in the forecast horizon.",
+          "title": "Forecast Start Dt Str",
+          "type": "string"
+        },
+        "time_scale": {
+          "default": "days",
+          "description": "The times scale of the forecast horizon. Valid time scales are 'hours', 'days', and 'weeks'.",
+          "title": "Time Scale",
+          "type": "string"
+        },
+        "horizon_len": {
+          "default": 60,
+          "description": "The integer length of the forecast horizon. Eg., 60 if a 60 day forecast was requested.",
+          "title": "Horizon Len",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "session_id",
+        "input_data_model",
+        "input_data",
+        "forecast_start_dt_str"
+      ],
+      "title": "create_forecasting_agent_and_get_forecastArguments",
+      "type": "object"
+    },
+    "annotations": null
+  },
+  {
+    "name": "chronulus-mcp_reuse_forecasting_agent_and_get_forecast",
+    "description": "\nThis tool creates a NormalizedForecaster agent with your session and input data model and then provides a forecast input \ndata to the agent and returns the prediction data and text explanation from the agent.\n\nWhen to use this tool:\n- Use this tool to request a forecast from Chronulus\n- This tool is specifically made to forecast values between 0 and 1 and does not require historical data\n- The prediction can be thought of as seasonal weights, probabilities, or shares of something as in the decimal representation of a percent\n\nHow to use this tool:\n- First, make sure you have a session_id for the forecasting or prediction use case.\n- Next, think about the features / characteristics most suitable for producing the requested forecast and then \ncreate an input_data_model that corresponds to the input_data you will provide for the thing being forecasted.\n- Remember to pass all relevant information to Chronulus including text and images provided by the user. \n- If a user gives you files about a thing you are forecasting or predicting, you should pass these as inputs to the \nagent using one of the following types: \n    - ImageFromFile\n    - List[ImageFromFile]\n    - TextFromFile\n    - List[TextFromFile]\n    - PdfFromFile\n    - List[PdfFromFile]\n- If you have a large amount of text (over 500 words) to pass to the agent, you should use the Text or List[Text] field types\n- Finally, add information about the forecasting horizon and time scale requested by the user\n- Assume the dates and datetimes in the prediction results are already converted to the appropriate local timezone if location is a factor in the use case. So do not try to convert from UTC to local time when plotting.\n- When plotting the predictions, use a Rechart time series with the appropriate axes labeled and with the prediction explanation displayed as a caption below the plot\n",
+    "implementation": null,
+    "input_schema": {
+      "properties": {
+        "agent_id": {
+          "description": "The agent_id for the forecasting or prediction use case and previously defined input_data_model",
+          "title": "Agent Id",
+          "type": "string"
+        },
+        "input_data": {
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            ]
+          },
+          "description": "The forecast inputs that you will pass to the chronulus agent to make the prediction. The keys of the dict should correspond to the InputField name you provided in input_fields.",
+          "title": "Input Data",
+          "type": "object"
+        },
+        "forecast_start_dt_str": {
+          "description": "The datetime str in '%Y-%m-%d %H:%M:%S' format of the first value in the forecast horizon.",
+          "title": "Forecast Start Dt Str",
+          "type": "string"
+        },
+        "time_scale": {
+          "default": "days",
+          "description": "The times scale of the forecast horizon. Valid time scales are 'hours', 'days', and 'weeks'.",
+          "title": "Time Scale",
+          "type": "string"
+        },
+        "horizon_len": {
+          "default": 60,
+          "description": "The integer length of the forecast horizon. Eg., 60 if a 60 day forecast was requested.",
+          "title": "Horizon Len",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "agent_id",
+        "input_data",
+        "forecast_start_dt_str"
+      ],
+      "title": "reuse_forecasting_agent_and_get_forecastArguments",
+      "type": "object"
+    },
+    "annotations": null
+  },
+  {
+    "name": "chronulus-mcp_rescale_forecast",
+    "description": "\nA tool that rescales the prediction data (values between 0 and 1) from the NormalizedForecaster agent to scale required for a use case\n\nWhen to use this tool:\n- Use this tool when there is enough information from the user or use cases to determine a reasonable min and max for the forecast predictions\n- Do not attempt to rescale or denormalize the predictions on your own without using this tool.\n- Also, if the best min and max for the use case is 0 and 1, then no rescaling is needed since that is already the scale of the predictions.\n- If a user requests to convert from probabilities to a unit in levels, be sure to caveat your use of this tool by noting that\n    probabilities do not always scale uniformly to levels. Rescaling can be used as a rough first-pass estimate. But for best results, \n    it would be better to start a new Chronulus forecasting use case predicting in levels from the start.\n    \nHow to use this tool:\n- To use this tool present prediction_id from the normalized prediction and the min and max as floats\n- If the user is also changing units, consider if the units will be inverted and set the inverse scale to True if needed.\n- When plotting the rescaled predictions, use a Rechart time series plot with the appropriate axes labeled and include the chronulus \n    prediction explanation as a caption below the plot. \n- If you would like to add additional notes about the scaled series, put these below the original prediction explanation. \n",
+    "implementation": null,
+    "input_schema": {
+      "properties": {
+        "prediction_id": {
+          "description": "The prediction_id from a prediction result",
+          "title": "Prediction Id",
+          "type": "string"
+        },
+        "y_min": {
+          "description": "The expected smallest value for the use case. E.g., for product sales, 0 would be the least possible value for sales.",
+          "title": "Y Min",
+          "type": "number"
+        },
+        "y_max": {
+          "description": "The expected largest value for the use case. E.g., for product sales, 0 would be the largest possible value would be given by the user or determined from this history of sales for the product in question or a similar product.",
+          "title": "Y Max",
+          "type": "number"
+        },
+        "invert_scale": {
+          "default": false,
+          "description": "Set this flag to true if the scale of the new units will run in the opposite direction from the inputs.",
+          "title": "Invert Scale",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "prediction_id",
+        "y_min",
+        "y_max"
+      ],
+      "title": "rescale_forecastArguments",
+      "type": "object"
+    },
+    "annotations": null
+  },
+  {
+    "name": "chronulus-mcp_save_forecast",
+    "description": "\nA tool that saves a Chronulus forecast from NormalizedForecaster to separate CSV and TXT files\n\nWhen to use this tool:\n- Use this tool when you need to save both the forecast data and its explanation to files\n- The forecast data will be saved as a CSV file for data analysis\n- The forecast explanation will be saved as a TXT file for reference\n- Both files will be saved in the same directory specified by output_path\n- This tool can also be used to directly save rescaled predictions without first calling the rescaling tool\n\nHow to use this tool:\n- Provide the prediction_id from a previous forecast\n- Specify the output_path where both files should be saved\n- Provide csv_name for the forecast data file (must end in .csv)\n- Provide txt_name for the explanation file (must end in .txt)\n- Optionally provide y_min and y_max to rescale the predictions (defaults to 0)\n- Set invert_scale to True if the target units run in the opposite direction\n- The tool will provide status updates through the MCP context\n",
+    "implementation": null,
+    "input_schema": {
+      "properties": {
+        "prediction_id": {
+          "description": "The prediction_id from a prediction result",
+          "title": "Prediction Id",
+          "type": "string"
+        },
+        "output_path": {
+          "description": "The path where the CSV file should be saved. Should end in .csv",
+          "title": "Output Path",
+          "type": "string"
+        },
+        "csv_name": {
+          "description": "The path where the CSV file should be saved. Should end in .csv",
+          "title": "Csv Name",
+          "type": "string"
+        },
+        "txt_name": {
+          "description": "The name of the TXT file to be saved. Should end in .txt",
+          "title": "Txt Name",
+          "type": "string"
+        },
+        "y_min": {
+          "default": 0.0,
+          "description": "The expected smallest value for the use case. E.g., for product sales, 0 would be the least possible value for sales.",
+          "title": "Y Min",
+          "type": "number"
+        },
+        "y_max": {
+          "default": 1.0,
+          "description": "The expected largest value for the use case. E.g., for product sales, 0 would be the largest possible value would be given by the user or determined from this history of sales for the product in question or a similar product.",
+          "title": "Y Max",
+          "type": "number"
+        },
+        "invert_scale": {
+          "default": false,
+          "description": "Set this flag to true if the scale of the new units will run in the opposite direction from the inputs.",
+          "title": "Invert Scale",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "prediction_id",
+        "output_path",
+        "csv_name",
+        "txt_name"
+      ],
+      "title": "save_forecastArguments",
+      "type": "object"
+    },
+    "annotations": null
+  },
+  {
+    "name": "chronulus-mcp_create_prediction_agent_and_get_predictions",
+    "description": "\nThis tool creates a BinaryPredictor agent with your session and input data model and then provides prediction input \ndata to the agent and returns the consensus a prediction from a panel of experts along with their individual estimates\nand text explanations. The agent also returns the alpha and beta parameters for a Beta distribution that allows you to\nestimate the confidence interval of its consensus probability estimate.\n\nWhen to use this tool:\n- Use this tool to request a probability estimate from Chronulus in situation when there is a binary outcome\n- This tool is specifically made to estimate the probability of an event occurring and not occurring and does not \nrequire historical data\n\nHow to use this tool:\n- First, make sure you have a session_id for the prediction use case.\n- Next, think about the features / characteristics most suitable for producing the requested prediction and then \ncreate an input_data_model that corresponds to the input_data you will provide for the thing or event being predicted.\n- Remember to pass all relevant information to Chronulus including text and images provided by the user. \n- If a user gives you files about a thing you are forecasting or predicting, you should pass these as inputs to the \nagent using one of the following types: \n    - ImageFromFile\n    - List[ImageFromFile]\n    - TextFromFile\n    - List[TextFromFile]\n    - PdfFromFile\n    - List[PdfFromFile]\n- If you have a large amount of text (over 500 words) to pass to the agent, you should use the Text or List[Text] field types\n- Finally, provide the number of experts to consult. The minimum and default number is 2, but users may request up to 30\n30 opinions in situations where reproducibility and risk sensitively is of the utmost importance. In most cases, 2 to 5 \nexperts is sufficient. \n",
+    "implementation": null,
+    "input_schema": {
+      "$defs": {
+        "InputField": {
+          "properties": {
+            "name": {
+              "description": "Field name. Should be a valid python variable name.",
+              "title": "Name",
+              "type": "string"
+            },
+            "description": {
+              "description": "A description of the value you will pass in the field.",
+              "title": "Description",
+              "type": "string"
+            },
+            "type": {
+              "default": "str",
+              "description": "The type of the field. \n        ImageFromFile takes a single named-argument, 'file_path' as input which should be absolute path to the image to be included. So you should provide this input as json, eg. {'file_path': '/path/to/image'}.\n        ",
+              "enum": [
+                "str",
+                "Text",
+                "List[Text]",
+                "TextFromFile",
+                "List[TextFromFile]",
+                "PdfFromFile",
+                "List[PdfFromFile]",
+                "ImageFromFile",
+                "List[ImageFromFile]"
+              ],
+              "title": "Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "description"
+          ],
+          "title": "InputField",
+          "type": "object"
+        }
+      },
+      "properties": {
+        "session_id": {
+          "description": "The session_id for the forecasting or prediction use case",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "input_data_model": {
+          "description": "Metadata on the fields you will include in the input_data.",
+          "items": {
+            "$ref": "#/$defs/InputField"
+          },
+          "title": "Input Data Model",
+          "type": "array"
+        },
+        "input_data": {
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            ]
+          },
+          "description": "The forecast inputs that you will pass to the chronulus agent to make the prediction. The keys of the dict should correspond to the InputField name you provided in input_fields.",
+          "title": "Input Data",
+          "type": "object"
+        },
+        "num_experts": {
+          "description": "The number of experts to consult when forming consensus",
+          "title": "Num Experts",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "session_id",
+        "input_data_model",
+        "input_data",
+        "num_experts"
+      ],
+      "title": "create_prediction_agent_and_get_predictionsArguments",
+      "type": "object"
+    },
+    "annotations": null
+  },
+  {
+    "name": "chronulus-mcp_reuse_prediction_agent_and_get_prediction",
+    "description": "\nThis tool provides prediction input data to a previously created Chronulus BinaryPredictor agent and returns the \nconsensus a prediction from a panel of experts along with their individual estimates and text explanations. The agent \nalso returns the alpha and beta parameters for a Beta distribution that allows you to estimate the confidence interval \nof its consensus probability estimate.\n\nWhen to use this tool:\n- Use this tool to request a prediction from a Chronulus prediction agent that you have already created and when your \ninput data model is unchanged\n- Use this tool to request a probability estimate from an existing prediction agent in a situation when there is a binary outcome\n- This tool is specifically made to estimate the probability of an event occurring and not occurring and does not \nrequire historical data\n\nHow to use this tool:\n- First, make sure you have a session_id for the prediction use case.\n- Next, think about the features / characteristics most suitable for producing the requested prediction and then \ncreate an input_data_model that corresponds to the input_data you will provide for the thing or event being predicted.\n- Remember to pass all relevant information to Chronulus including text and images provided by the user. \n- If a user gives you files about a thing you are forecasting or predicting, you should pass these as inputs to the \nagent using one of the following types: \n    - ImageFromFile\n    - List[ImageFromFile]\n    - TextFromFile\n    - List[TextFromFile]\n    - PdfFromFile\n    - List[PdfFromFile]\n- If you have a large amount of text (over 500 words) to pass to the agent, you should use the Text or List[Text] field types\n- Finally, provide the number of experts to consult. The minimum and default number is 2, but users may request up to 30\n30 opinions in situations where reproducibility and risk sensitively is of the utmost importance. In most cases, 2 to 5 \nexperts is sufficient. \n\nHow to use this tool:\n- First, make sure you have an agent_id for the prediction agent. The agent is already attached to the correct session. \nSo you do not need to provide a session_id.\n- Next, reference the input data model that you previously used with the agent and create new input data for the item \nbeing predicted that aligns with the previously specified input data model\n- Remember to pass all relevant information to Chronulus including text and images provided by the user. \n- If a user gives you files about a thing you are forecasting or predicting, you should pass these as inputs to the \nagent using one of the following types: \n    - ImageFromFile\n    - List[ImageFromFile]\n    - TextFromFile\n    - List[TextFromFile]\n    - PdfFromFile\n    - List[PdfFromFile]\n- If you have a large amount of text (over 500 words) to pass to the agent, you should use the Text or List[Text] field types\n- Finally, provide the number of experts to consult. The minimum and default number is 2, but users may request up to 30\n30 opinions in situations where reproducibility and risk sensitively is of the utmost importance. In most cases, 2 to 5 \nexperts is sufficient. \n",
+    "implementation": null,
+    "input_schema": {
+      "properties": {
+        "agent_id": {
+          "description": "The agent_id for the forecasting or prediction use case and previously defined input_data_model",
+          "title": "Agent Id",
+          "type": "string"
+        },
+        "input_data": {
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            ]
+          },
+          "description": "The forecast inputs that you will pass to the chronulus agent to make the prediction. The keys of the dict should correspond to the InputField name you provided in input_fields.",
+          "title": "Input Data",
+          "type": "object"
+        },
+        "num_experts": {
+          "description": "The number of experts to consult when forming consensus",
+          "title": "Num Experts",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "agent_id",
+        "input_data",
+        "num_experts"
+      ],
+      "title": "reuse_prediction_agent_and_get_predictionArguments",
+      "type": "object"
+    },
+    "annotations": null
+  },
+  {
+    "name": "chronulus-mcp_save_prediction_analysis_html",
+    "description": "\nA tool that saves an analysis of a BinaryPredictor prediction to HTML. \n\nThe analysis includes a plot of the theoretical and empirical beta distribution estimated by Chronulus and also\nlist the opinions provided by each expert.\n\nWhen to use this tool:\n- Use this tool when you need to save the BinaryPredictor estimates to for the user\n\nHow to use this tool:\n- Provide the request_id from a previous prediction response\n- Specify the output_path where the html should be saved\n- Provide html_name for the file (must end in .html)\n- The tool will provide status updates through the MCP context\n",
+    "implementation": null,
+    "input_schema": {
+      "properties": {
+        "request_id": {
+          "description": "The request_id from the BinaryPredictor result",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "output_path": {
+          "description": "The path where the HTML file should be saved.",
+          "title": "Output Path",
+          "type": "string"
+        },
+        "html_name": {
+          "description": "The path where the HTML file should be saved.",
+          "title": "Html Name",
+          "type": "string"
+        },
+        "title": {
+          "description": "Title of analysis",
+          "title": "Title",
+          "type": "string"
+        },
+        "plot_label": {
+          "description": "Label for the Beta plot",
+          "title": "Plot Label",
+          "type": "string"
+        },
+        "chronulus_prediction_summary": {
+          "description": "A summary paragraph distilling prediction results and expert opinions provided by Chronulus",
+          "title": "Chronulus Prediction Summary",
+          "type": "string"
+        },
+        "dist_shape": {
+          "description": "A one line description of the shape of the distribution of predictions",
+          "title": "Dist Shape",
+          "type": "string"
+        },
+        "dist_shape_interpretation": {
+          "description": "2-3 sentences interpreting the shape of the distribution of predictions in layman's terms",
+          "title": "Dist Shape Interpretation",
+          "type": "string"
+        }
+      },
+      "required": [
+        "request_id",
+        "output_path",
+        "html_name",
+        "title",
+        "plot_label",
+        "chronulus_prediction_summary",
+        "dist_shape",
+        "dist_shape_interpretation"
+      ],
+      "title": "save_prediction_analysis_htmlArguments",
+      "type": "object"
+    },
+    "annotations": null
+  },
+  {
+    "name": "chronulus-mcp_get_risk_assessment_scorecard",
+    "description": "\nA tool that retrieves the risk assessment scorecard for the Chronulus Session in Markdown format\n\nWhen to use this tool:\n- Use this tool when the use asks about the risk level or safety concerns of a forecasting use case\n- You may also use this tool to provide justification to a user if you would like to warn them of the implications of \n    what they are asking you to forecasting or predict.\n\nHow to use this tool:\n- Make sure you have a session_id for the forecasting or prediction use case\n- When displaying the scorecard markdown for the user, you should use an MDX-style React component\n",
+    "implementation": null,
+    "input_schema": {
+      "properties": {
+        "session_id": {
+          "description": "The session_id for the forecasting or prediction use case",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "as_json": {
+          "description": "If true, returns the scorecard in JSON format, otherwise returns a markdown formatted scorecard",
+          "title": "As Json",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "session_id",
+        "as_json"
+      ],
+      "title": "get_risk_assessment_scorecardArguments",
+      "type": "object"
+    },
+    "annotations": null
+  },
+  {
+    "name": "MiniMax-MCP_text_to_audio",
+    "description": "Convert text to audio with a given voice and save the output audio file to a given directory.\n    Directory is optional, if not provided, the output file will be saved to $HOME/Desktop.\n    Voice id is optional, if not provided, the default voice will be used.\n\n    COST WARNING: This tool makes an API call to Minimax which may incur costs. Only use when explicitly requested by the user.\n\n    Args:\n        text (str): The text to convert to speech.\n        voice_id (str, optional): The id of the voice to use. For example, \"male-qn-qingse\"/\"audiobook_female_1\"/\"cute_boy\"/\"Charming_Lady\"...\n        model (string, optional): The model to use.\n        speed (float, optional): Speed of the generated audio. Controls the speed of the generated speech. Values range from 0.5 to 2.0, with 1.0 being the default speed. \n        vol (float, optional): Volume of the generated audio. Controls the volume of the generated speech. Values range from 0 to 10, with 1 being the default volume.\n        pitch (int, optional): Pitch of the generated audio. Controls the speed of the generated speech. Values range from -12 to 12, with 0 being the default speed.\n        emotion (str, optional): Emotion of the generated audio. Controls the emotion of the generated speech. Values range [\"happy\", \"sad\", \"angry\", \"fearful\", \"disgusted\", \"surprised\", \"neutral\"], with \"happy\" being the default emotion.\n        sample_rate (int, optional): Sample rate of the generated audio. Controls the sample rate of the generated speech. Values range [8000,16000,22050,24000,32000,44100] with 32000 being the default sample rate.\n        bitrate (int, optional): Bitrate of the generated audio. Controls the bitrate of the generated speech. Values range [32000,64000,128000,256000] with 128000 being the default bitrate.\n        channel (int, optional): Channel of the generated audio. Controls the channel of the generated speech. Values range [1, 2] with 1 being the default channel.\n        format (str, optional): Format of the generated audio. Controls the format of the generated speech. Values range [\"pcm\", \"mp3\",\"flac\"] with \"mp3\" being the default format.\n        language_boost (str, optional): Language boost of the generated audio. Controls the language boost of the generated speech. Values range ['Chinese', 'Chinese,Yue', 'English', 'Arabic', 'Russian', 'Spanish', 'French', 'Portuguese', 'German', 'Turkish', 'Dutch', 'Ukrainian', 'Vietnamese', 'Indonesian', 'Japanese', 'Italian', 'Korean', 'Thai', 'Polish', 'Romanian', 'Greek', 'Czech', 'Finnish', 'Hindi', 'auto'] with \"auto\" being the default language boost.\n        output_directory (str): The directory to save the audio to.\n\n    Returns:\n        Text content with the path to the output file and name of the voice used.\n    ",
+    "implementation": null,
+    "input_schema": {
+      "properties": {
+        "text": {
+          "title": "Text",
+          "type": "string"
+        },
+        "output_directory": {
+          "default": null,
+          "title": "Output Directory",
+          "type": "string"
+        },
+        "voice_id": {
+          "default": "female-shaonv",
+          "title": "Voice Id",
+          "type": "string"
+        },
+        "model": {
+          "default": "speech-02-hd",
+          "title": "Model",
+          "type": "string"
+        },
+        "speed": {
+          "default": 1.0,
+          "title": "Speed",
+          "type": "number"
+        },
+        "vol": {
+          "default": 1.0,
+          "title": "Vol",
+          "type": "number"
+        },
+        "pitch": {
+          "default": 0,
+          "title": "Pitch",
+          "type": "integer"
+        },
+        "emotion": {
+          "default": "happy",
+          "title": "Emotion",
+          "type": "string"
+        },
+        "sample_rate": {
+          "default": 32000,
+          "title": "Sample Rate",
+          "type": "integer"
+        },
+        "bitrate": {
+          "default": 128000,
+          "title": "Bitrate",
+          "type": "integer"
+        },
+        "channel": {
+          "default": 1,
+          "title": "Channel",
+          "type": "integer"
+        },
+        "format": {
+          "default": "mp3",
+          "title": "Format",
+          "type": "string"
+        },
+        "language_boost": {
+          "default": "auto",
+          "title": "Language Boost",
+          "type": "string"
+        }
+      },
+      "required": [
+        "text"
+      ],
+      "title": "text_to_audioArguments",
+      "type": "object"
+    },
+    "annotations": null
+  },
+  {
+    "name": "MiniMax-MCP_list_voices",
+    "description": "List all voices available.\n\n    Args:\n        voice_type (str, optional): The type of voices to list. Values range [\"all\", \"system\", \"voice_cloning\"], with \"all\" being the default.\n    Returns:\n        Text content with the list of voices.\n    ",
+    "implementation": null,
+    "input_schema": {
+      "properties": {
+        "voice_type": {
+          "default": "all",
+          "title": "Voice Type",
+          "type": "string"
+        }
+      },
+      "title": "list_voicesArguments",
+      "type": "object"
+    },
+    "annotations": null
+  },
+  {
+    "name": "MiniMax-MCP_voice_clone",
+    "description": "Clone a voice using provided audio files. The new voice will be charged upon first use.\n\n    COST WARNING: This tool makes an API call to Minimax which may incur costs. Only use when explicitly requested by the user.\n\n     Args:\n        voice_id (str): The id of the voice to use.\n        file (str): The path to the audio file to clone or a URL to the audio file.\n        text (str, optional): The text to use for the demo audio.\n        is_url (bool, optional): Whether the file is a URL. Defaults to False.\n        output_directory (str): The directory to save the demo audio to.\n    Returns:\n        Text content with the voice id of the cloned voice.\n    ",
+    "implementation": null,
+    "input_schema": {
+      "properties": {
+        "voice_id": {
+          "title": "Voice Id",
+          "type": "string"
+        },
+        "file": {
+          "title": "File",
+          "type": "string"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        },
+        "output_directory": {
+          "default": null,
+          "title": "Output Directory",
+          "type": "string"
+        },
+        "is_url": {
+          "default": false,
+          "title": "Is Url",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "voice_id",
+        "file",
+        "text"
+      ],
+      "title": "voice_cloneArguments",
+      "type": "object"
+    },
+    "annotations": null
+  },
+  {
+    "name": "MiniMax-MCP_play_audio",
+    "description": "Play an audio file. Supports WAV and MP3 formats. Not supports video.\n\n     Args:\n        input_file_path (str): The path to the audio file to play.\n        is_url (bool, optional): Whether the audio file is a URL.\n    Returns:\n        Text content with the path to the audio file.\n    ",
+    "implementation": null,
+    "input_schema": {
+      "properties": {
+        "input_file_path": {
+          "title": "Input File Path",
+          "type": "string"
+        },
+        "is_url": {
+          "default": false,
+          "title": "Is Url",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "input_file_path"
+      ],
+      "title": "play_audioArguments",
+      "type": "object"
+    },
+    "annotations": null
+  },
+  {
+    "name": "MiniMax-MCP_generate_video",
+    "description": "Generate a video from a prompt.\n\n    COST WARNING: This tool makes an API call to Minimax which may incur costs. Only use when explicitly requested by the user.\n\n     Args:\n        model (str, optional): The model to use. Values range [\"T2V-01\", \"T2V-01-Director\", \"I2V-01\", \"I2V-01-Director\", \"I2V-01-live\", \"MiniMax-Hailuo-02\"]. \"Director\" supports inserting instructions for camera movement control. \"I2V\" for image to video. \"T2V\" for text to video. \"MiniMax-Hailuo-02\" is the latest model with best effect, ultra-clear quality and precise response.\n        prompt (str): The prompt to generate the video from. When use Director model, the prompt supports 15 Camera Movement Instructions (Enumerated Values)\n            -Truck: [Truck left], [Truck right]\n            -Pan: [Pan left], [Pan right]\n            -Push: [Push in], [Pull out]\n            -Pedestal: [Pedestal up], [Pedestal down]\n            -Tilt: [Tilt up], [Tilt down]\n            -Zoom: [Zoom in], [Zoom out]\n            -Shake: [Shake]\n            -Follow: [Tracking shot]\n            -Static: [Static shot]\n        first_frame_image (str): The first frame image. The model must be \"I2V\" Series.\n        duration (int, optional): The duration of the video. The model must be \"MiniMax-Hailuo-02\". Values can be 6 and 10.\n        resolution (str, optional): The resolution of the video. The model must be \"MiniMax-Hailuo-02\". Values range [\"768P\", \"1080P\"]\n        output_directory (str): The directory to save the video to.\n        async_mode (bool, optional): Whether to use async mode. Defaults to False. If True, the video generation task will be submitted asynchronously and the response will return a task_id. Should use `query_video_generation` tool to check the status of the task and get the result.\n    Returns:\n        Text content with the path to the output video file.\n    ",
+    "implementation": null,
+    "input_schema": {
+      "properties": {
+        "model": {
+          "default": "T2V-01",
+          "title": "Model",
+          "type": "string"
+        },
+        "prompt": {
+          "default": "",
+          "title": "Prompt",
+          "type": "string"
+        },
+        "first_frame_image": {
+          "default": null,
+          "title": "first_frame_image",
+          "type": "string"
+        },
+        "duration": {
+          "default": null,
+          "title": "Duration",
+          "type": "integer"
+        },
+        "resolution": {
+          "default": null,
+          "title": "Resolution",
+          "type": "string"
+        },
+        "output_directory": {
+          "default": null,
+          "title": "Output Directory",
+          "type": "string"
+        },
+        "async_mode": {
+          "default": false,
+          "title": "Async Mode",
+          "type": "boolean"
+        }
+      },
+      "title": "generate_videoArguments",
+      "type": "object"
+    },
+    "annotations": null
+  },
+  {
+    "name": "MiniMax-MCP_query_video_generation",
+    "description": "Query the status of a video generation task.\n\n    Args:\n        task_id (str): The task ID to query. Should be the task_id returned by `generate_video` tool if `async_mode` is True.\n        output_directory (str): The directory to save the video to.\n    Returns:\n        Text content with the status of the task.\n    ",
+    "implementation": null,
+    "input_schema": {
+      "properties": {
+        "task_id": {
+          "title": "Task Id",
+          "type": "string"
+        },
+        "output_directory": {
+          "default": null,
+          "title": "Output Directory",
+          "type": "string"
+        }
+      },
+      "required": [
+        "task_id"
+      ],
+      "title": "query_video_generationArguments",
+      "type": "object"
+    },
+    "annotations": null
+  },
+  {
+    "name": "MiniMax-MCP_text_to_image",
+    "description": "Generate a image from a prompt.\n\n    COST WARNING: This tool makes an API call to Minimax which may incur costs. Only use when explicitly requested by the user.\n\n     Args:\n        model (str, optional): The model to use. Values range [\"image-01\"], with \"image-01\" being the default.\n        prompt (str): The prompt to generate the image from.\n        aspect_ratio (str, optional): The aspect ratio of the image. Values range [\"1:1\", \"16:9\",\"4:3\", \"3:2\", \"2:3\", \"3:4\", \"9:16\", \"21:9\"], with \"1:1\" being the default.\n        n (int, optional): The number of images to generate. Values range [1, 9], with 1 being the default.\n        prompt_optimizer (bool, optional): Whether to optimize the prompt. Values range [True, False], with True being the default.\n        output_directory (str): The directory to save the image to.\n    Returns:\n        Text content with the path to the output image file.\n    ",
+    "implementation": null,
+    "input_schema": {
+      "properties": {
+        "model": {
+          "default": "image-01",
+          "title": "Model",
+          "type": "string"
+        },
+        "prompt": {
+          "default": "",
+          "title": "Prompt",
+          "type": "string"
+        },
+        "aspect_ratio": {
+          "default": "1:1",
+          "title": "Aspect Ratio",
+          "type": "string"
+        },
+        "n": {
+          "default": 1,
+          "title": "N",
+          "type": "integer"
+        },
+        "prompt_optimizer": {
+          "default": true,
+          "title": "Prompt Optimizer",
+          "type": "boolean"
+        },
+        "output_directory": {
+          "default": null,
+          "title": "Output Directory",
+          "type": "string"
+        }
+      },
+      "title": "text_to_imageArguments",
+      "type": "object"
+    },
+    "annotations": null
+  },
+  {
+    "name": "MiniMax-MCP_music_generation",
+    "description": "Create a music generation task using AI models. Generate music from prompt and lyrics.\n\n    COST WARNING: This tool makes an API call to Minimax which may incur costs. Only use when explicitly requested by the user.\n\n    Args:\n        prompt (str): Music creation inspiration describing style, mood, scene, etc.\n            Example: \"Pop music, sad, suitable for rainy nights\". Character range: [10, 300]\n        lyrics (str): Song lyrics for music generation.\n            Use newline (\\n) to separate each line of lyrics. Supports lyric structure tags [Intro][Verse][Chorus][Bridge][Outro] \n            to enhance musicality. Character range: [10, 600] (each Chinese character, punctuation, and letter counts as 1 character)\n        stream (bool, optional): Whether to enable streaming mode. Defaults to False\n        sample_rate (int, optional): Sample rate of generated music. Values: [16000, 24000, 32000, 44100]\n        bitrate (int, optional): Bitrate of generated music. Values: [32000, 64000, 128000, 256000]\n        format (str, optional): Format of generated music. Values: [\"mp3\", \"wav\", \"pcm\"]. Defaults to \"mp3\"\n        output_directory (str, optional): Directory to save the generated music file\n        \n    Note: Currently supports generating music up to 1 minute in length.\n\n    Returns:\n        Text content with the path to the generated music file or generation status.\n    ",
+    "implementation": null,
+    "input_schema": {
+      "properties": {
+        "prompt": {
+          "title": "Prompt",
+          "type": "string"
+        },
+        "lyrics": {
+          "title": "Lyrics",
+          "type": "string"
+        },
+        "sample_rate": {
+          "default": 32000,
+          "title": "Sample Rate",
+          "type": "integer"
+        },
+        "bitrate": {
+          "default": 128000,
+          "title": "Bitrate",
+          "type": "integer"
+        },
+        "format": {
+          "default": "mp3",
+          "title": "Format",
+          "type": "string"
+        },
+        "output_directory": {
+          "default": null,
+          "title": "Output Directory",
+          "type": "string"
+        }
+      },
+      "required": [
+        "prompt",
+        "lyrics"
+      ],
+      "title": "music_generationArguments",
+      "type": "object"
+    },
+    "annotations": null
+  },
+  {
+    "name": "MiniMax-MCP_voice_design",
+    "description": "Generate a voice based on description prompts.\n\n    COST WARNING: This tool makes an API call to Minimax which may incur costs. Only use when explicitly requested by the user.\n\n     Args:\n        prompt (str): The prompt to generate the voice from.\n        preview_text (str): The text to preview the voice.\n        voice_id (str, optional): The id of the voice to use. For example, \"male-qn-qingse\"/\"audiobook_female_1\"/\"cute_boy\"/\"Charming_Lady\"...\n        output_directory (str, optional): The directory to save the voice to.\n    Returns:\n        Text content with the path to the output voice file.\n    ",
+    "implementation": null,
+    "input_schema": {
+      "properties": {
+        "prompt": {
+          "title": "Prompt",
+          "type": "string"
+        },
+        "preview_text": {
+          "title": "Preview Text",
+          "type": "string"
+        },
+        "voice_id": {
+          "default": null,
+          "title": "Voice Id",
+          "type": "string"
+        },
+        "output_directory": {
+          "default": null,
+          "title": "Output Directory",
+          "type": "string"
+        }
+      },
+      "required": [
+        "prompt",
+        "preview_text"
+      ],
+      "title": "voice_designArguments",
+      "type": "object"
+    },
+    "annotations": null
+  }
+]

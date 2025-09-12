@@ -1,0 +1,26 @@
+{
+  "weather.make_nws_request": {
+    "file": "weather.py",
+    "start": 12,
+    "end": 24,
+    "code": "async def make_nws_request(url: str) -> dict[str, Any] | None:\n    \"\"\"Make a request to the NWS API with proper error handling.\"\"\"\n    headers = {\n        \"User-Agent\": USER_AGENT,\n        \"Accept\": \"application/geo+json\"\n    }\n    async with httpx.AsyncClient() as client:\n        try:\n            response = await client.get(url, headers=headers, timeout=30.0)\n            response.raise_for_status()\n            return response.json()\n        except Exception:\n            return None"
+  },
+  "weather.format_alert": {
+    "file": "weather.py",
+    "start": 26,
+    "end": 35,
+    "code": "def format_alert(feature: dict) -> str:\n    \"\"\"Format an alert feature into a readable string.\"\"\"\n    props = feature[\"properties\"]\n    return f\"\"\"\nEvent: {props.get('event', 'Unknown')}\nArea: {props.get('areaDesc', 'Unknown')}\nSeverity: {props.get('severity', 'Unknown')}\nDescription: {props.get('description', 'No description available')}\nInstructions: {props.get('instruction', 'No specific instructions provided')}\n\"\"\""
+  },
+  "weather.get_alerts": {
+    "file": "weather.py",
+    "start": 38,
+    "end": 54,
+    "code": "async def get_alerts(state: str) -> str:\n    \"\"\"Get weather alerts for a US state.\n\n    Args:\n        state: Two-letter US state code (e.g. CA, NY)\n    \"\"\"\n    url = f\"{NWS_API_BASE}/alerts/active/area/{state}\"\n    data = await make_nws_request(url)\n\n    if not data or \"features\" not in data:\n        return \"Unable to fetch alerts or no alerts found.\"\n\n    if not data[\"features\"]:\n        return \"No active alerts for this state.\"\n\n    alerts = [format_alert(feature) for feature in data[\"features\"]]\n    return \"\\n---\\n\".join(alerts)"
+  },
+  "weather.get_forecast": {
+    "file": "weather.py",
+    "start": 57,
+    "end": 90,
+    "code": "async def get_forecast(latitude: float, longitude: float) -> str:\n    \"\"\"Get weather forecast for a location.\n\n    Args:\n        latitude: Latitude of the location\n        longitude: Longitude of the location\n    \"\"\"\n    # First get the forecast grid endpoint\n    points_url = f\"{NWS_API_BASE}/points/{latitude},{longitude}\"\n    points_data = await make_nws_request(points_url)\n\n    if not points_data:\n        return \"Unable to fetch forecast data for this location.\"\n\n    # Get the forecast URL from the points response\n    forecast_url = points_data[\"properties\"][\"forecast\"]\n    forecast_data = await make_nws_request(forecast_url)\n\n    if not forecast_data:\n        return \"Unable to fetch detailed forecast.\"\n\n    # Format the periods into a readable forecast\n    periods = forecast_data[\"properties\"][\"periods\"]\n    forecasts = []\n    for period in periods[:5]:  # Only show next 5 periods\n        forecast = f\"\"\"\n{period['name']}:\nTemperature: {period['temperature']}°{period['temperatureUnit']}\nWind: {period['windSpeed']} {period['windDirection']}\nForecast: {period['detailedForecast']}\n\"\"\"\n        forecasts.append(forecast)\n\n    return \"\\n---\\n\".join(forecasts)"
+  }
+}
