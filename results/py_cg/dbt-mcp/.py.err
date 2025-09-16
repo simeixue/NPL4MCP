@@ -84,4 +84,4 @@ Code2Flow: Found variables ['AbstractContextManager->UNKNOWN_MODULE', 'AccessTok
 Code2Flow: Skipped processing these calls because the algorithm linked them to multiple function definitions: ['UNKNOWN_VAR.__init__()'].
 Code2Flow: Generating output file...
 Code2Flow: Wrote output file '/Users/xue/workspace/mcp_project/NPL4MCP/results/py_cg/dbt-mcp/cg_py.json' with 233 nodes and 393 edges.
-Code2Flow: Code2flow finished processing in 0.15 seconds.
+Code2Flow: Code2flow finished processing in 0.16 seconds.
