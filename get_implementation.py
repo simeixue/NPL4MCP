@@ -10,54 +10,12 @@ from typing import Dict, List, Set, Tuple, Optional
 from fastmcp import Client
 from fastmcp.tools import FunctionTool
 from utils.file_util import FileUtil
+from utils.server_config import config
 
 REPO_BASE = "/Users/xue/workspace/mcp_project/mcp_server_pyrepos"
 OUT_BASE = Path("/Users/xue/workspace/mcp_project/NPL4MCP/results/py_cg")
 
-# ---------------- Server config ----------------
-config = {
-    "mcpServers": {
-        "mcp-aiven": {
-            "command": "uv",
-            "args": [
-                "--directory",
-                f"{REPO_BASE}/mcp-aiven",
-                "run",
-                "--with-editable",
-                f"{REPO_BASE}/mcp-aiven",
-                "--python",
-                "3.13",
-                "mcp-aiven",
-            ],
-            "env": {
-                "AIVEN_BASE_URL": "https://api.aiven.io",
-                "AIVEN_TOKEN": os.environ.get("AIVEN_TOKEN", ""),
-            },
-        },
-        "chronulus-mcp": {
-            "command": "uvx",
-            "args": ["chronulus-mcp"],
-            "env": {"CHRONULUS_API_KEY": os.environ.get("CHRONULUS_API_KEY", "")},
-        },
-        "meilisearch-mcp": {
-            "command": "uvx",
-            "args": ["-n", "meilisearch-mcp"]
-        },
-        
-        # "MiniMax-MCP": {
-        #     "command": "uvx",
-        #     "args": ["minimax-mcp", "-y"],
-        #     "env": {
-        #         "MINIMAX_API_KEY": os.environ.get("MINIMAX_API_KEY", ""),
-        #         "MINIMAX_MCP_BASE_PATH": os.environ.get("MINIMAX_MCP_BASE_PATH", ""),
-        #         "MINIMAX_API_HOST": os.environ.get("MINIMAX_API_HOST", ""),
-        #         "MINIMAX_API_RESOURCE_MODE": os.environ.get(
-        #             "MINIMAX_API_RESOURCE_MODE", ""
-        #         ),
-        #     },
-        # },
-    }
-}
+
 
 # ---------------- Helpers: func slices + call graph ----------------
 def _read_text(p: Path) -> str:
