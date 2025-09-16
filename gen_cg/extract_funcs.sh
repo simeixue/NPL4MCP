@@ -15,7 +15,6 @@ for PROJ in "${REPOS_DIR}"/*; do
 
     PY_TMP=$(mktemp)
   find "${PROJ}" -type f -name '*.py' \
-    -not -name '__init__.py' \
     -not -path '*/.git/*' \
     -not -path '*/__pycache__/*' \
     -not -path '*/.mypy_cache/*' \
@@ -24,7 +23,6 @@ for PROJ in "${REPOS_DIR}"/*; do
     -not -path '*/venv/*' \
     -not -path '*/.venv/*' \
     -not -path '*/env/*' \
-    -not -path '*/test/*' \
     -print > "${PY_TMP}"
 
   COUNT=$(wc -l < "${PY_TMP}" | tr -d ' ')

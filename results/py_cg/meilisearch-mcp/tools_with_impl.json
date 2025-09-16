@@ -1,0 +1,589 @@
+[
+  {
+    "name": "get-connection-settings",
+    "description": "Get current Meilisearch connection settings",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": false
+    },
+    "annotations": {},
+    "implementation": null
+  },
+  {
+    "name": "update-connection-settings",
+    "description": "Update Meilisearch connection settings",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string"
+        },
+        "api_key": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "annotations": {},
+    "implementation": null
+  },
+  {
+    "name": "health-check",
+    "description": "Check Meilisearch server health",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": false
+    },
+    "annotations": {},
+    "implementation": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/meilisearch-mcp/src/meilisearch_mcp/client.py\n# module: src.meilisearch_mcp.client\n# qname: src.meilisearch_mcp.client.MeilisearchClient.health_check\n# lines: 35-41\n    def health_check(self) -> bool:\n        \"\"\"Check if Meilisearch is healthy\"\"\"\n        try:\n            response = self.client.health()\n            return response.get(\"status\") == \"available\"\n        except Exception:\n            return False\n"
+  },
+  {
+    "name": "get-version",
+    "description": "Get Meilisearch version information",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": false
+    },
+    "annotations": {},
+    "implementation": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/meilisearch-mcp/src/meilisearch_mcp/client.py\n# module: src.meilisearch_mcp.client\n# qname: src.meilisearch_mcp.client.MeilisearchClient.get_version\n# lines: 43-45\n    def get_version(self) -> Dict[str, Any]:\n        \"\"\"Get Meilisearch version information\"\"\"\n        return self.client.get_version()\n"
+  },
+  {
+    "name": "get-stats",
+    "description": "Get database statistics",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": false
+    },
+    "annotations": {},
+    "implementation": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/meilisearch-mcp/src/meilisearch_mcp/client.py\n# module: src.meilisearch_mcp.client\n# qname: src.meilisearch_mcp.client.MeilisearchClient.get_stats\n# lines: 47-49\n    def get_stats(self) -> Dict[str, Any]:\n        \"\"\"Get database stats\"\"\"\n        return self.client.get_all_stats()\n"
+  },
+  {
+    "name": "create-index",
+    "description": "Create a new Meilisearch index",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string"
+        },
+        "primaryKey": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "uid"
+      ],
+      "additionalProperties": false
+    },
+    "annotations": {},
+    "implementation": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/meilisearch-mcp/src/meilisearch_mcp/indexes.py\n# module: src.meilisearch_mcp.indexes\n# qname: src.meilisearch_mcp.indexes.IndexManager.create_index\n# lines: 20-27\n    def create_index(\n        self, uid: str, primary_key: Optional[str] = None\n    ) -> Dict[str, Any]:\n        \"\"\"Create a new index\"\"\"\n        try:\n            return self.client.create_index(uid, {\"primaryKey\": primary_key})\n        except Exception as e:\n            raise Exception(f\"Failed to create index: {str(e)}\")\n"
+  },
+  {
+    "name": "list-indexes",
+    "description": "List all Meilisearch indexes",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": false
+    },
+    "annotations": {},
+    "implementation": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/meilisearch-mcp/src/meilisearch_mcp/indexes.py\n# module: src.meilisearch_mcp.indexes\n# qname: src.meilisearch_mcp.indexes.IndexManager.list_indexes\n# lines: 36-41\n    def list_indexes(self) -> List[Dict[str, Any]]:\n        \"\"\"List all indexes\"\"\"\n        try:\n            return self.client.get_indexes()\n        except Exception as e:\n            raise Exception(f\"Failed to list indexes: {str(e)}\")\n"
+  },
+  {
+    "name": "delete-index",
+    "description": "Delete a Meilisearch index",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "uid"
+      ],
+      "additionalProperties": false
+    },
+    "annotations": {},
+    "implementation": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/meilisearch-mcp/src/meilisearch_mcp/indexes.py\n# module: src.meilisearch_mcp.indexes\n# qname: src.meilisearch_mcp.indexes.IndexManager.delete_index\n# lines: 43-48\n    def delete_index(self, uid: str) -> Dict[str, Any]:\n        \"\"\"Delete an index\"\"\"\n        try:\n            return self.client.delete_index(uid)\n        except Exception as e:\n            raise Exception(f\"Failed to delete index: {str(e)}\")\n"
+  },
+  {
+    "name": "get-documents",
+    "description": "Get documents from an index",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "indexUid": {
+          "type": "string"
+        },
+        "offset": {
+          "type": "integer"
+        },
+        "limit": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "indexUid"
+      ],
+      "additionalProperties": false
+    },
+    "annotations": {},
+    "implementation": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/meilisearch-mcp/src/meilisearch_mcp/documents.py\n# module: src.meilisearch_mcp.documents\n# qname: src.meilisearch_mcp.documents.DocumentManager.get_documents\n# lines: 11-60\n    def get_documents(\n        self,\n        index_uid: str,\n        offset: Optional[int] = None,\n        limit: Optional[int] = None,\n        fields: Optional[List[str]] = None,\n    ) -> Dict[str, Any]:\n        \"\"\"Get documents from an index\"\"\"\n        try:\n            index = self.client.index(index_uid)\n            # Build parameters dict, excluding None values to avoid API errors\n            params = {}\n            if offset is not None:\n                params[\"offset\"] = offset\n            if limit is not None:\n                params[\"limit\"] = limit\n            if fields is not None:\n                params[\"fields\"] = fields\n\n            result = index.get_documents(params if params else {})\n\n            # Convert meilisearch model objects to JSON-serializable format\n            if hasattr(result, \"__dict__\"):\n                result_dict = result.__dict__.copy()\n                # Convert individual document objects in results if they exist\n                if \"results\" in result_dict and isinstance(\n                    result_dict[\"results\"], list\n                ):\n                    serialized_results = []\n                    for doc in result_dict[\"results\"]:\n                        if hasattr(doc, \"__dict__\"):\n                            # Extract the actual document data\n                            doc_dict = doc.__dict__.copy()\n                            # Look for private attributes that might contain the actual data\n                            for key, value in doc_dict.items():\n                                if key.startswith(\"_\") and isinstance(value, dict):\n                                    # Use the dict content instead of the wrapper\n                                    serialized_results.append(value)\n                                    break\n                            else:\n                                # If no private dict found, use the object dict directly\n                                serialized_results.append(doc_dict)\n                        else:\n                            serialized_results.append(doc)\n                    result_dict[\"results\"] = serialized_results\n                return result_dict\n            else:\n                return result\n        except Exception as e:\n            raise Exception(f\"Failed to get documents: {str(e)}\")\n"
+  },
+  {
+    "name": "add-documents",
+    "description": "Add documents to an index",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "indexUid": {
+          "type": "string"
+        },
+        "documents": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        },
+        "primaryKey": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "indexUid",
+        "documents"
+      ],
+      "additionalProperties": false
+    },
+    "annotations": {},
+    "implementation": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/meilisearch-mcp/src/meilisearch_mcp/documents.py\n# module: src.meilisearch_mcp.documents\n# qname: src.meilisearch_mcp.documents.DocumentManager.add_documents\n# lines: 72-83\n    def add_documents(\n        self,\n        index_uid: str,\n        documents: List[Dict[str, Any]],\n        primary_key: Optional[str] = None,\n    ) -> Dict[str, Any]:\n        \"\"\"Add documents to an index\"\"\"\n        try:\n            index = self.client.index(index_uid)\n            return index.add_documents(documents, primary_key)\n        except Exception as e:\n            raise Exception(f\"Failed to add documents: {str(e)}\")\n"
+  },
+  {
+    "name": "get-settings",
+    "description": "Get current settings for an index",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "indexUid": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "indexUid"
+      ],
+      "additionalProperties": false
+    },
+    "annotations": {},
+    "implementation": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/meilisearch-mcp/src/meilisearch_mcp/settings.py\n# module: src.meilisearch_mcp.settings\n# qname: src.meilisearch_mcp.settings.SettingsManager.get_settings\n# lines: 27-33\n    def get_settings(self, index_uid: str) -> Dict[str, Any]:\n        \"\"\"Get all settings for an index\"\"\"\n        try:\n            index = self.client.index(index_uid)\n            return index.get_settings()\n        except Exception as e:\n            raise Exception(f\"Failed to get settings: {str(e)}\")\n"
+  },
+  {
+    "name": "update-settings",
+    "description": "Update settings for an index",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "indexUid": {
+          "type": "string"
+        },
+        "settings": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "required": [
+        "indexUid",
+        "settings"
+      ],
+      "additionalProperties": false
+    },
+    "annotations": {},
+    "implementation": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/meilisearch-mcp/src/meilisearch_mcp/settings.py\n# module: src.meilisearch_mcp.settings\n# qname: src.meilisearch_mcp.settings.SettingsManager.update_settings\n# lines: 35-43\n    def update_settings(\n        self, index_uid: str, settings: Dict[str, Any]\n    ) -> Dict[str, Any]:\n        \"\"\"Update settings for an index\"\"\"\n        try:\n            index = self.client.index(index_uid)\n            return index.update_settings(settings)\n        except Exception as e:\n            raise Exception(f\"Failed to update settings: {str(e)}\")\n"
+  },
+  {
+    "name": "search",
+    "description": "Search through Meilisearch indices. If indexUid is not provided, it will search across all indices.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string"
+        },
+        "indexUid": {
+          "type": "string"
+        },
+        "limit": {
+          "type": "integer"
+        },
+        "offset": {
+          "type": "integer"
+        },
+        "filter": {
+          "type": "string"
+        },
+        "sort": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "query"
+      ],
+      "additionalProperties": false
+    },
+    "annotations": {},
+    "implementation": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/meilisearch-mcp/src/meilisearch_mcp/client.py\n# module: src.meilisearch_mcp.client\n# qname: src.meilisearch_mcp.client.MeilisearchClient.search\n# lines: 51-102\n    def search(\n        self,\n        query: str,\n        index_uid: Optional[str] = None,\n        limit: Optional[int] = 20,\n        offset: Optional[int] = 0,\n        filter: Optional[str] = None,\n        sort: Optional[List[str]] = None,\n        **kwargs,\n    ) -> Dict[str, Any]:\n        \"\"\"\n        Search through Meilisearch indices.\n        If index_uid is provided, search in that specific index.\n        If not provided, search across all available indices.\n        \"\"\"\n        try:\n            # Prepare search parameters, removing None values\n            search_params = {\n                \"limit\": limit if limit is not None else 20,\n                \"offset\": offset if offset is not None else 0,\n            }\n\n            if filter is not None:\n                search_params[\"filter\"] = filter\n            if sort is not None:\n                search_params[\"sort\"] = sort\n\n            # Add any additional parameters\n            search_params.update({k: v for k, v in kwargs.items() if v is not None})\n\n            if index_uid:\n                # Search in specific index\n                index = self.client.index(index_uid)\n                return index.search(query, search_params)\n            else:\n                # Search across all indices\n                results = {}\n                indexes = self.client.get_indexes()\n\n                for index in indexes[\"results\"]:\n                    try:\n                        search_result = index.search(query, search_params)\n                        if search_result[\"hits\"]:  # Only include indices with matches\n                            results[index.uid] = search_result\n                    except Exception as e:\n                        logger.warning(f\"Failed to search index {index.uid}: {str(e)}\")\n                        continue\n\n                return {\"multi_index\": True, \"query\": query, \"results\": results}\n\n        except Exception as e:\n            raise Exception(f\"Search failed: {str(e)}\")\n"
+  },
+  {
+    "name": "get-task",
+    "description": "Get information about a specific task",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "taskUid": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "taskUid"
+      ],
+      "additionalProperties": false
+    },
+    "annotations": {},
+    "implementation": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/meilisearch-mcp/src/meilisearch_mcp/tasks.py\n# module: src.meilisearch_mcp.tasks\n# qname: src.meilisearch_mcp.tasks.TaskManager.get_task\n# lines: 22-28\n    def get_task(self, task_uid: int) -> Dict[str, Any]:\n        \"\"\"Get information about a specific task\"\"\"\n        try:\n            task = self.client.get_task(task_uid)\n            return serialize_task_results(task)\n        except Exception as e:\n            raise Exception(f\"Failed to get task: {str(e)}\")\n"
+  },
+  {
+    "name": "get-tasks",
+    "description": "Get list of tasks with optional filters",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer"
+        },
+        "from": {
+          "type": "integer"
+        },
+        "reverse": {
+          "type": "boolean"
+        },
+        "batchUids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "uids": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "canceledBy": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "types": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "statuses": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "indexUids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "afterEnqueuedAt": {
+          "type": "string"
+        },
+        "beforeEnqueuedAt": {
+          "type": "string"
+        },
+        "afterStartedAt": {
+          "type": "string"
+        },
+        "beforeStartedAt": {
+          "type": "string"
+        },
+        "afterFinishedAt": {
+          "type": "string"
+        },
+        "beforeFinishedAt": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "annotations": {},
+    "implementation": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/meilisearch-mcp/src/meilisearch_mcp/tasks.py\n# module: src.meilisearch_mcp.tasks\n# qname: src.meilisearch_mcp.tasks.TaskManager.get_tasks\n# lines: 30-36\n    def get_tasks(self, parameters: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:\n        \"\"\"Get list of tasks with optional filters\"\"\"\n        try:\n            tasks = self.client.get_tasks(parameters)\n            return serialize_task_results(tasks)\n        except Exception as e:\n            raise Exception(f\"Failed to get tasks: {str(e)}\")\n"
+  },
+  {
+    "name": "cancel-tasks",
+    "description": "Cancel tasks based on filters",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "uids": {
+          "type": "string"
+        },
+        "indexUids": {
+          "type": "string"
+        },
+        "types": {
+          "type": "string"
+        },
+        "statuses": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "annotations": {},
+    "implementation": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/meilisearch-mcp/src/meilisearch_mcp/tasks.py\n# module: src.meilisearch_mcp.tasks\n# qname: src.meilisearch_mcp.tasks.TaskManager.cancel_tasks\n# lines: 38-44\n    def cancel_tasks(self, query_parameters: Dict[str, Any]) -> Dict[str, Any]:\n        \"\"\"Cancel tasks based on query parameters\"\"\"\n        try:\n            result = self.client.cancel_tasks(query_parameters)\n            return serialize_task_results(result)\n        except Exception as e:\n            raise Exception(f\"Failed to cancel tasks: {str(e)}\")\n"
+  },
+  {
+    "name": "get-keys",
+    "description": "Get list of API keys",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "offset": {
+          "type": "integer"
+        },
+        "limit": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false
+    },
+    "annotations": {},
+    "implementation": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/meilisearch-mcp/src/meilisearch_mcp/keys.py\n# module: src.meilisearch_mcp.keys\n# qname: src.meilisearch_mcp.keys.KeyManager.get_keys\n# lines: 12-17\n    def get_keys(self, parameters: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:\n        \"\"\"Get list of API keys\"\"\"\n        try:\n            return self.client.get_keys(parameters)\n        except Exception as e:\n            raise Exception(f\"Failed to get keys: {str(e)}\")\n"
+  },
+  {
+    "name": "create-key",
+    "description": "Create a new API key",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "indexes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "expiresAt": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "actions",
+        "indexes"
+      ],
+      "additionalProperties": false
+    },
+    "annotations": {},
+    "implementation": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/meilisearch-mcp/src/meilisearch_mcp/keys.py\n# module: src.meilisearch_mcp.keys\n# qname: src.meilisearch_mcp.keys.KeyManager.create_key\n# lines: 26-31\n    def create_key(self, options: Dict[str, Any]) -> Dict[str, Any]:\n        \"\"\"Create a new API key\"\"\"\n        try:\n            return self.client.create_key(options)\n        except Exception as e:\n            raise Exception(f\"Failed to create key: {str(e)}\")\n"
+  },
+  {
+    "name": "delete-key",
+    "description": "Delete an API key",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "key"
+      ],
+      "additionalProperties": false
+    },
+    "annotations": {},
+    "implementation": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/meilisearch-mcp/src/meilisearch_mcp/keys.py\n# module: src.meilisearch_mcp.keys\n# qname: src.meilisearch_mcp.keys.KeyManager.delete_key\n# lines: 40-45\n    def delete_key(self, key: str) -> None:\n        \"\"\"Delete an API key\"\"\"\n        try:\n            return self.client.delete_key(key)\n        except Exception as e:\n            raise Exception(f\"Failed to delete key: {str(e)}\")\n"
+  },
+  {
+    "name": "get-health-status",
+    "description": "Get comprehensive health status of Meilisearch",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": false
+    },
+    "annotations": {},
+    "implementation": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/meilisearch-mcp/src/meilisearch_mcp/monitoring.py\n# module: src.meilisearch_mcp.monitoring\n# qname: src.meilisearch_mcp.monitoring.MonitoringManager.get_health_status\n# lines: 35-63\n    def get_health_status(self) -> HealthStatus:\n        \"\"\"Get comprehensive health status\"\"\"\n        try:\n            # Get various stats to build health picture\n            stats = self.client.get_all_stats()\n            indexes = self.client.get_indexes()\n\n            indexes_info = []\n            for index in indexes:\n                index_stats = self.client.index(index.uid).get_stats()\n                indexes_info.append(\n                    {\n                        \"uid\": index.uid,\n                        \"documents_count\": index_stats[\"numberOfDocuments\"],\n                        \"is_indexing\": index_stats[\"isIndexing\"],\n                    }\n                )\n\n            return HealthStatus(\n                is_healthy=True,\n                database_size=stats[\"databaseSize\"],\n                last_update=datetime.fromisoformat(\n                    stats[\"lastUpdate\"].replace(\"Z\", \"+00:00\")\n                ),\n                indexes_count=len(indexes),\n                indexes_info=indexes_info,\n            )\n        except Exception as e:\n            raise Exception(f\"Failed to get health status: {str(e)}\")\n"
+  },
+  {
+    "name": "get-index-metrics",
+    "description": "Get detailed metrics for an index",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "indexUid": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "indexUid"
+      ],
+      "additionalProperties": false
+    },
+    "annotations": {},
+    "implementation": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/meilisearch-mcp/src/meilisearch_mcp/monitoring.py\n# module: src.meilisearch_mcp.monitoring\n# qname: src.meilisearch_mcp.monitoring.MonitoringManager.get_index_metrics\n# lines: 65-78\n    def get_index_metrics(self, index_uid: str) -> IndexMetrics:\n        \"\"\"Get detailed metrics for an index\"\"\"\n        try:\n            index = self.client.index(index_uid)\n            stats = index.get_stats()\n\n            return IndexMetrics(\n                number_of_documents=stats[\"numberOfDocuments\"],\n                field_distribution=stats[\"fieldDistribution\"],\n                is_indexing=stats[\"isIndexing\"],\n                index_size=stats.get(\"indexSize\"),\n            )\n        except Exception as e:\n            raise Exception(f\"Failed to get index metrics: {str(e)}\")\n"
+  },
+  {
+    "name": "get-system-info",
+    "description": "Get system-level information",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": false
+    },
+    "annotations": {},
+    "implementation": null
+  },
+  {
+    "name": "create-chat-completion",
+    "description": "Create a conversational chat completion using Meilisearch's chat feature",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "workspace_uid": {
+          "type": "string",
+          "description": "Unique identifier of the chat workspace"
+        },
+        "messages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "role": {
+                "type": "string",
+                "enum": [
+                  "user",
+                  "assistant",
+                  "system"
+                ]
+              },
+              "content": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "role",
+              "content"
+            ]
+          },
+          "description": "List of message objects comprising the chat history"
+        },
+        "model": {
+          "type": "string",
+          "default": "gpt-3.5-turbo",
+          "description": "The model to use for completion"
+        },
+        "stream": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether to stream the response (currently must be true)"
+        }
+      },
+      "required": [
+        "workspace_uid",
+        "messages"
+      ],
+      "additionalProperties": false
+    },
+    "annotations": {},
+    "implementation": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/meilisearch-mcp/src/meilisearch_mcp/chat.py\n# module: src.meilisearch_mcp.chat\n# qname: src.meilisearch_mcp.chat.ChatManager.create_chat_completion\n# lines: 15-47\n    async def create_chat_completion(\n        self,\n        workspace_uid: str,\n        messages: List[Dict[str, str]],\n        model: str = \"gpt-3.5-turbo\",\n        stream: bool = True,\n    ) -> str:\n        try:\n            logger.info(f\"Creating chat completion for workspace: {workspace_uid}\")\n\n            # The SDK returns an iterator for streaming responses\n            response_chunks = []\n            for chunk in self.client.create_chat_completion(\n                workspace_uid=workspace_uid,\n                messages=messages,\n                model=model,\n                stream=stream,\n            ):\n                response_chunks.append(chunk)\n\n            # Combine all chunks into a complete response\n            full_response = self._combine_chunks(response_chunks)\n            logger.info(\n                f\"Chat completion created successfully for workspace: {workspace_uid}\"\n            )\n            return full_response\n\n        except MeilisearchApiError as e:\n            logger.error(f\"Meilisearch API error in create_chat_completion: {e}\")\n            raise\n        except Exception as e:\n            logger.error(f\"Error in create_chat_completion: {e}\")\n            raise\n"
+  },
+  {
+    "name": "get-chat-workspaces",
+    "description": "Get list of available chat workspaces",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "offset": {
+          "type": "integer",
+          "description": "Number of workspaces to skip"
+        },
+        "limit": {
+          "type": "integer",
+          "description": "Maximum number of workspaces to return"
+        }
+      },
+      "additionalProperties": false
+    },
+    "annotations": {},
+    "implementation": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/meilisearch-mcp/src/meilisearch_mcp/chat.py\n# module: src.meilisearch_mcp.chat\n# qname: src.meilisearch_mcp.chat.ChatManager.get_chat_workspaces\n# lines: 59-74\n    async def get_chat_workspaces(\n        self, offset: Optional[int] = None, limit: Optional[int] = None\n    ) -> Dict[str, Any]:\n        try:\n            logger.info(f\"Getting chat workspaces (offset={offset}, limit={limit})\")\n            workspaces = self.client.get_chat_workspaces(offset=offset, limit=limit)\n            logger.info(\n                f\"Retrieved {len(workspaces.get('results', []))} chat workspaces\"\n            )\n            return workspaces\n        except MeilisearchApiError as e:\n            logger.error(f\"Meilisearch API error in get_chat_workspaces: {e}\")\n            raise\n        except Exception as e:\n            logger.error(f\"Error in get_chat_workspaces: {e}\")\n            raise\n"
+  },
+  {
+    "name": "get-chat-workspace-settings",
+    "description": "Get settings for a specific chat workspace",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "workspace_uid": {
+          "type": "string",
+          "description": "Unique identifier of the chat workspace"
+        }
+      },
+      "required": [
+        "workspace_uid"
+      ],
+      "additionalProperties": false
+    },
+    "annotations": {},
+    "implementation": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/meilisearch-mcp/src/meilisearch_mcp/chat.py\n# module: src.meilisearch_mcp.chat\n# qname: src.meilisearch_mcp.chat.ChatManager.get_chat_workspace_settings\n# lines: 76-87\n    async def get_chat_workspace_settings(self, workspace_uid: str) -> Dict[str, Any]:\n        try:\n            logger.info(f\"Getting settings for chat workspace: {workspace_uid}\")\n            settings = self.client.get_chat_workspace_settings(workspace_uid)\n            logger.info(f\"Retrieved settings for workspace: {workspace_uid}\")\n            return settings\n        except MeilisearchApiError as e:\n            logger.error(f\"Meilisearch API error in get_chat_workspace_settings: {e}\")\n            raise\n        except Exception as e:\n            logger.error(f\"Error in get_chat_workspace_settings: {e}\")\n            raise\n"
+  },
+  {
+    "name": "update-chat-workspace-settings",
+    "description": "Update settings for a specific chat workspace",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "workspace_uid": {
+          "type": "string",
+          "description": "Unique identifier of the chat workspace"
+        },
+        "settings": {
+          "type": "object",
+          "description": "Settings to update for the workspace",
+          "additionalProperties": true
+        }
+      },
+      "required": [
+        "workspace_uid",
+        "settings"
+      ],
+      "additionalProperties": false
+    },
+    "annotations": {},
+    "implementation": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/meilisearch-mcp/src/meilisearch_mcp/chat.py\n# module: src.meilisearch_mcp.chat\n# qname: src.meilisearch_mcp.chat.ChatManager.update_chat_workspace_settings\n# lines: 89-106\n    async def update_chat_workspace_settings(\n        self, workspace_uid: str, settings: Dict[str, Any]\n    ) -> Dict[str, Any]:\n        try:\n            logger.info(f\"Updating settings for chat workspace: {workspace_uid}\")\n            updated_settings = self.client.update_chat_workspace_settings(\n                workspace_uid, settings\n            )\n            logger.info(f\"Updated settings for workspace: {workspace_uid}\")\n            return updated_settings\n        except MeilisearchApiError as e:\n            logger.error(\n                f\"Meilisearch API error in update_chat_workspace_settings: {e}\"\n            )\n            raise\n        except Exception as e:\n            logger.error(f\"Error in update_chat_workspace_settings: {e}\")\n            raise\n"
+  }
+]
