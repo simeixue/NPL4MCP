@@ -24,4 +24,4 @@ Code2Flow: Found variables ['Any->UNKNOWN_MODULE', 'AsyncMock->UNKNOWN_MODULE', 
 Code2Flow: Skipped processing these calls because the algorithm linked them to multiple function definitions: ['UNKNOWN_VAR.__init__()', 'self.shutdown()'].
 Code2Flow: Generating output file...
 Code2Flow: Wrote output file '/Users/xue/workspace/mcp_project/NPL4MCP/results/py_cg/meilisearch-mcp/cg_py.json' with 116 nodes and 221 edges.
-Code2Flow: Code2flow finished processing in 0.05 seconds.
+Code2Flow: Code2flow finished processing in 0.07 seconds.

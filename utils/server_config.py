@@ -33,16 +33,38 @@ config = {
         #     "command": "uvx",
         #     "args": ["-n", "meilisearch-mcp"]
         # },
-        "mcp-server-qdrant": {
-            "command": "uvx",
-            "args": ["mcp-server-qdrant"],
-            "env": {
-            "QDRANT_URL": "https://xyz-example.eu-central.aws.cloud.qdrant.io:6333",
-            "QDRANT_API_KEY": "your_api_key",
-            "COLLECTION_NAME": "your-collection-name",
-            "EMBEDDING_MODEL": "sentence-transformers/all-MiniLM-L6-v2"
-            }
+        "python-notebook-mcp": {
+            "command": "python", 
+            "args": [
+                f"{REPO_BASE}/python-notebook-mcp/server.py"
+                ],
+            "autoApprove": ["initialize_workspace"]
         }
+        
+        
+
+
+# ---------------- 有问题或需要配置的server ----------------
+
+        # "mcp-server-qdrant": { #tool的名字改变
+        #     "command": "uvx",
+        #     "args": ["mcp-server-qdrant"],
+        #     "env": {
+        #     "QDRANT_URL": "https://xyz-example.eu-central.aws.cloud.qdrant.io:6333",
+        #     "QDRANT_API_KEY": "your_api_key",
+        #     "COLLECTION_NAME": "your-collection-name",
+        #     "EMBEDDING_MODEL": "sentence-transformers/all-MiniLM-L6-v2"
+        #     }
+        # }
+        # "mcp-server-nacos": {
+        #     "command": "uv",
+        #     "args": [ 
+        #     "--directory",
+        #     f"{REPO_BASE}/mcp-server-nacos",
+        #     "run",
+        #     "mcp-server-nacos"
+        #     ]
+        # }
         
         # "MiniMax-MCP": {
         #     "command": "uvx",
@@ -55,6 +77,10 @@ config = {
         #             "MINIMAX_API_RESOURCE_MODE", ""
         #         ),
         #     },
+        # },
+
+        # "alibabacloud-observability-mcp-server": {
+        #     "url": "http://localhost:7897/sse"
         # },
     }
 }
