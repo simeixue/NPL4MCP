@@ -7,32 +7,32 @@ OUT_BASE = Path("/Users/xue/workspace/mcp_project/NPL4MCP/results/py_cg")
 # ---------------- Server config ----------------
 config = {
     "mcpServers": {
-        # "mcp-aiven": {
-        #     "command": "uv",
-        #     "args": [
-        #         "--directory",
-        #         f"{REPO_BASE}/mcp-aiven",
-        #         "run",
-        #         "--with-editable",
-        #         f"{REPO_BASE}/mcp-aiven",
-        #         "--python",
-        #         "3.13",
-        #         "mcp-aiven",
-        #     ],
-        #     "env": {
-        #         "AIVEN_BASE_URL": "https://api.aiven.io",
-        #         "AIVEN_TOKEN": os.environ.get("AIVEN_TOKEN", ""),
-        #     },
-        # },
-        # "chronulus-mcp": {
-        #     "command": "uvx",
-        #     "args": ["chronulus-mcp"],
-        #     "env": {"CHRONULUS_API_KEY": os.environ.get("CHRONULUS_API_KEY", "")},
-        # },
-        # "meilisearch-mcp": {
-        #     "command": "uvx",
-        #     "args": ["-n", "meilisearch-mcp"]
-        # },
+        "mcp-aiven": {
+            "command": "uv",
+            "args": [
+                "--directory",
+                f"{REPO_BASE}/mcp-aiven",
+                "run",
+                "--with-editable",
+                f"{REPO_BASE}/mcp-aiven",
+                "--python",
+                "3.13",
+                "mcp-aiven",
+            ],
+            "env": {
+                "AIVEN_BASE_URL": "https://api.aiven.io",
+                "AIVEN_TOKEN": os.environ.get("AIVEN_TOKEN", ""),
+            },
+        },
+        "chronulus-mcp": {
+            "command": "uvx",
+            "args": ["chronulus-mcp"],
+            "env": {"CHRONULUS_API_KEY": os.environ.get("CHRONULUS_API_KEY", "")},
+        },
+        "meilisearch-mcp": {
+            "command": "uvx",
+            "args": ["-n", "meilisearch-mcp"]
+        },
         "python-notebook-mcp": {
             "command": "python", 
             "args": [
