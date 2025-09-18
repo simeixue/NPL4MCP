@@ -1,0 +1,56 @@
+[
+  {
+    "name": "list_projects",
+    "description": "",
+    "input_schema": {
+      "properties": {},
+      "title": "list_projectsArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-aiven/mcp_aiven/mcp_server.py\n# module: mcp_aiven.mcp_server\n# qname: mcp_aiven.mcp_server.list_projects\n# lines: 30-34\ndef list_projects():\n    logger.info(\"Listing all projects\")\n    results = aiven_client.get_projects()\n    logger.info(f\"Found {len(results)} projects\")\n    return [result['project_name'] for result in results]\n"
+  },
+  {
+    "name": "list_services",
+    "description": "",
+    "input_schema": {
+      "properties": {
+        "project_name": {
+          "title": "project_name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "project_name"
+      ],
+      "title": "list_servicesArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-aiven/mcp_aiven/mcp_server.py\n# module: mcp_aiven.mcp_server\n# qname: mcp_aiven.mcp_server.list_services\n# lines: 38-42\ndef list_services(project_name):\n    logger.info(\"Listing all services in a project: %s\", project_name)\n    results = aiven_client.get_services(project=project_name)\n    logger.info(f\"Found {len(results)} services\")\n    return [s[\"service_name\"] for s in results]\n"
+  },
+  {
+    "name": "get_service_details",
+    "description": "",
+    "input_schema": {
+      "properties": {
+        "project_name": {
+          "title": "project_name",
+          "type": "string"
+        },
+        "service_name": {
+          "title": "service_name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "project_name",
+        "service_name"
+      ],
+      "title": "get_service_detailsArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-aiven/mcp_aiven/mcp_server.py\n# module: mcp_aiven.mcp_server\n# qname: mcp_aiven.mcp_server.get_service_details\n# lines: 46-49\ndef get_service_details(project_name, service_name):\n    logger.info(\"Fetching details for service: %s in project: %s\", service_name, project_name)\n    result = aiven_client.get_service(project=project_name, service=service_name)\n    return result\n"
+  }
+]
