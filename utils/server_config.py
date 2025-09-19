@@ -7,44 +7,60 @@ OUT_BASE = Path("/Users/xue/workspace/mcp_project/NPL4MCP/results/py_cg")
 # ---------------- Server config ----------------
 config = {
     "mcpServers": {
-        "mcp-aiven": {
-            "command": "uv",
-            "args": [
-                "--directory",
-                f"{REPO_BASE}/mcp-aiven",
-                "run",
-                "--with-editable",
-                f"{REPO_BASE}/mcp-aiven",
-                "--python",
-                "3.13",
-                "mcp-aiven",
-            ],
-            "env": {
-                "AIVEN_BASE_URL": "https://api.aiven.io",
-                "AIVEN_TOKEN": os.environ.get("AIVEN_TOKEN", ""),
-            },
-        },
-        "chronulus-mcp": {
-            "command": "uvx",
-            "args": ["chronulus-mcp"],
-            "env": {"CHRONULUS_API_KEY": os.environ.get("CHRONULUS_API_KEY", "")},
-        },
-        "meilisearch-mcp": {
-            "command": "uvx",
-            "args": ["-n", "meilisearch-mcp"]
-        },
-        "python-notebook-mcp": {
-            "command": "python", 
-            "args": [
-                f"{REPO_BASE}/python-notebook-mcp/server.py"
-                ],
-            "autoApprove": ["initialize_workspace"]
+        "twolven_mcp-server-puppeteer-py": {
+            "command": "python",
+            "args": [f"{REPO_BASE}/twolven_mcp-server-puppeteer-py/puppeteer.py"]
         }
+        # "Medical_calculator_MCP":{
+        #     "command": "python",
+        #     "args": [
+        #         f"{REPO_BASE}/Medical_calculator_MCP/server.py"
+        #     ]
+        # }
+        # "mcp-aiven": {
+        #     "command": "uv",
+        #     "args": [
+        #         "--directory",
+        #         f"{REPO_BASE}/mcp-aiven",
+        #         "run",
+        #         "--with-editable",
+        #         f"{REPO_BASE}/mcp-aiven",
+        #         "--python",
+        #         "3.13",
+        #         "mcp-aiven",
+        #     ],
+        #     "env": {
+        #         "AIVEN_BASE_URL": "https://api.aiven.io",
+        #         "AIVEN_TOKEN": os.environ.get("AIVEN_TOKEN", ""),
+        #     },
+        # },
+        # "chronulus-mcp": {
+        #     "command": "uvx",
+        #     "args": ["chronulus-mcp"],
+        #     "env": {"CHRONULUS_API_KEY": os.environ.get("CHRONULUS_API_KEY", "")},
+        # },
+        # "meilisearch-mcp": {
+        #     "command": "uvx",
+        #     "args": ["-n", "meilisearch-mcp"]
+        # },
+        # "python-notebook-mcp": {
+        #     "command": "python", 
+        #     "args": [
+        #         f"{REPO_BASE}/python-notebook-mcp/server.py"
+        #         ],
+        #     "autoApprove": ["initialize_workspace"]
+        # }
         
         
 
 
 # ---------------- 有问题或需要配置的server ----------------
+        # "MemProcFS-mcp-server": {
+        #     "command": "python",
+        #     "args": [
+        #         f"{REPO_BASE}/MemProcFS-mcp-server/server.py"
+        #     ]
+        # }
 
         # "mcp-server-qdrant": { #tool的名字改变
         #     "command": "uvx",

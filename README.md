@@ -1,4 +1,10 @@
 0916: 根据tool的名字能够获得完整的implementation
+
 所以下面这种函数名改变的情况找不到：
 在找tool的implementation的时候，代码是去找函数名为：qdrant-find的函数体，而实际的实现是find(find_foo = find)
-![alt text](image.png)
+![alt text](/src/image.png)
+
+0917
+如果tool不是以一个单独的函数出现的，也找不到
+https://github.com/MCP-Mirror/twolven_mcp-server-puppeteer-py/blob/main/puppeteer.py
+![alt text](/src/image-1.png)

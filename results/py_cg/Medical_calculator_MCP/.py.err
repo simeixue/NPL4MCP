@@ -1,0 +1,12 @@
+Code2Flow: Found 1 files from sources argument.
+Code2Flow: Processing 1 source file(s).
+Code2Flow:   /Users/xue/workspace/mcp_project/mcp_server_pyrepos/Medical_calculator_MCP/server.py
+Code2Flow: Found groups ['File: server'].
+Code2Flow: Found nodes ['(global)', 'bmi_calculator', 'calculate_egfr', 'corrected_calcium', 'eag_to_hba1c', 'estimated_average_glucose', 'free_androgen_index', 'fructosamine_to_hba1c', 'glucose_unit_conversion_mg_to_mmol', 'glucose_unit_conversion_mmol_to_mg', 'ideal_body_weight', 'insulin_correction_factor', 'insulin_to_carb_ratio'].
+Code2Flow: Found calls ['FastMCP()'].
+Code2Flow: Found variables ['FastMCP->UNKNOWN_MODULE', 'mcp-><Call owner_token=None token=FastMCP>'].
+Code2Flow: No functions found! Most likely, your file(s) do not have functions that call each other. Note that to generate a flowchart, you need to have both the function calls and the function definitions. Or, you might be excluding too many with --exclude-* / --include-* / --target-function arguments. 
+Code2Flow: Code2flow will generate an empty output file.
+Code2Flow: Generating output file...
+Code2Flow: Wrote output file '/Users/xue/workspace/mcp_project/NPL4MCP/results/py_cg/Medical_calculator_MCP/cg_py.json' with 0 nodes and 0 edges.
+Code2Flow: Code2flow finished processing in 0.00 seconds.

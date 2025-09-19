@@ -157,6 +157,10 @@ async def handle_one_server(server_name: str, server_cfg: dict):
     out_path = out_dir / "tools_with_impl.json"
 
     serializable = [serialize_tool(t, server_name, impl_map) for t in tools]
+    
+    # 检查 implementation 字段是否全为 None
+    if all(item["implementation"] is None for item in serializable):
+        print(f"\033[33m{server_name}的所有 implementation 都是 None\033[0m")
     FileUtil.save_data(serializable, str(out_path), indent=2)
     print(f"[ok] {server_name} -> {out_path}")
 

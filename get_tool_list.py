@@ -9,43 +9,43 @@ REPO_BASE = "/Users/xue/workspace/mcp_project/mcp_server_pyrepos"
 
 # 工具对象序列化函数
 def serialize_tool(tool):
-    source = "<source code unavailable>"
-
-    if isinstance(tool, FunctionTool):
-        f = getattr(tool, "function", None) or getattr(tool, "fn", None)
-        if f:
-            try:
-                source = inspect.getsource(f)
-            except Exception:
-                pass
-
     return {
         "name": tool.name,
         "description": tool.description,
-        "implementation": source,
+        # "implementation": source,
         "input_schema": tool.inputSchema,
         "annotations": tool.annotations,
     }
 
 config = {
     "mcpServers": {
-        "mcp-aiven": {
-            "command": "uv",
-            "args": [
-                "--directory",
-                f"{REPO_BASE}/mcp-aiven",
-                "run",
-                "--with-editable",
-                f"{REPO_BASE}/mcp-aiven",
-                "--python",
-                "3.13",
-                "mcp-aiven"
-            ],
-            "env": {
-                "AIVEN_BASE_URL": "https://api.aiven.io",
-                "AIVEN_TOKEN": "$AIVEN_TOKEN"
-            }
-        },
+        "twolven_mcp-server-puppeteer-py": {
+            "command": "python",
+            "args": [f"{REPO_BASE}/twolven_mcp-server-puppeteer-py/puppeteer.py"]
+        }
+        # "Medical_calculator_MCP":{
+        #     "command": "python",
+        #     "args": [
+        #         f"{REPO_BASE}/Medical_calculator_MCP/server.py"
+        #     ]
+        # }
+        # "mcp-aiven": {
+        #     "command": "uv",
+        #     "args": [
+        #         "--directory",
+        #         f"{REPO_BASE}/mcp-aiven",
+        #         "run",
+        #         "--with-editable",
+        #         f"{REPO_BASE}/mcp-aiven",
+        #         "--python",
+        #         "3.13",
+        #         "mcp-aiven"
+        #     ],
+        #     "env": {
+        #         "AIVEN_BASE_URL": "https://api.aiven.io",
+        #         "AIVEN_TOKEN": "$AIVEN_TOKEN"
+        #     }
+        # },
         # "windows-cmd": {
         #     "command": "node",
         #     "args": ["/path/to/dist/index.js"]
