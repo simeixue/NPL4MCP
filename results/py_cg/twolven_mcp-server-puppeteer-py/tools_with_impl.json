@@ -17,7 +17,8 @@
         "url"
       ]
     },
-    "annotations": null
+    "annotations": {},
+    "implementation": null
   },
   {
     "name": "puppeteer_screenshot",
@@ -50,7 +51,8 @@
         "name"
       ]
     },
-    "annotations": null
+    "annotations": {},
+    "implementation": null
   },
   {
     "name": "puppeteer_click",
@@ -71,7 +73,8 @@
         "selector"
       ]
     },
-    "annotations": null
+    "annotations": {},
+    "implementation": null
   },
   {
     "name": "puppeteer_fill",
@@ -97,7 +100,8 @@
         "value"
       ]
     },
-    "annotations": null
+    "annotations": {},
+    "implementation": null
   },
   {
     "name": "puppeteer_evaluate",
@@ -118,6 +122,7 @@
         "script"
       ]
     },
-    "annotations": null
+    "annotations": {},
+    "implementation": null
   }
 ]

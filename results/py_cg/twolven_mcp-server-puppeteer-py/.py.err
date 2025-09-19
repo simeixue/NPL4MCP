@@ -1,0 +1,11 @@
+Code2Flow: Found 2 files from sources argument.
+Code2Flow: Processing 2 source file(s).
+Code2Flow:   /Users/xue/workspace/mcp_project/mcp_server_pyrepos/twolven_mcp-server-puppeteer-py/puppeteer.py
+Code2Flow:   /Users/xue/workspace/mcp_project/mcp_server_pyrepos/twolven_mcp-server-puppeteer-py/setup.py
+Code2Flow: Found groups ['File: puppeteer', 'Class: BrowserManager', 'File: setup'].
+Code2Flow: Found nodes ['(global)', '(global)', 'BrowserManager.__init__', 'BrowserManager.check_page_loaded', 'BrowserManager.ensure_browser', 'call_tool', 'list_tools', 'main'].
+Code2Flow: Found calls ['BrowserManager()', 'ImageContent()', 'Server()', 'TextContent()', 'Tool()', 'UNKNOWN_VAR.decode()', 'UNKNOWN_VAR.start()', 'app.create_initialization_options()', 'app.run()', 'arguments.get()', 'async_playwright()', 'asyncio.run()', 'base64.b64encode()', 'browser_manager.check_page_loaded()', 'browser_manager.ensure_browser()', 'element.screenshot()', 'find_packages()', 'logger.error()', 'logger.info()', 'logging.basicConfig()', 'logging.getLogger()', 'main()', 'page.click()', 'page.evaluate()', 'page.fill()', 'page.goto()', 'page.screenshot()', 'page.set_viewport_size()', 'page.wait_for_selector()', 'self.append()', 'self.launch()', 'self.new_page()', 'self.on()', 'setup()', 'stdio_server()', 'str()'].
+Code2Flow: Found variables ['ImageContent->UNKNOWN_MODULE', 'PlaywrightTimeout->UNKNOWN_MODULE', 'Server->UNKNOWN_MODULE', 'TextContent->UNKNOWN_MODULE', 'Tool->UNKNOWN_MODULE', 'app-><Call owner_token=None token=Server>', 'async_playwright->UNKNOWN_MODULE', 'asyncio->UNKNOWN_MODULE', 'base64->UNKNOWN_MODULE', 'browser_manager->BrowserManager', 'find_packages->UNKNOWN_MODULE', 'height-><Call owner_token=arguments token=get>', 'logger-><Call owner_token=logging token=getLogger>', 'logging->UNKNOWN_MODULE', 'nav_timeout-><Call owner_token=arguments token=get>', 'screenshot_b64-><Call owner_token=UNKNOWN_VAR token=decode>', 'self->BrowserManager', 'setup->UNKNOWN_MODULE', 'stdio_server->UNKNOWN_MODULE', 'timeout-><Call owner_token=arguments token=get>', 'width-><Call owner_token=arguments token=get>'].
+Code2Flow: Generating output file...
+Code2Flow: Wrote output file '/Users/xue/workspace/mcp_project/NPL4MCP/results/py_cg/twolven_mcp-server-puppeteer-py/cg_py.json' with 6 nodes and 4 edges.
+Code2Flow: Code2flow finished processing in 0.00 seconds.
