@@ -1,0 +1,23 @@
+[
+  {
+    "name": "query",
+    "description": "Use this to execute a query on the MotherDuck or DuckDB database",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string",
+          "description": "SQL query to execute that is a dialect of DuckDB SQL"
+        }
+      },
+      "required": [
+        "query"
+      ]
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-server-motherduck/src/mcp_server_motherduck/database.py\n# module: src.mcp_server_motherduck.database\n# qname: src.mcp_server_motherduck.database.DatabaseClient.query\n# lines: 126-131\n    def query(self, query: str) -> str:\n        try:\n            return self._execute(query)\n\n        except Exception as e:\n            raise ValueError(f\"❌ Error executing query: {e}\")",
+      "depth_max": 0
+    }
+  }
+]

@@ -1,17 +1,44 @@
-import json
+import json, dataclasses
 import pickle
 import pandas as pd
 import os
 import ast
 import numpy as np
+from enum import Enum
+from pathlib import Path
+from typing import Any
 
+try:
+    from pydantic import BaseModel  # pydantic v2/v1 都可
+except Exception:  # 没装也不影响
+    class BaseModel:  # type: ignore
+        pass
 class FileUtil:
-    # 写入data
-    def save_data(data, path,indent=None, ensure_ascii=False):
-        with open(path, 'w', encoding='utf-8') as file:
-            if type(data) is not str:
-                data = json.dumps(data,indent=indent, ensure_ascii=ensure_ascii)
-            file.write(data)
+    def _to_jsonable(obj: Any):
+        if isinstance(obj, BaseModel):
+            # pydantic v2/v1 统一处理
+            dump = getattr(obj, "model_dump", None) or getattr(obj, "dict", None)
+            return dump() if dump else str(obj)
+        if dataclasses.is_dataclass(obj):
+            return dataclasses.asdict(obj)
+        if isinstance(obj, (set, tuple)):
+            return list(obj)
+        if isinstance(obj, Path):
+            return str(obj)
+        if isinstance(obj, Enum):
+            return obj.value
+        if isinstance(obj, bytes):
+            return obj.decode("utf-8", "ignore")
+        # 兜底交给 str，避免再次抛 TypeError
+        try:
+            json.dumps(obj)
+            return obj
+        except TypeError:
+            return str(obj)
+
+    def save_data(data: Any, path: str, indent: int = 2, ensure_ascii: bool = False):
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=indent, ensure_ascii=ensure_ascii, default=FileUtil._to_jsonable)
 
     
     # 读取data

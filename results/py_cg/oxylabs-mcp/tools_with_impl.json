@@ -1,0 +1,890 @@
+[
+  {
+    "name": "ai_crawler",
+    "description": "Tool useful for crawling a website from starting url and returning data in a specified format.\n\nSchema is required only if output_format is json.\n'render_javascript' is used to render javascript heavy websites.\n'return_sources_limit' is used to limit the number of sources to return,\nfor example if you expect results from single source, you can set it to 1.",
+    "input_schema": {
+      "properties": {
+        "url": {
+          "description": "The URL from which crawling will be started.",
+          "type": "string"
+        },
+        "user_prompt": {
+          "description": "What information user wants to extract from the domain.",
+          "type": "string"
+        },
+        "output_format": {
+          "default": "markdown",
+          "description": "The format of the output. If json, the schema is required. Markdown returns full text of the page.",
+          "enum": [
+            "json",
+            "markdown"
+          ],
+          "type": "string"
+        },
+        "schema": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The schema to use for the crawl. Only required if output_format is json."
+        },
+        "render_javascript": {
+          "default": false,
+          "description": "Whether to render the HTML of the page using javascript. Much slower, therefore use it only for websites that require javascript to render the page. Unless user asks to use it, first try to crawl the page without it. If results are unsatisfactory, try to use it.",
+          "type": "boolean"
+        },
+        "return_sources_limit": {
+          "default": 25,
+          "description": "The maximum number of sources to return.",
+          "maximum": 50,
+          "type": "integer"
+        },
+        "geo_location": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Two letter ISO country code to use for the crawl proxy."
+        }
+      },
+      "required": [
+        "url",
+        "user_prompt"
+      ],
+      "type": "object"
+    },
+    "annotations": {
+      "title": null,
+      "readOnlyHint": true,
+      "destructiveHint": null,
+      "idempotentHint": null,
+      "openWorldHint": null
+    },
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/oxylabs-mcp/tests/conftest.py\n# module: tests.conftest\n# qname: tests.conftest.ai_crawler\n# lines: 89-94\ndef ai_crawler(mock_schema):\n    mock_crawler = MagicMock()\n    mock_crawler.generate_schema.return_value = mock_schema\n\n    with patch(\"oxylabs_mcp.tools.ai_studio.AiCrawler\", return_value=mock_crawler):\n        yield mock_crawler",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/oxylabs-mcp/src/oxylabs_mcp/utils.py\n# module: src.oxylabs_mcp.utils\n# qname: src.oxylabs_mcp.utils.get_and_verify_oxylabs_ai_studio_api_key\n# lines: 231-242\ndef get_and_verify_oxylabs_ai_studio_api_key() -> str:\n    \"\"\"Extract and varify the Oxylabs AI Studio API key.\"\"\"\n    ai_studio_api_key = get_oxylabs_ai_studio_api_key()\n\n    if ai_studio_api_key is None:\n        msg = \"AI Studio API key is not set\"\n        logger.warning(msg)\n        raise ValueError(msg)\n    if not is_api_key_valid(ai_studio_api_key):\n        raise ValueError(\"AI Studio API key is not valid\")\n\n    return ai_studio_api_key"
+      ],
+      "depth_2": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/oxylabs-mcp/src/oxylabs_mcp/utils.py\n# module: src.oxylabs_mcp.utils\n# qname: src.oxylabs_mcp.utils.get_oxylabs_ai_studio_api_key\n# lines: 187-198\ndef get_oxylabs_ai_studio_api_key() -> str | None:\n    \"\"\"Extract the Oxylabs AI Studio API key.\"\"\"\n    if settings.MCP_TRANSPORT == \"streamable-http\":\n        request_headers = dict(get_context().request_context.request.headers)  # type: ignore[union-attr]\n        ai_studio_api_key = request_headers.get(AI_STUDIO_API_KEY_HEADER.lower())\n        if not ai_studio_api_key:\n            query_params = get_context().request_context.request.query_params  # type: ignore[union-attr]\n            ai_studio_api_key = query_params.get(AI_STUDIO_API_KEY_QUERY_PARAM)\n    else:\n        ai_studio_api_key = os.getenv(AI_STUDIO_API_KEY_ENV)\n\n    return ai_studio_api_key"
+      ],
+      "depth_max": 2
+    }
+  },
+  {
+    "name": "ai_scraper",
+    "description": "Scrape the contents of the web page and return the data in the specified format.\n\nSchema is required only if output_format is json.\n'render_javascript' is used to render javascript heavy websites.",
+    "input_schema": {
+      "properties": {
+        "url": {
+          "description": "The URL to scrape",
+          "type": "string"
+        },
+        "output_format": {
+          "default": "markdown",
+          "description": "The format of the output. If json, the schema is required. Markdown returns full text of the page.",
+          "enum": [
+            "json",
+            "markdown"
+          ],
+          "type": "string"
+        },
+        "schema": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The schema to use for the scrape. Only required if output_format is json."
+        },
+        "render_javascript": {
+          "default": false,
+          "description": "Whether to render the HTML of the page using javascript. Much slower, therefore use it only for websites that require javascript to render the page.Unless user asks to use it, first try to scrape the page without it. If results are unsatisfactory, try to use it.",
+          "type": "boolean"
+        },
+        "geo_location": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Two letter ISO country code to use for the scrape proxy."
+        }
+      },
+      "required": [
+        "url"
+      ],
+      "type": "object"
+    },
+    "annotations": {
+      "title": null,
+      "readOnlyHint": true,
+      "destructiveHint": null,
+      "idempotentHint": null,
+      "openWorldHint": null
+    },
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/oxylabs-mcp/tests/conftest.py\n# module: tests.conftest\n# qname: tests.conftest.ai_scraper\n# lines: 98-103\ndef ai_scraper(mock_schema):\n    mock_scraper = MagicMock()\n    mock_scraper.generate_schema.return_value = mock_schema\n\n    with patch(\"oxylabs_mcp.tools.ai_studio.AiScraper\", return_value=mock_scraper):\n        yield mock_scraper",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/oxylabs-mcp/src/oxylabs_mcp/utils.py\n# module: src.oxylabs_mcp.utils\n# qname: src.oxylabs_mcp.utils.get_and_verify_oxylabs_ai_studio_api_key\n# lines: 231-242\ndef get_and_verify_oxylabs_ai_studio_api_key() -> str:\n    \"\"\"Extract and varify the Oxylabs AI Studio API key.\"\"\"\n    ai_studio_api_key = get_oxylabs_ai_studio_api_key()\n\n    if ai_studio_api_key is None:\n        msg = \"AI Studio API key is not set\"\n        logger.warning(msg)\n        raise ValueError(msg)\n    if not is_api_key_valid(ai_studio_api_key):\n        raise ValueError(\"AI Studio API key is not valid\")\n\n    return ai_studio_api_key"
+      ],
+      "depth_2": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/oxylabs-mcp/src/oxylabs_mcp/utils.py\n# module: src.oxylabs_mcp.utils\n# qname: src.oxylabs_mcp.utils.get_oxylabs_ai_studio_api_key\n# lines: 187-198\ndef get_oxylabs_ai_studio_api_key() -> str | None:\n    \"\"\"Extract the Oxylabs AI Studio API key.\"\"\"\n    if settings.MCP_TRANSPORT == \"streamable-http\":\n        request_headers = dict(get_context().request_context.request.headers)  # type: ignore[union-attr]\n        ai_studio_api_key = request_headers.get(AI_STUDIO_API_KEY_HEADER.lower())\n        if not ai_studio_api_key:\n            query_params = get_context().request_context.request.query_params  # type: ignore[union-attr]\n            ai_studio_api_key = query_params.get(AI_STUDIO_API_KEY_QUERY_PARAM)\n    else:\n        ai_studio_api_key = os.getenv(AI_STUDIO_API_KEY_ENV)\n\n    return ai_studio_api_key"
+      ],
+      "depth_max": 2
+    }
+  },
+  {
+    "name": "ai_browser_agent",
+    "description": "Run the browser agent and return the data in the specified format.\n\nThis tool is useful if you need navigate around the website and do some actions.\nIt allows navigating to any url, clicking on links, filling forms, scrolling, etc.\nFinally it returns the data in the specified format. Schema is required only if output_format is json.\n'task_prompt' describes what browser agent should achieve",
+    "input_schema": {
+      "properties": {
+        "url": {
+          "description": "The URL to start the browser agent navigation from.",
+          "type": "string"
+        },
+        "task_prompt": {
+          "description": "What browser agent should do.",
+          "type": "string"
+        },
+        "output_format": {
+          "default": "markdown",
+          "description": "The output format. Screenshot is base64 encoded jpeg image. Markdown returns full text of the page including links. If json, the schema is required.",
+          "enum": [
+            "json",
+            "markdown",
+            "html",
+            "screenshot"
+          ],
+          "type": "string"
+        },
+        "schema": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The schema to use for the scrape. Only required if output_format is json."
+        },
+        "geo_location": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Two letter ISO country code to use for the browser proxy."
+        }
+      },
+      "required": [
+        "url",
+        "task_prompt"
+      ],
+      "type": "object"
+    },
+    "annotations": {
+      "title": null,
+      "readOnlyHint": true,
+      "destructiveHint": null,
+      "idempotentHint": null,
+      "openWorldHint": null
+    },
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/oxylabs-mcp/src/oxylabs_mcp/tools/ai_studio.py\n# module: src.oxylabs_mcp.tools.ai_studio\n# qname: src.oxylabs_mcp.tools.ai_studio.ai_browser_agent\n# lines: 158-202\nasync def ai_browser_agent(\n    url: Annotated[str, Field(description=\"The URL to start the browser agent navigation from.\")],\n    task_prompt: Annotated[str, Field(description=\"What browser agent should do.\")],\n    output_format: Annotated[\n        Literal[\"json\", \"markdown\", \"html\", \"screenshot\"],\n        Field(\n            description=(\n                \"The output format. Screenshot is base64 encoded jpeg image. \"\n                \"Markdown returns full text of the page including links. \"\n                \"If json, the schema is required.\"\n            )\n        ),\n    ] = \"markdown\",\n    schema: Annotated[\n        dict[str, Any] | None,\n        Field(\n            description=(\n                \"The schema to use for the scrape. Only required if output_format is json.\"\n            )\n        ),\n    ] = None,\n    geo_location: Annotated[\n        str | None, Field(description=\"Two letter ISO country code to use for the browser proxy.\")\n    ] = None,\n) -> str:\n    \"\"\"Run the browser agent and return the data in the specified format.\n\n    This tool is useful if you need navigate around the website and do some actions.\n    It allows navigating to any url, clicking on links, filling forms, scrolling, etc.\n    Finally it returns the data in the specified format. Schema is required only if output_format is json.\n    'task_prompt' describes what browser agent should achieve\n    \"\"\"  # noqa: E501\n    logger.info(\n        f\"Calling ai_browser_agent with: {url=}, {task_prompt=}, {output_format=}, {schema=}\"\n    )\n    browser_agent = BrowserAgent(api_key=get_and_verify_oxylabs_ai_studio_api_key())\n    result = await browser_agent.run_async(\n        url=url,\n        user_prompt=task_prompt,\n        output_format=output_format,\n        schema=schema,\n        geo_location=geo_location,\n    )\n    data = result.data.model_dump(mode=\"json\") if result.data else None\n    return json.dumps({\"data\": data})",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/oxylabs-mcp/src/oxylabs_mcp/utils.py\n# module: src.oxylabs_mcp.utils\n# qname: src.oxylabs_mcp.utils.get_and_verify_oxylabs_ai_studio_api_key\n# lines: 231-242\ndef get_and_verify_oxylabs_ai_studio_api_key() -> str:\n    \"\"\"Extract and varify the Oxylabs AI Studio API key.\"\"\"\n    ai_studio_api_key = get_oxylabs_ai_studio_api_key()\n\n    if ai_studio_api_key is None:\n        msg = \"AI Studio API key is not set\"\n        logger.warning(msg)\n        raise ValueError(msg)\n    if not is_api_key_valid(ai_studio_api_key):\n        raise ValueError(\"AI Studio API key is not valid\")\n\n    return ai_studio_api_key"
+      ],
+      "depth_2": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/oxylabs-mcp/src/oxylabs_mcp/utils.py\n# module: src.oxylabs_mcp.utils\n# qname: src.oxylabs_mcp.utils.get_oxylabs_ai_studio_api_key\n# lines: 187-198\ndef get_oxylabs_ai_studio_api_key() -> str | None:\n    \"\"\"Extract the Oxylabs AI Studio API key.\"\"\"\n    if settings.MCP_TRANSPORT == \"streamable-http\":\n        request_headers = dict(get_context().request_context.request.headers)  # type: ignore[union-attr]\n        ai_studio_api_key = request_headers.get(AI_STUDIO_API_KEY_HEADER.lower())\n        if not ai_studio_api_key:\n            query_params = get_context().request_context.request.query_params  # type: ignore[union-attr]\n            ai_studio_api_key = query_params.get(AI_STUDIO_API_KEY_QUERY_PARAM)\n    else:\n        ai_studio_api_key = os.getenv(AI_STUDIO_API_KEY_ENV)\n\n    return ai_studio_api_key"
+      ],
+      "depth_max": 2
+    }
+  },
+  {
+    "name": "ai_search",
+    "description": "Search the web based on a provided query.\n\n'return_content' is used to return markdown content for each search result. If 'return_content'\n    is set to True, you don't need to use ai_scraper to get the content of the search results urls,\n    because it is already included in the search results.\nif 'return_content' is set to True, prefer lower 'limit' to reduce payload size.",
+    "input_schema": {
+      "properties": {
+        "query": {
+          "description": "The query to search for.",
+          "type": "string"
+        },
+        "limit": {
+          "default": 10,
+          "description": "Maximum number of results to return.",
+          "maximum": 50,
+          "type": "integer"
+        },
+        "render_javascript": {
+          "default": false,
+          "description": "Whether to render the HTML of the page using javascript. Much slower, therefore use it only if user asks to use it.First try to search with setting it to False. ",
+          "type": "boolean"
+        },
+        "return_content": {
+          "default": false,
+          "description": "Whether to return markdown content of the search results.",
+          "type": "boolean"
+        },
+        "geo_location": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Two letter ISO country code to use for the search proxy."
+        }
+      },
+      "required": [
+        "query"
+      ],
+      "type": "object"
+    },
+    "annotations": {
+      "title": null,
+      "readOnlyHint": true,
+      "destructiveHint": null,
+      "idempotentHint": null,
+      "openWorldHint": null
+    },
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/oxylabs-mcp/tests/conftest.py\n# module: tests.conftest\n# qname: tests.conftest.ai_search\n# lines: 116-120\ndef ai_search():\n    mock_ai_search = MagicMock()\n\n    with patch(\"oxylabs_mcp.tools.ai_studio.AiSearch\", return_value=mock_ai_search):\n        yield mock_ai_search",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/oxylabs-mcp/src/oxylabs_mcp/utils.py\n# module: src.oxylabs_mcp.utils\n# qname: src.oxylabs_mcp.utils.get_and_verify_oxylabs_ai_studio_api_key\n# lines: 231-242\ndef get_and_verify_oxylabs_ai_studio_api_key() -> str:\n    \"\"\"Extract and varify the Oxylabs AI Studio API key.\"\"\"\n    ai_studio_api_key = get_oxylabs_ai_studio_api_key()\n\n    if ai_studio_api_key is None:\n        msg = \"AI Studio API key is not set\"\n        logger.warning(msg)\n        raise ValueError(msg)\n    if not is_api_key_valid(ai_studio_api_key):\n        raise ValueError(\"AI Studio API key is not valid\")\n\n    return ai_studio_api_key"
+      ],
+      "depth_2": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/oxylabs-mcp/src/oxylabs_mcp/utils.py\n# module: src.oxylabs_mcp.utils\n# qname: src.oxylabs_mcp.utils.get_oxylabs_ai_studio_api_key\n# lines: 187-198\ndef get_oxylabs_ai_studio_api_key() -> str | None:\n    \"\"\"Extract the Oxylabs AI Studio API key.\"\"\"\n    if settings.MCP_TRANSPORT == \"streamable-http\":\n        request_headers = dict(get_context().request_context.request.headers)  # type: ignore[union-attr]\n        ai_studio_api_key = request_headers.get(AI_STUDIO_API_KEY_HEADER.lower())\n        if not ai_studio_api_key:\n            query_params = get_context().request_context.request.query_params  # type: ignore[union-attr]\n            ai_studio_api_key = query_params.get(AI_STUDIO_API_KEY_QUERY_PARAM)\n    else:\n        ai_studio_api_key = os.getenv(AI_STUDIO_API_KEY_ENV)\n\n    return ai_studio_api_key"
+      ],
+      "depth_max": 2
+    }
+  },
+  {
+    "name": "generate_schema",
+    "description": "Generate a json schema in openapi format.",
+    "input_schema": {
+      "properties": {
+        "user_prompt": {
+          "type": "string"
+        },
+        "app_name": {
+          "enum": [
+            "ai_crawler",
+            "ai_scraper",
+            "browser_agent"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "user_prompt",
+        "app_name"
+      ],
+      "type": "object"
+    },
+    "annotations": {
+      "title": null,
+      "readOnlyHint": true,
+      "destructiveHint": null,
+      "idempotentHint": null,
+      "openWorldHint": null
+    },
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/oxylabs-mcp/src/oxylabs_mcp/tools/ai_studio.py\n# module: src.oxylabs_mcp.tools.ai_studio\n# qname: src.oxylabs_mcp.tools.ai_studio.generate_schema\n# lines: 250-267\nasync def generate_schema(\n    user_prompt: str,\n    app_name: Literal[\"ai_crawler\", \"ai_scraper\", \"browser_agent\"],\n) -> str:\n    \"\"\"Generate a json schema in openapi format.\"\"\"\n    if app_name == \"ai_crawler\":\n        crawler = AiCrawler(api_key=get_and_verify_oxylabs_ai_studio_api_key())\n        schema = crawler.generate_schema(prompt=user_prompt)\n    elif app_name == \"ai_scraper\":\n        scraper = AiScraper(api_key=get_and_verify_oxylabs_ai_studio_api_key())\n        schema = scraper.generate_schema(prompt=user_prompt)\n    elif app_name == \"browser_agent\":\n        browser_agent = BrowserAgent(api_key=get_and_verify_oxylabs_ai_studio_api_key())\n        schema = browser_agent.generate_schema(prompt=user_prompt)\n    else:\n        raise ValueError(f\"Invalid app name: {app_name}\")\n\n    return json.dumps({\"data\": schema})",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/oxylabs-mcp/src/oxylabs_mcp/utils.py\n# module: src.oxylabs_mcp.utils\n# qname: src.oxylabs_mcp.utils.get_and_verify_oxylabs_ai_studio_api_key\n# lines: 231-242\ndef get_and_verify_oxylabs_ai_studio_api_key() -> str:\n    \"\"\"Extract and varify the Oxylabs AI Studio API key.\"\"\"\n    ai_studio_api_key = get_oxylabs_ai_studio_api_key()\n\n    if ai_studio_api_key is None:\n        msg = \"AI Studio API key is not set\"\n        logger.warning(msg)\n        raise ValueError(msg)\n    if not is_api_key_valid(ai_studio_api_key):\n        raise ValueError(\"AI Studio API key is not valid\")\n\n    return ai_studio_api_key"
+      ],
+      "depth_2": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/oxylabs-mcp/src/oxylabs_mcp/utils.py\n# module: src.oxylabs_mcp.utils\n# qname: src.oxylabs_mcp.utils.get_oxylabs_ai_studio_api_key\n# lines: 187-198\ndef get_oxylabs_ai_studio_api_key() -> str | None:\n    \"\"\"Extract the Oxylabs AI Studio API key.\"\"\"\n    if settings.MCP_TRANSPORT == \"streamable-http\":\n        request_headers = dict(get_context().request_context.request.headers)  # type: ignore[union-attr]\n        ai_studio_api_key = request_headers.get(AI_STUDIO_API_KEY_HEADER.lower())\n        if not ai_studio_api_key:\n            query_params = get_context().request_context.request.query_params  # type: ignore[union-attr]\n            ai_studio_api_key = query_params.get(AI_STUDIO_API_KEY_QUERY_PARAM)\n    else:\n        ai_studio_api_key = os.getenv(AI_STUDIO_API_KEY_ENV)\n\n    return ai_studio_api_key"
+      ],
+      "depth_max": 2
+    }
+  },
+  {
+    "name": "ai_map",
+    "description": "Tool useful for mapping website's urls.",
+    "input_schema": {
+      "properties": {
+        "url": {
+          "description": "The URL from which URLs mapping will be started.",
+          "type": "string"
+        },
+        "user_prompt": {
+          "description": "What kind of urls user wants to find.",
+          "type": "string"
+        },
+        "render_javascript": {
+          "default": false,
+          "description": "Whether to render the HTML of the page using javascript. Much slower, therefore use it only for websites that require javascript to render the page. Unless user asks to use it, first try to crawl the page without it. If results are unsatisfactory, try to use it.",
+          "type": "boolean"
+        },
+        "return_sources_limit": {
+          "default": 25,
+          "description": "The maximum number of sources to return.",
+          "maximum": 50,
+          "type": "integer"
+        },
+        "geo_location": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Two letter ISO country code to use for the mapping proxy."
+        }
+      },
+      "required": [
+        "url",
+        "user_prompt"
+      ],
+      "type": "object"
+    },
+    "annotations": {
+      "title": null,
+      "readOnlyHint": true,
+      "destructiveHint": null,
+      "idempotentHint": null,
+      "openWorldHint": null
+    },
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/oxylabs-mcp/tests/conftest.py\n# module: tests.conftest\n# qname: tests.conftest.ai_map\n# lines: 124-128\ndef ai_map():\n    mock_ai_map = MagicMock()\n\n    with patch(\"oxylabs_mcp.tools.ai_studio.AiMap\", return_value=mock_ai_map):\n        yield mock_ai_map",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/oxylabs-mcp/src/oxylabs_mcp/utils.py\n# module: src.oxylabs_mcp.utils\n# qname: src.oxylabs_mcp.utils.get_and_verify_oxylabs_ai_studio_api_key\n# lines: 231-242\ndef get_and_verify_oxylabs_ai_studio_api_key() -> str:\n    \"\"\"Extract and varify the Oxylabs AI Studio API key.\"\"\"\n    ai_studio_api_key = get_oxylabs_ai_studio_api_key()\n\n    if ai_studio_api_key is None:\n        msg = \"AI Studio API key is not set\"\n        logger.warning(msg)\n        raise ValueError(msg)\n    if not is_api_key_valid(ai_studio_api_key):\n        raise ValueError(\"AI Studio API key is not valid\")\n\n    return ai_studio_api_key"
+      ],
+      "depth_2": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/oxylabs-mcp/src/oxylabs_mcp/utils.py\n# module: src.oxylabs_mcp.utils\n# qname: src.oxylabs_mcp.utils.get_oxylabs_ai_studio_api_key\n# lines: 187-198\ndef get_oxylabs_ai_studio_api_key() -> str | None:\n    \"\"\"Extract the Oxylabs AI Studio API key.\"\"\"\n    if settings.MCP_TRANSPORT == \"streamable-http\":\n        request_headers = dict(get_context().request_context.request.headers)  # type: ignore[union-attr]\n        ai_studio_api_key = request_headers.get(AI_STUDIO_API_KEY_HEADER.lower())\n        if not ai_studio_api_key:\n            query_params = get_context().request_context.request.query_params  # type: ignore[union-attr]\n            ai_studio_api_key = query_params.get(AI_STUDIO_API_KEY_QUERY_PARAM)\n    else:\n        ai_studio_api_key = os.getenv(AI_STUDIO_API_KEY_ENV)\n\n    return ai_studio_api_key"
+      ],
+      "depth_max": 2
+    }
+  },
+  {
+    "name": "universal_scraper",
+    "description": "Get a content of any webpage.\n\nSupports browser rendering, parsing of certain webpages\nand different output formats.",
+    "input_schema": {
+      "properties": {
+        "url": {
+          "description": "Website url to scrape.",
+          "type": "string"
+        },
+        "render": {
+          "default": "",
+          "description": "\n        Whether a headless browser should be used to render the page.\n        For example:\n            - 'html' when browser is required to render the page.\n        ",
+          "enum": [
+            "",
+            "html"
+          ],
+          "examples": [
+            "",
+            "html"
+          ],
+          "type": "string"
+        },
+        "user_agent_type": {
+          "default": "",
+          "description": "Device type and browser that will be used to determine User-Agent header value.",
+          "enum": [
+            "",
+            "desktop",
+            "desktop_chrome",
+            "desktop_firefox",
+            "desktop_safari",
+            "desktop_edge",
+            "desktop_opera",
+            "mobile",
+            "mobile_ios",
+            "mobile_android",
+            "tablet"
+          ],
+          "type": "string"
+        },
+        "geo_location": {
+          "default": "",
+          "description": "\n        The geographical location that the result should be adapted for.\n        Use ISO-3166 country codes.\n        Examples:\n            - 'California, United States'\n            - 'Mexico'\n            - 'US' for United States\n            - 'DE' for Germany\n            - 'FR' for France\n        ",
+          "examples": [
+            "US",
+            "DE",
+            "FR"
+          ],
+          "type": "string"
+        },
+        "output_format": {
+          "default": "",
+          "description": "\n        The format of the output. Works only when parse parameter is false.\n            - links - Most efficient when the goal is navigation or finding specific URLs. Use this first when you need to locate a specific page within a website.\n            - md - Best for extracting and reading visible content once you've found the right page. Use this to get structured content that's easy to read and process.\n            - html - Should be used sparingly only when you need the raw HTML structure, JavaScript code, or styling information.\n        ",
+          "enum": [
+            "",
+            "links",
+            "md",
+            "html"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "url"
+      ],
+      "type": "object"
+    },
+    "annotations": {
+      "title": null,
+      "readOnlyHint": true,
+      "destructiveHint": null,
+      "idempotentHint": null,
+      "openWorldHint": null
+    },
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/oxylabs-mcp/src/oxylabs_mcp/tools/scraper.py\n# module: src.oxylabs_mcp.tools.scraper\n# qname: src.oxylabs_mcp.tools.scraper.universal_scraper\n# lines: 25-52\nasync def universal_scraper(\n    url: url_params.URL_PARAM,\n    render: url_params.RENDER_PARAM = \"\",\n    user_agent_type: url_params.USER_AGENT_TYPE_PARAM = \"\",\n    geo_location: url_params.GEO_LOCATION_PARAM = \"\",\n    output_format: url_params.OUTPUT_FORMAT_PARAM = \"\",\n) -> str:\n    \"\"\"Get a content of any webpage.\n\n    Supports browser rendering, parsing of certain webpages\n    and different output formats.\n    \"\"\"\n    try:\n        async with oxylabs_client() as client:\n            payload: dict[str, Any] = {\"url\": url}\n\n            if render:\n                payload[\"render\"] = render\n            if user_agent_type:\n                payload[\"user_agent_type\"] = user_agent_type\n            if geo_location:\n                payload[\"geo_location\"] = geo_location\n\n            response_json = await client.scrape(payload)\n\n            return get_content(response_json, output_format=output_format)\n    except MCPServerError as e:\n        return await e.process()",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/oxylabs-mcp/src/oxylabs_mcp/utils.py\n# module: src.oxylabs_mcp.utils\n# qname: src.oxylabs_mcp.utils.get_content\n# lines: 288-305\ndef get_content(\n    response_json: dict[str, typing.Any],\n    *,\n    output_format: str,\n    parse: bool = False,\n) -> str:\n    \"\"\"Extract content from response and convert to a proper format.\"\"\"\n    content = response_json[\"results\"][0][\"content\"]\n    if parse and isinstance(content, dict):\n        return json.dumps(content)\n    if output_format == \"html\":\n        return str(content)\n    if output_format == \"links\":\n        links = extract_links_with_text(str(content))\n        return \"\\n\".join(links)\n\n    stripped_html = strip_html(str(content))\n    return markdownify(stripped_html)  # type: ignore[no-any-return]"
+      ],
+      "depth_2": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/oxylabs-mcp/src/oxylabs_mcp/utils.py\n# module: src.oxylabs_mcp.utils\n# qname: src.oxylabs_mcp.utils.extract_links_with_text\n# lines: 245-285\ndef extract_links_with_text(html: str, base_url: str | None = None) -> list[str]:\n    \"\"\"Extract links with their display text from HTML.\n\n    Args:\n        html (str): The input HTML string.\n        base_url (str | None): Base URL to use for converting relative URLs to absolute.\n                             If None, relative URLs will remain as is.\n\n    Returns:\n        list[str]: List of links in format [Display Text] URL\n\n    \"\"\"\n    html_tree = fromstring(html)\n    links = []\n\n    for link in html_tree.xpath(\"//a[@href]\"):  # type: ignore[union-attr]\n        href = link.get(\"href\")  # type: ignore[union-attr]\n        text = link.text_content().strip()  # type: ignore[union-attr]\n\n        if href and text:\n            # Skip empty or whitespace-only text\n            if not text:\n                continue\n\n            # Skip anchor links\n            if href.startswith(\"#\"):\n                continue\n\n            # Skip javascript links\n            if href.startswith(\"javascript:\"):\n                continue\n\n            # Make relative URLs absolute if base_url is provided\n            if base_url and href.startswith(\"/\"):\n                # Remove trailing slash from base_url if present\n                base = base_url.rstrip(\"/\")\n                href = f\"{base}{href}\"\n\n            links.append(f\"[{text}] {href}\")\n\n    return links",
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/oxylabs-mcp/src/oxylabs_mcp/utils.py\n# module: src.oxylabs_mcp.utils\n# qname: src.oxylabs_mcp.utils.strip_html\n# lines: 68-116\ndef strip_html(html: str) -> str:\n    \"\"\"Simplify an HTML string.\n\n    Will remove unwanted elements, attributes, and redundant content\n    Args:\n        html (str): The input HTML string.\n\n    Returns:\n        str: The cleaned and simplified HTML string.\n\n    \"\"\"\n    cleaned_html = clean_html(html)\n    html_tree = fromstring(cleaned_html)\n\n    for element in html_tree.iter():\n        # Remove style attributes.\n        if \"style\" in element.attrib:\n            del element.attrib[\"style\"]\n\n        # Remove elements that have no attributes, no content and no children.\n        if (\n            (not element.attrib or (len(element.attrib) == 1 and \"idx\" in element.attrib))\n            and not element.getchildren()  # type: ignore[attr-defined]\n            and (not element.text or not element.text.strip())\n            and (not element.tail or not element.tail.strip())\n        ):\n            parent = element.getparent()\n            if parent is not None:\n                parent.remove(element)\n\n    # Remove elements with footer and hidden in class or id\n    xpath_query = (\n        \".//*[contains(@class, 'footer') or contains(@id, 'footer') or \"\n        \"contains(@class, 'hidden') or contains(@id, 'hidden')]\"\n    )\n    elements_to_remove = html_tree.xpath(xpath_query)\n    for element in elements_to_remove:  # type: ignore[assignment, union-attr]\n        parent = element.getparent()\n        if parent is not None:\n            parent.remove(element)\n\n    # Serialize the HTML tree back to a string\n    stripped_html = tostring(html_tree, encoding=\"unicode\")\n    # Previous cleaning produces empty spaces.\n    # Replace multiple spaces with a single one\n    stripped_html = re.sub(r\"\\s{2,}\", \" \", stripped_html)\n    # Replace consecutive newlines with an empty string\n    stripped_html = re.sub(r\"\\n{2,}\", \"\", stripped_html)\n    return stripped_html"
+      ],
+      "depth_3": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/oxylabs-mcp/src/oxylabs_mcp/utils.py\n# module: src.oxylabs_mcp.utils\n# qname: src.oxylabs_mcp.utils.clean_html\n# lines: 46-65\ndef clean_html(html: str) -> str:\n    \"\"\"Clean an HTML string.\"\"\"\n    cleaner = Cleaner(\n        scripts=True,\n        javascript=True,\n        style=True,\n        remove_tags=[],\n        kill_tags=[\"nav\", \"svg\", \"footer\", \"noscript\", \"script\", \"form\"],\n        safe_attrs=list(defs.safe_attrs) + [\"idx\"],\n        comments=True,\n        inline_style=True,\n        links=True,\n        meta=False,\n        page_structure=False,\n        embedded=True,\n        frames=False,\n        forms=False,\n        annoying_tags=False,\n    )\n    return cleaner.clean_html(html)  # type: ignore[no-any-return]"
+      ],
+      "depth_max": 3
+    }
+  },
+  {
+    "name": "google_search_scraper",
+    "description": "Scrape Google Search results.\n\nSupports content parsing, different user agent types, pagination,\ndomain, geolocation, locale parameters and different output formats.",
+    "input_schema": {
+      "properties": {
+        "query": {
+          "description": "URL-encoded keyword to search for.",
+          "type": "string"
+        },
+        "parse": {
+          "default": true,
+          "description": "Should result be parsed. If the result is not parsed, the output_format parameter is applied.",
+          "type": "boolean"
+        },
+        "render": {
+          "default": "",
+          "description": "\n        Whether a headless browser should be used to render the page.\n        For example:\n            - 'html' when browser is required to render the page.\n        ",
+          "enum": [
+            "",
+            "html"
+          ],
+          "examples": [
+            "",
+            "html"
+          ],
+          "type": "string"
+        },
+        "user_agent_type": {
+          "default": "",
+          "description": "Device type and browser that will be used to determine User-Agent header value.",
+          "enum": [
+            "",
+            "desktop",
+            "desktop_chrome",
+            "desktop_firefox",
+            "desktop_safari",
+            "desktop_edge",
+            "desktop_opera",
+            "mobile",
+            "mobile_ios",
+            "mobile_android",
+            "tablet"
+          ],
+          "type": "string"
+        },
+        "start_page": {
+          "default": 0,
+          "description": "Starting page number.",
+          "type": "integer"
+        },
+        "pages": {
+          "default": 0,
+          "description": "Number of pages to retrieve.",
+          "type": "integer"
+        },
+        "limit": {
+          "default": 0,
+          "description": "Number of results to retrieve in each page.",
+          "type": "integer"
+        },
+        "domain": {
+          "default": "",
+          "description": "\n        Domain localization for Google.\n        Use country top level domains.\n        For example:\n            - 'co.uk' for United Kingdom\n            - 'us' for United States\n            - 'fr' for France\n        ",
+          "examples": [
+            "uk",
+            "us",
+            "fr"
+          ],
+          "type": "string"
+        },
+        "geo_location": {
+          "default": "",
+          "description": "\n        The geographical location that the result should be adapted for.\n        Use ISO-3166 country codes.\n        Examples:\n            - 'California, United States'\n            - 'Mexico'\n            - 'US' for United States\n            - 'DE' for Germany\n            - 'FR' for France\n        ",
+          "examples": [
+            "US",
+            "DE",
+            "FR"
+          ],
+          "type": "string"
+        },
+        "locale": {
+          "default": "",
+          "description": "\n        Set 'Accept-Language' header value which changes your Google search page web interface language.\n        Examples:\n            - 'en-US' for English, United States\n            - 'de-AT' for German, Austria\n            - 'fr-FR' for French, France\n        ",
+          "examples": [
+            "en-US",
+            "de-AT",
+            "fr-FR"
+          ],
+          "type": "string"
+        },
+        "ad_mode": {
+          "default": false,
+          "description": "If true will use the Google Ads source optimized for the paid ads.",
+          "type": "boolean"
+        },
+        "output_format": {
+          "default": "",
+          "description": "\n        The format of the output. Works only when parse parameter is false.\n            - links - Most efficient when the goal is navigation or finding specific URLs. Use this first when you need to locate a specific page within a website.\n            - md - Best for extracting and reading visible content once you've found the right page. Use this to get structured content that's easy to read and process.\n            - html - Should be used sparingly only when you need the raw HTML structure, JavaScript code, or styling information.\n        ",
+          "enum": [
+            "",
+            "links",
+            "md",
+            "html"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "query"
+      ],
+      "type": "object"
+    },
+    "annotations": {
+      "title": null,
+      "readOnlyHint": true,
+      "destructiveHint": null,
+      "idempotentHint": null,
+      "openWorldHint": null
+    },
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/oxylabs-mcp/src/oxylabs_mcp/tools/scraper.py\n# module: src.oxylabs_mcp.tools.scraper\n# qname: src.oxylabs_mcp.tools.scraper.google_search_scraper\n# lines: 56-107\nasync def google_search_scraper(\n    query: url_params.GOOGLE_QUERY_PARAM,\n    parse: url_params.PARSE_PARAM = True,  # noqa: FBT002\n    render: url_params.RENDER_PARAM = \"\",\n    user_agent_type: url_params.USER_AGENT_TYPE_PARAM = \"\",\n    start_page: url_params.START_PAGE_PARAM = 0,\n    pages: url_params.PAGES_PARAM = 0,\n    limit: url_params.LIMIT_PARAM = 0,\n    domain: url_params.DOMAIN_PARAM = \"\",\n    geo_location: url_params.GEO_LOCATION_PARAM = \"\",\n    locale: url_params.LOCALE_PARAM = \"\",\n    ad_mode: url_params.AD_MODE_PARAM = False,  # noqa: FBT002\n    output_format: url_params.OUTPUT_FORMAT_PARAM = \"\",\n) -> str:\n    \"\"\"Scrape Google Search results.\n\n    Supports content parsing, different user agent types, pagination,\n    domain, geolocation, locale parameters and different output formats.\n    \"\"\"\n    try:\n        async with oxylabs_client() as client:\n            payload: dict[str, Any] = {\"query\": query}\n\n            if ad_mode:\n                payload[\"source\"] = \"google_ads\"\n            else:\n                payload[\"source\"] = \"google_search\"\n\n            if parse:\n                payload[\"parse\"] = parse\n            if render:\n                payload[\"render\"] = render\n            if user_agent_type:\n                payload[\"user_agent_type\"] = user_agent_type\n            if start_page:\n                payload[\"start_page\"] = start_page\n            if pages:\n                payload[\"pages\"] = pages\n            if limit:\n                payload[\"limit\"] = limit\n            if domain:\n                payload[\"domain\"] = domain\n            if geo_location:\n                payload[\"geo_location\"] = geo_location\n            if locale:\n                payload[\"locale\"] = locale\n\n            response_json = await client.scrape(payload)\n\n            return get_content(response_json, parse=parse, output_format=output_format)\n    except MCPServerError as e:\n        return await e.process()",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/oxylabs-mcp/src/oxylabs_mcp/utils.py\n# module: src.oxylabs_mcp.utils\n# qname: src.oxylabs_mcp.utils.get_content\n# lines: 288-305\ndef get_content(\n    response_json: dict[str, typing.Any],\n    *,\n    output_format: str,\n    parse: bool = False,\n) -> str:\n    \"\"\"Extract content from response and convert to a proper format.\"\"\"\n    content = response_json[\"results\"][0][\"content\"]\n    if parse and isinstance(content, dict):\n        return json.dumps(content)\n    if output_format == \"html\":\n        return str(content)\n    if output_format == \"links\":\n        links = extract_links_with_text(str(content))\n        return \"\\n\".join(links)\n\n    stripped_html = strip_html(str(content))\n    return markdownify(stripped_html)  # type: ignore[no-any-return]"
+      ],
+      "depth_2": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/oxylabs-mcp/src/oxylabs_mcp/utils.py\n# module: src.oxylabs_mcp.utils\n# qname: src.oxylabs_mcp.utils.extract_links_with_text\n# lines: 245-285\ndef extract_links_with_text(html: str, base_url: str | None = None) -> list[str]:\n    \"\"\"Extract links with their display text from HTML.\n\n    Args:\n        html (str): The input HTML string.\n        base_url (str | None): Base URL to use for converting relative URLs to absolute.\n                             If None, relative URLs will remain as is.\n\n    Returns:\n        list[str]: List of links in format [Display Text] URL\n\n    \"\"\"\n    html_tree = fromstring(html)\n    links = []\n\n    for link in html_tree.xpath(\"//a[@href]\"):  # type: ignore[union-attr]\n        href = link.get(\"href\")  # type: ignore[union-attr]\n        text = link.text_content().strip()  # type: ignore[union-attr]\n\n        if href and text:\n            # Skip empty or whitespace-only text\n            if not text:\n                continue\n\n            # Skip anchor links\n            if href.startswith(\"#\"):\n                continue\n\n            # Skip javascript links\n            if href.startswith(\"javascript:\"):\n                continue\n\n            # Make relative URLs absolute if base_url is provided\n            if base_url and href.startswith(\"/\"):\n                # Remove trailing slash from base_url if present\n                base = base_url.rstrip(\"/\")\n                href = f\"{base}{href}\"\n\n            links.append(f\"[{text}] {href}\")\n\n    return links",
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/oxylabs-mcp/src/oxylabs_mcp/utils.py\n# module: src.oxylabs_mcp.utils\n# qname: src.oxylabs_mcp.utils.strip_html\n# lines: 68-116\ndef strip_html(html: str) -> str:\n    \"\"\"Simplify an HTML string.\n\n    Will remove unwanted elements, attributes, and redundant content\n    Args:\n        html (str): The input HTML string.\n\n    Returns:\n        str: The cleaned and simplified HTML string.\n\n    \"\"\"\n    cleaned_html = clean_html(html)\n    html_tree = fromstring(cleaned_html)\n\n    for element in html_tree.iter():\n        # Remove style attributes.\n        if \"style\" in element.attrib:\n            del element.attrib[\"style\"]\n\n        # Remove elements that have no attributes, no content and no children.\n        if (\n            (not element.attrib or (len(element.attrib) == 1 and \"idx\" in element.attrib))\n            and not element.getchildren()  # type: ignore[attr-defined]\n            and (not element.text or not element.text.strip())\n            and (not element.tail or not element.tail.strip())\n        ):\n            parent = element.getparent()\n            if parent is not None:\n                parent.remove(element)\n\n    # Remove elements with footer and hidden in class or id\n    xpath_query = (\n        \".//*[contains(@class, 'footer') or contains(@id, 'footer') or \"\n        \"contains(@class, 'hidden') or contains(@id, 'hidden')]\"\n    )\n    elements_to_remove = html_tree.xpath(xpath_query)\n    for element in elements_to_remove:  # type: ignore[assignment, union-attr]\n        parent = element.getparent()\n        if parent is not None:\n            parent.remove(element)\n\n    # Serialize the HTML tree back to a string\n    stripped_html = tostring(html_tree, encoding=\"unicode\")\n    # Previous cleaning produces empty spaces.\n    # Replace multiple spaces with a single one\n    stripped_html = re.sub(r\"\\s{2,}\", \" \", stripped_html)\n    # Replace consecutive newlines with an empty string\n    stripped_html = re.sub(r\"\\n{2,}\", \"\", stripped_html)\n    return stripped_html"
+      ],
+      "depth_3": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/oxylabs-mcp/src/oxylabs_mcp/utils.py\n# module: src.oxylabs_mcp.utils\n# qname: src.oxylabs_mcp.utils.clean_html\n# lines: 46-65\ndef clean_html(html: str) -> str:\n    \"\"\"Clean an HTML string.\"\"\"\n    cleaner = Cleaner(\n        scripts=True,\n        javascript=True,\n        style=True,\n        remove_tags=[],\n        kill_tags=[\"nav\", \"svg\", \"footer\", \"noscript\", \"script\", \"form\"],\n        safe_attrs=list(defs.safe_attrs) + [\"idx\"],\n        comments=True,\n        inline_style=True,\n        links=True,\n        meta=False,\n        page_structure=False,\n        embedded=True,\n        frames=False,\n        forms=False,\n        annoying_tags=False,\n    )\n    return cleaner.clean_html(html)  # type: ignore[no-any-return]"
+      ],
+      "depth_max": 3
+    }
+  },
+  {
+    "name": "amazon_search_scraper",
+    "description": "Scrape Amazon search results.\n\nSupports content parsing, different user agent types, pagination,\ndomain, geolocation, locale parameters and different output formats.\nSupports Amazon specific parameters such as category id, merchant id, currency.",
+    "input_schema": {
+      "properties": {
+        "query": {
+          "description": "Keyword to search for.",
+          "type": "string"
+        },
+        "category_id": {
+          "default": "",
+          "description": "Search for items in a particular browse node (product category).",
+          "type": "string"
+        },
+        "merchant_id": {
+          "default": "",
+          "description": "Search for items sold by a particular seller.",
+          "type": "string"
+        },
+        "currency": {
+          "default": "",
+          "description": "Currency that will be used to display the prices.",
+          "examples": [
+            "USD",
+            "EUR",
+            "AUD"
+          ],
+          "type": "string"
+        },
+        "parse": {
+          "default": true,
+          "description": "Should result be parsed. If the result is not parsed, the output_format parameter is applied.",
+          "type": "boolean"
+        },
+        "render": {
+          "default": "",
+          "description": "\n        Whether a headless browser should be used to render the page.\n        For example:\n            - 'html' when browser is required to render the page.\n        ",
+          "enum": [
+            "",
+            "html"
+          ],
+          "examples": [
+            "",
+            "html"
+          ],
+          "type": "string"
+        },
+        "user_agent_type": {
+          "default": "",
+          "description": "Device type and browser that will be used to determine User-Agent header value.",
+          "enum": [
+            "",
+            "desktop",
+            "desktop_chrome",
+            "desktop_firefox",
+            "desktop_safari",
+            "desktop_edge",
+            "desktop_opera",
+            "mobile",
+            "mobile_ios",
+            "mobile_android",
+            "tablet"
+          ],
+          "type": "string"
+        },
+        "start_page": {
+          "default": 0,
+          "description": "Starting page number.",
+          "type": "integer"
+        },
+        "pages": {
+          "default": 0,
+          "description": "Number of pages to retrieve.",
+          "type": "integer"
+        },
+        "domain": {
+          "default": "",
+          "description": "\n        Domain localization for Google.\n        Use country top level domains.\n        For example:\n            - 'co.uk' for United Kingdom\n            - 'us' for United States\n            - 'fr' for France\n        ",
+          "examples": [
+            "uk",
+            "us",
+            "fr"
+          ],
+          "type": "string"
+        },
+        "geo_location": {
+          "default": "",
+          "description": "\n        The geographical location that the result should be adapted for.\n        Use ISO-3166 country codes.\n        Examples:\n            - 'California, United States'\n            - 'Mexico'\n            - 'US' for United States\n            - 'DE' for Germany\n            - 'FR' for France\n        ",
+          "examples": [
+            "US",
+            "DE",
+            "FR"
+          ],
+          "type": "string"
+        },
+        "locale": {
+          "default": "",
+          "description": "\n        Set 'Accept-Language' header value which changes your Google search page web interface language.\n        Examples:\n            - 'en-US' for English, United States\n            - 'de-AT' for German, Austria\n            - 'fr-FR' for French, France\n        ",
+          "examples": [
+            "en-US",
+            "de-AT",
+            "fr-FR"
+          ],
+          "type": "string"
+        },
+        "output_format": {
+          "default": "",
+          "description": "\n        The format of the output. Works only when parse parameter is false.\n            - links - Most efficient when the goal is navigation or finding specific URLs. Use this first when you need to locate a specific page within a website.\n            - md - Best for extracting and reading visible content once you've found the right page. Use this to get structured content that's easy to read and process.\n            - html - Should be used sparingly only when you need the raw HTML structure, JavaScript code, or styling information.\n        ",
+          "enum": [
+            "",
+            "links",
+            "md",
+            "html"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "query"
+      ],
+      "type": "object"
+    },
+    "annotations": {
+      "title": null,
+      "readOnlyHint": true,
+      "destructiveHint": null,
+      "idempotentHint": null,
+      "openWorldHint": null
+    },
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/oxylabs-mcp/src/oxylabs_mcp/tools/scraper.py\n# module: src.oxylabs_mcp.tools.scraper\n# qname: src.oxylabs_mcp.tools.scraper.amazon_search_scraper\n# lines: 111-167\nasync def amazon_search_scraper(\n    query: url_params.AMAZON_SEARCH_QUERY_PARAM,\n    category_id: url_params.CATEGORY_ID_CONTEXT_PARAM = \"\",\n    merchant_id: url_params.MERCHANT_ID_CONTEXT_PARAM = \"\",\n    currency: url_params.CURRENCY_CONTEXT_PARAM = \"\",\n    parse: url_params.PARSE_PARAM = True,  # noqa: FBT002\n    render: url_params.RENDER_PARAM = \"\",\n    user_agent_type: url_params.USER_AGENT_TYPE_PARAM = \"\",\n    start_page: url_params.START_PAGE_PARAM = 0,\n    pages: url_params.PAGES_PARAM = 0,\n    domain: url_params.DOMAIN_PARAM = \"\",\n    geo_location: url_params.GEO_LOCATION_PARAM = \"\",\n    locale: url_params.LOCALE_PARAM = \"\",\n    output_format: url_params.OUTPUT_FORMAT_PARAM = \"\",\n) -> str:\n    \"\"\"Scrape Amazon search results.\n\n    Supports content parsing, different user agent types, pagination,\n    domain, geolocation, locale parameters and different output formats.\n    Supports Amazon specific parameters such as category id, merchant id, currency.\n    \"\"\"\n    try:\n        async with oxylabs_client() as client:\n            payload: dict[str, Any] = {\"source\": \"amazon_search\", \"query\": query}\n\n            context = []\n            if category_id:\n                context.append({\"key\": \"category_id\", \"value\": category_id})\n            if merchant_id:\n                context.append({\"key\": \"merchant_id\", \"value\": merchant_id})\n            if currency:\n                context.append({\"key\": \"currency\", \"value\": currency})\n            if context:\n                payload[\"context\"] = context\n\n            if parse:\n                payload[\"parse\"] = parse\n            if render:\n                payload[\"render\"] = render\n            if user_agent_type:\n                payload[\"user_agent_type\"] = user_agent_type\n            if start_page:\n                payload[\"start_page\"] = start_page\n            if pages:\n                payload[\"pages\"] = pages\n            if domain:\n                payload[\"domain\"] = domain\n            if geo_location:\n                payload[\"geo_location\"] = geo_location\n            if locale:\n                payload[\"locale\"] = locale\n\n            response_json = await client.scrape(payload)\n\n            return get_content(response_json, parse=parse, output_format=output_format)\n    except MCPServerError as e:\n        return await e.process()",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/oxylabs-mcp/src/oxylabs_mcp/utils.py\n# module: src.oxylabs_mcp.utils\n# qname: src.oxylabs_mcp.utils.get_content\n# lines: 288-305\ndef get_content(\n    response_json: dict[str, typing.Any],\n    *,\n    output_format: str,\n    parse: bool = False,\n) -> str:\n    \"\"\"Extract content from response and convert to a proper format.\"\"\"\n    content = response_json[\"results\"][0][\"content\"]\n    if parse and isinstance(content, dict):\n        return json.dumps(content)\n    if output_format == \"html\":\n        return str(content)\n    if output_format == \"links\":\n        links = extract_links_with_text(str(content))\n        return \"\\n\".join(links)\n\n    stripped_html = strip_html(str(content))\n    return markdownify(stripped_html)  # type: ignore[no-any-return]"
+      ],
+      "depth_2": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/oxylabs-mcp/src/oxylabs_mcp/utils.py\n# module: src.oxylabs_mcp.utils\n# qname: src.oxylabs_mcp.utils.extract_links_with_text\n# lines: 245-285\ndef extract_links_with_text(html: str, base_url: str | None = None) -> list[str]:\n    \"\"\"Extract links with their display text from HTML.\n\n    Args:\n        html (str): The input HTML string.\n        base_url (str | None): Base URL to use for converting relative URLs to absolute.\n                             If None, relative URLs will remain as is.\n\n    Returns:\n        list[str]: List of links in format [Display Text] URL\n\n    \"\"\"\n    html_tree = fromstring(html)\n    links = []\n\n    for link in html_tree.xpath(\"//a[@href]\"):  # type: ignore[union-attr]\n        href = link.get(\"href\")  # type: ignore[union-attr]\n        text = link.text_content().strip()  # type: ignore[union-attr]\n\n        if href and text:\n            # Skip empty or whitespace-only text\n            if not text:\n                continue\n\n            # Skip anchor links\n            if href.startswith(\"#\"):\n                continue\n\n            # Skip javascript links\n            if href.startswith(\"javascript:\"):\n                continue\n\n            # Make relative URLs absolute if base_url is provided\n            if base_url and href.startswith(\"/\"):\n                # Remove trailing slash from base_url if present\n                base = base_url.rstrip(\"/\")\n                href = f\"{base}{href}\"\n\n            links.append(f\"[{text}] {href}\")\n\n    return links",
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/oxylabs-mcp/src/oxylabs_mcp/utils.py\n# module: src.oxylabs_mcp.utils\n# qname: src.oxylabs_mcp.utils.strip_html\n# lines: 68-116\ndef strip_html(html: str) -> str:\n    \"\"\"Simplify an HTML string.\n\n    Will remove unwanted elements, attributes, and redundant content\n    Args:\n        html (str): The input HTML string.\n\n    Returns:\n        str: The cleaned and simplified HTML string.\n\n    \"\"\"\n    cleaned_html = clean_html(html)\n    html_tree = fromstring(cleaned_html)\n\n    for element in html_tree.iter():\n        # Remove style attributes.\n        if \"style\" in element.attrib:\n            del element.attrib[\"style\"]\n\n        # Remove elements that have no attributes, no content and no children.\n        if (\n            (not element.attrib or (len(element.attrib) == 1 and \"idx\" in element.attrib))\n            and not element.getchildren()  # type: ignore[attr-defined]\n            and (not element.text or not element.text.strip())\n            and (not element.tail or not element.tail.strip())\n        ):\n            parent = element.getparent()\n            if parent is not None:\n                parent.remove(element)\n\n    # Remove elements with footer and hidden in class or id\n    xpath_query = (\n        \".//*[contains(@class, 'footer') or contains(@id, 'footer') or \"\n        \"contains(@class, 'hidden') or contains(@id, 'hidden')]\"\n    )\n    elements_to_remove = html_tree.xpath(xpath_query)\n    for element in elements_to_remove:  # type: ignore[assignment, union-attr]\n        parent = element.getparent()\n        if parent is not None:\n            parent.remove(element)\n\n    # Serialize the HTML tree back to a string\n    stripped_html = tostring(html_tree, encoding=\"unicode\")\n    # Previous cleaning produces empty spaces.\n    # Replace multiple spaces with a single one\n    stripped_html = re.sub(r\"\\s{2,}\", \" \", stripped_html)\n    # Replace consecutive newlines with an empty string\n    stripped_html = re.sub(r\"\\n{2,}\", \"\", stripped_html)\n    return stripped_html"
+      ],
+      "depth_3": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/oxylabs-mcp/src/oxylabs_mcp/utils.py\n# module: src.oxylabs_mcp.utils\n# qname: src.oxylabs_mcp.utils.clean_html\n# lines: 46-65\ndef clean_html(html: str) -> str:\n    \"\"\"Clean an HTML string.\"\"\"\n    cleaner = Cleaner(\n        scripts=True,\n        javascript=True,\n        style=True,\n        remove_tags=[],\n        kill_tags=[\"nav\", \"svg\", \"footer\", \"noscript\", \"script\", \"form\"],\n        safe_attrs=list(defs.safe_attrs) + [\"idx\"],\n        comments=True,\n        inline_style=True,\n        links=True,\n        meta=False,\n        page_structure=False,\n        embedded=True,\n        frames=False,\n        forms=False,\n        annoying_tags=False,\n    )\n    return cleaner.clean_html(html)  # type: ignore[no-any-return]"
+      ],
+      "depth_max": 3
+    }
+  },
+  {
+    "name": "amazon_product_scraper",
+    "description": "Scrape Amazon products.\n\nSupports content parsing, different user agent types, domain,\ngeolocation, locale parameters and different output formats.\nSupports Amazon specific parameters such as currency and getting\nmore accurate pricing data with auto select variant.",
+    "input_schema": {
+      "properties": {
+        "query": {
+          "description": "Keyword to search for.",
+          "type": "string"
+        },
+        "autoselect_variant": {
+          "default": false,
+          "description": "To get accurate pricing/buybox data, set this parameter to true.",
+          "type": "boolean"
+        },
+        "currency": {
+          "default": "",
+          "description": "Currency that will be used to display the prices.",
+          "examples": [
+            "USD",
+            "EUR",
+            "AUD"
+          ],
+          "type": "string"
+        },
+        "parse": {
+          "default": true,
+          "description": "Should result be parsed. If the result is not parsed, the output_format parameter is applied.",
+          "type": "boolean"
+        },
+        "render": {
+          "default": "",
+          "description": "\n        Whether a headless browser should be used to render the page.\n        For example:\n            - 'html' when browser is required to render the page.\n        ",
+          "enum": [
+            "",
+            "html"
+          ],
+          "examples": [
+            "",
+            "html"
+          ],
+          "type": "string"
+        },
+        "user_agent_type": {
+          "default": "",
+          "description": "Device type and browser that will be used to determine User-Agent header value.",
+          "enum": [
+            "",
+            "desktop",
+            "desktop_chrome",
+            "desktop_firefox",
+            "desktop_safari",
+            "desktop_edge",
+            "desktop_opera",
+            "mobile",
+            "mobile_ios",
+            "mobile_android",
+            "tablet"
+          ],
+          "type": "string"
+        },
+        "domain": {
+          "default": "",
+          "description": "\n        Domain localization for Google.\n        Use country top level domains.\n        For example:\n            - 'co.uk' for United Kingdom\n            - 'us' for United States\n            - 'fr' for France\n        ",
+          "examples": [
+            "uk",
+            "us",
+            "fr"
+          ],
+          "type": "string"
+        },
+        "geo_location": {
+          "default": "",
+          "description": "\n        The geographical location that the result should be adapted for.\n        Use ISO-3166 country codes.\n        Examples:\n            - 'California, United States'\n            - 'Mexico'\n            - 'US' for United States\n            - 'DE' for Germany\n            - 'FR' for France\n        ",
+          "examples": [
+            "US",
+            "DE",
+            "FR"
+          ],
+          "type": "string"
+        },
+        "locale": {
+          "default": "",
+          "description": "\n        Set 'Accept-Language' header value which changes your Google search page web interface language.\n        Examples:\n            - 'en-US' for English, United States\n            - 'de-AT' for German, Austria\n            - 'fr-FR' for French, France\n        ",
+          "examples": [
+            "en-US",
+            "de-AT",
+            "fr-FR"
+          ],
+          "type": "string"
+        },
+        "output_format": {
+          "default": "",
+          "description": "\n        The format of the output. Works only when parse parameter is false.\n            - links - Most efficient when the goal is navigation or finding specific URLs. Use this first when you need to locate a specific page within a website.\n            - md - Best for extracting and reading visible content once you've found the right page. Use this to get structured content that's easy to read and process.\n            - html - Should be used sparingly only when you need the raw HTML structure, JavaScript code, or styling information.\n        ",
+          "enum": [
+            "",
+            "links",
+            "md",
+            "html"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "query"
+      ],
+      "type": "object"
+    },
+    "annotations": {
+      "title": null,
+      "readOnlyHint": true,
+      "destructiveHint": null,
+      "idempotentHint": null,
+      "openWorldHint": null
+    },
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/oxylabs-mcp/src/oxylabs_mcp/tools/scraper.py\n# module: src.oxylabs_mcp.tools.scraper\n# qname: src.oxylabs_mcp.tools.scraper.amazon_product_scraper\n# lines: 171-219\nasync def amazon_product_scraper(\n    query: url_params.AMAZON_SEARCH_QUERY_PARAM,\n    autoselect_variant: url_params.AUTOSELECT_VARIANT_CONTEXT_PARAM = False,  # noqa: FBT002\n    currency: url_params.CURRENCY_CONTEXT_PARAM = \"\",\n    parse: url_params.PARSE_PARAM = True,  # noqa: FBT002\n    render: url_params.RENDER_PARAM = \"\",\n    user_agent_type: url_params.USER_AGENT_TYPE_PARAM = \"\",\n    domain: url_params.DOMAIN_PARAM = \"\",\n    geo_location: url_params.GEO_LOCATION_PARAM = \"\",\n    locale: url_params.LOCALE_PARAM = \"\",\n    output_format: url_params.OUTPUT_FORMAT_PARAM = \"\",\n) -> str:\n    \"\"\"Scrape Amazon products.\n\n    Supports content parsing, different user agent types, domain,\n    geolocation, locale parameters and different output formats.\n    Supports Amazon specific parameters such as currency and getting\n    more accurate pricing data with auto select variant.\n    \"\"\"\n    try:\n        async with oxylabs_client() as client:\n            payload: dict[str, Any] = {\"source\": \"amazon_product\", \"query\": query}\n\n            context = []\n            if autoselect_variant:\n                context.append({\"key\": \"autoselect_variant\", \"value\": autoselect_variant})\n            if currency:\n                context.append({\"key\": \"currency\", \"value\": currency})\n            if context:\n                payload[\"context\"] = context\n\n            if parse:\n                payload[\"parse\"] = parse\n            if render:\n                payload[\"render\"] = render\n            if user_agent_type:\n                payload[\"user_agent_type\"] = user_agent_type\n            if domain:\n                payload[\"domain\"] = domain\n            if geo_location:\n                payload[\"geo_location\"] = geo_location\n            if locale:\n                payload[\"locale\"] = locale\n\n            response_json = await client.scrape(payload)\n\n            return get_content(response_json, parse=parse, output_format=output_format)\n    except MCPServerError as e:\n        return await e.process()",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/oxylabs-mcp/src/oxylabs_mcp/utils.py\n# module: src.oxylabs_mcp.utils\n# qname: src.oxylabs_mcp.utils.get_content\n# lines: 288-305\ndef get_content(\n    response_json: dict[str, typing.Any],\n    *,\n    output_format: str,\n    parse: bool = False,\n) -> str:\n    \"\"\"Extract content from response and convert to a proper format.\"\"\"\n    content = response_json[\"results\"][0][\"content\"]\n    if parse and isinstance(content, dict):\n        return json.dumps(content)\n    if output_format == \"html\":\n        return str(content)\n    if output_format == \"links\":\n        links = extract_links_with_text(str(content))\n        return \"\\n\".join(links)\n\n    stripped_html = strip_html(str(content))\n    return markdownify(stripped_html)  # type: ignore[no-any-return]"
+      ],
+      "depth_2": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/oxylabs-mcp/src/oxylabs_mcp/utils.py\n# module: src.oxylabs_mcp.utils\n# qname: src.oxylabs_mcp.utils.extract_links_with_text\n# lines: 245-285\ndef extract_links_with_text(html: str, base_url: str | None = None) -> list[str]:\n    \"\"\"Extract links with their display text from HTML.\n\n    Args:\n        html (str): The input HTML string.\n        base_url (str | None): Base URL to use for converting relative URLs to absolute.\n                             If None, relative URLs will remain as is.\n\n    Returns:\n        list[str]: List of links in format [Display Text] URL\n\n    \"\"\"\n    html_tree = fromstring(html)\n    links = []\n\n    for link in html_tree.xpath(\"//a[@href]\"):  # type: ignore[union-attr]\n        href = link.get(\"href\")  # type: ignore[union-attr]\n        text = link.text_content().strip()  # type: ignore[union-attr]\n\n        if href and text:\n            # Skip empty or whitespace-only text\n            if not text:\n                continue\n\n            # Skip anchor links\n            if href.startswith(\"#\"):\n                continue\n\n            # Skip javascript links\n            if href.startswith(\"javascript:\"):\n                continue\n\n            # Make relative URLs absolute if base_url is provided\n            if base_url and href.startswith(\"/\"):\n                # Remove trailing slash from base_url if present\n                base = base_url.rstrip(\"/\")\n                href = f\"{base}{href}\"\n\n            links.append(f\"[{text}] {href}\")\n\n    return links",
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/oxylabs-mcp/src/oxylabs_mcp/utils.py\n# module: src.oxylabs_mcp.utils\n# qname: src.oxylabs_mcp.utils.strip_html\n# lines: 68-116\ndef strip_html(html: str) -> str:\n    \"\"\"Simplify an HTML string.\n\n    Will remove unwanted elements, attributes, and redundant content\n    Args:\n        html (str): The input HTML string.\n\n    Returns:\n        str: The cleaned and simplified HTML string.\n\n    \"\"\"\n    cleaned_html = clean_html(html)\n    html_tree = fromstring(cleaned_html)\n\n    for element in html_tree.iter():\n        # Remove style attributes.\n        if \"style\" in element.attrib:\n            del element.attrib[\"style\"]\n\n        # Remove elements that have no attributes, no content and no children.\n        if (\n            (not element.attrib or (len(element.attrib) == 1 and \"idx\" in element.attrib))\n            and not element.getchildren()  # type: ignore[attr-defined]\n            and (not element.text or not element.text.strip())\n            and (not element.tail or not element.tail.strip())\n        ):\n            parent = element.getparent()\n            if parent is not None:\n                parent.remove(element)\n\n    # Remove elements with footer and hidden in class or id\n    xpath_query = (\n        \".//*[contains(@class, 'footer') or contains(@id, 'footer') or \"\n        \"contains(@class, 'hidden') or contains(@id, 'hidden')]\"\n    )\n    elements_to_remove = html_tree.xpath(xpath_query)\n    for element in elements_to_remove:  # type: ignore[assignment, union-attr]\n        parent = element.getparent()\n        if parent is not None:\n            parent.remove(element)\n\n    # Serialize the HTML tree back to a string\n    stripped_html = tostring(html_tree, encoding=\"unicode\")\n    # Previous cleaning produces empty spaces.\n    # Replace multiple spaces with a single one\n    stripped_html = re.sub(r\"\\s{2,}\", \" \", stripped_html)\n    # Replace consecutive newlines with an empty string\n    stripped_html = re.sub(r\"\\n{2,}\", \"\", stripped_html)\n    return stripped_html"
+      ],
+      "depth_3": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/oxylabs-mcp/src/oxylabs_mcp/utils.py\n# module: src.oxylabs_mcp.utils\n# qname: src.oxylabs_mcp.utils.clean_html\n# lines: 46-65\ndef clean_html(html: str) -> str:\n    \"\"\"Clean an HTML string.\"\"\"\n    cleaner = Cleaner(\n        scripts=True,\n        javascript=True,\n        style=True,\n        remove_tags=[],\n        kill_tags=[\"nav\", \"svg\", \"footer\", \"noscript\", \"script\", \"form\"],\n        safe_attrs=list(defs.safe_attrs) + [\"idx\"],\n        comments=True,\n        inline_style=True,\n        links=True,\n        meta=False,\n        page_structure=False,\n        embedded=True,\n        frames=False,\n        forms=False,\n        annoying_tags=False,\n    )\n    return cleaner.clean_html(html)  # type: ignore[no-any-return]"
+      ],
+      "depth_max": 3
+    }
+  }
+]

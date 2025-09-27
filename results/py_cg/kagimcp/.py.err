@@ -1,0 +1,10 @@
+Code2Flow: Found 1 files from sources argument.
+Code2Flow: Processing 1 source file(s).
+Code2Flow:   /Users/xue/workspace/mcp_project/mcp_server_pyrepos/kagimcp/src/kagimcp/server.py
+Code2Flow: Found groups ['File: server'].
+Code2Flow: Found nodes ['(global)', 'format_search_results', 'kagi_search_fetch', 'kagi_summarizer', 'main'].
+Code2Flow: Found calls ['FastMCP()', 'KagiClient()', 'ThreadPoolExecutor()', 'UNKNOWN_VAR.join()', 'UNKNOWN_VAR.strip()', 'ValueError()', 'cast()', 'enumerate()', 'executor.map()', 'format_search_results()', 'kagi_client.summarize()', 'len()', 'list()', 'main()', 'mcp.run()', 'os.get()', 'per_query_response_strs.append()', 'query_response_template.format()', 'repr()', 'result.get()', 'result_template.format()', 'str()', 'textwrap.dedent()', 'zip()'].
+Code2Flow: Found variables ['FastMCP->UNKNOWN_MODULE', 'Field->UNKNOWN_MODULE', 'KagiClient->UNKNOWN_MODULE', 'Literal->UNKNOWN_MODULE', 'ThreadPoolExecutor->UNKNOWN_MODULE', 'cast->UNKNOWN_MODULE', 'engine-><Call owner_token=None token=cast>', 'engine-><Call owner_token=os token=get>', 'formatted_results_str-><Call owner_token=UNKNOWN_VAR token=join>', 'kagi_client-><Call owner_token=None token=KagiClient>', 'mcp-><Call owner_token=None token=FastMCP>', 'os->UNKNOWN_MODULE', 'query_response_str-><Call owner_token=query_response_template token=format>', 'query_response_template-><Call owner_token=UNKNOWN_VAR token=strip>', 'result_template-><Call owner_token=UNKNOWN_VAR token=strip>', 'results-><Call owner_token=None token=list>', 'textwrap->UNKNOWN_MODULE'].
+Code2Flow: Generating output file...
+Code2Flow: Wrote output file '/Users/xue/workspace/mcp_project/NPL4MCP/results/py_cg/kagimcp/cg_py.json' with 4 nodes and 2 edges.
+Code2Flow: Code2flow finished processing in 0.00 seconds.

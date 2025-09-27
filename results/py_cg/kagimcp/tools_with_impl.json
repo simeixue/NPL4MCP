@@ -1,0 +1,77 @@
+[
+  {
+    "name": "kagi_search_fetch",
+    "description": "Fetch web results based on one or more queries using the Kagi Search API. Use for general search and when the user explicitly tells you to 'fetch' results/information. Results are from all queries given. They are numbered continuously, so that a user may be able to refer to a result by a specific number.",
+    "input_schema": {
+      "properties": {
+        "queries": {
+          "description": "One or more concise, keyword-focused search queries. Include essential context within each query for standalone use.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Queries",
+          "type": "array"
+        }
+      },
+      "required": [
+        "queries"
+      ],
+      "title": "kagi_search_fetchArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/kagimcp/src/kagimcp/server.py\n# module: src.kagimcp.server\n# qname: src.kagimcp.server.kagi_search_fetch\n# lines: 16-32\ndef kagi_search_fetch(\n    queries: list[str] = Field(\n        description=\"One or more concise, keyword-focused search queries. Include essential context within each query for standalone use.\"\n    ),\n) -> str:\n    \"\"\"Fetch web results based on one or more queries using the Kagi Search API. Use for general search and when the user explicitly tells you to 'fetch' results/information. Results are from all queries given. They are numbered continuously, so that a user may be able to refer to a result by a specific number.\"\"\"\n    try:\n        if not queries:\n            raise ValueError(\"Search called with no queries.\")\n\n        with ThreadPoolExecutor() as executor:\n            results = list(executor.map(kagi_client.search, queries, timeout=10))\n\n        return format_search_results(queries, results)\n\n    except Exception as e:\n        return f\"Error: {str(e) or repr(e)}\"",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/kagimcp/src/kagimcp/server.py\n# module: src.kagimcp.server\n# qname: src.kagimcp.server.format_search_results\n# lines: 35-79\ndef format_search_results(queries: list[str], responses) -> str:\n    \"\"\"Formatting of results for response. Need to consider both LLM and human parsing.\"\"\"\n\n    result_template = textwrap.dedent(\"\"\"\n        {result_number}: {title}\n        {url}\n        Published Date: {published}\n        {snippet}\n    \"\"\").strip()\n\n    query_response_template = textwrap.dedent(\"\"\"\n        -----\n        Results for search query \\\"{query}\\\":\n        -----\n        {formatted_search_results}\n    \"\"\").strip()\n\n    per_query_response_strs = []\n\n    start_index = 1\n    for query, response in zip(queries, responses):\n        # t == 0 is search result, t == 1 is related searches\n        results = [result for result in response[\"data\"] if result[\"t\"] == 0]\n\n        # published date is not always present\n        formatted_results_list = [\n            result_template.format(\n                result_number=result_number,\n                title=result[\"title\"],\n                url=result[\"url\"],\n                published=result.get(\"published\", \"Not Available\"),\n                snippet=result[\"snippet\"],\n            )\n            for result_number, result in enumerate(results, start=start_index)\n        ]\n\n        start_index += len(results)\n\n        formatted_results_str = \"\\n\\n\".join(formatted_results_list)\n        query_response_str = query_response_template.format(\n            query=query, formatted_search_results=formatted_results_str\n        )\n        per_query_response_strs.append(query_response_str)\n\n    return \"\\n\\n\".join(per_query_response_strs)"
+      ],
+      "depth_max": 1
+    }
+  },
+  {
+    "name": "kagi_summarizer",
+    "description": "Summarize content from a URL using the Kagi Summarizer API. The Summarizer can summarize any document type (text webpage, video, audio, etc.)",
+    "input_schema": {
+      "properties": {
+        "url": {
+          "description": "A URL to a document to summarize.",
+          "title": "Url",
+          "type": "string"
+        },
+        "summary_type": {
+          "default": "summary",
+          "description": "Type of summary to produce. Options are 'summary' for paragraph prose and 'takeaway' for a bulleted list of key points.",
+          "enum": [
+            "summary",
+            "takeaway"
+          ],
+          "title": "Summary Type",
+          "type": "string"
+        },
+        "target_language": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Desired output language using language codes (e.g., 'EN' for English). If not specified, the document's original language influences the output.",
+          "title": "Target Language"
+        }
+      },
+      "required": [
+        "url"
+      ],
+      "title": "kagi_summarizerArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/kagimcp/src/kagimcp/server.py\n# module: src.kagimcp.server\n# qname: src.kagimcp.server.kagi_summarizer\n# lines: 83-119\ndef kagi_summarizer(\n    url: str = Field(description=\"A URL to a document to summarize.\"),\n    summary_type: Literal[\"summary\", \"takeaway\"] = Field(\n        default=\"summary\",\n        description=\"Type of summary to produce. Options are 'summary' for paragraph prose and 'takeaway' for a bulleted list of key points.\",\n    ),\n    target_language: str | None = Field(\n        default=None,\n        description=\"Desired output language using language codes (e.g., 'EN' for English). If not specified, the document's original language influences the output.\",\n    ),\n) -> str:\n    \"\"\"Summarize content from a URL using the Kagi Summarizer API. The Summarizer can summarize any document type (text webpage, video, audio, etc.)\"\"\"\n    try:\n        if not url:\n            raise ValueError(\"Summarizer called with no URL.\")\n\n        engine = os.environ.get(\"KAGI_SUMMARIZER_ENGINE\", \"cecil\")\n\n        valid_engines = {\"cecil\", \"agnes\", \"daphne\", \"muriel\"}\n        if engine not in valid_engines:\n            raise ValueError(\n                f\"Summarizer configured incorrectly, invalid summarization engine set: {engine}. Must be one of the following: {valid_engines}\"\n            )\n\n        engine = cast(Literal[\"cecil\", \"agnes\", \"daphne\", \"muriel\"], engine)\n\n        summary = kagi_client.summarize(\n            url,\n            engine=engine,\n            summary_type=summary_type,\n            target_language=target_language,\n        )[\"data\"][\"output\"]\n\n        return summary\n\n    except Exception as e:\n        return f\"Error: {str(e) or repr(e)}\"",
+      "depth_max": 0
+    }
+  }
+]
