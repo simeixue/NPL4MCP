@@ -19,12 +19,23 @@ def serialize_tool(tool):
 
 config = {
     "mcpServers": {
-        "Medical_calculator_MCP": {
-            "command": "python",
-            "args": [
-                f"{REPO_BASE}/Medical_calculator_MCP/server.py"
-            ]
+        "ElevenLabs": {
+            "command": "uvx",
+            "args": ["elevenlabs-mcp"],
+            "env": {
+                "ELEVENLABS_API_KEY": "f9e85540026f9fc5ebe1901fa5bbe368afab6637768a4623d6752589f480a8d8"
+            }
         },
+        # "time": {
+        #     "command": "uvx",
+        #     "args": ["mcp-server-time"]
+        # }
+        # "Medical_calculator_MCP": {
+        #     "command": "python",
+        #     "args": [
+        #         f"{REPO_BASE}/Medical_calculator_MCP/server.py"
+        #     ]
+        # },
         # "twolven_mcp-server-puppeteer-py": {
         #     "command": "python",
         #     "args": [f"{REPO_BASE}/twolven_mcp-server-puppeteer-py/puppeteer.py"]

@@ -44,10 +44,10 @@ if __name__ == "__main__":
         sys.exit(1)
     check_func_results(pycg_dir)
 
-    # Step 3: get_tool_list
-    if not run_cmd("get_tool_list", "python ./get_tool_list.py"):
-        print("server启动失败")
-        sys.exit(1)
+    # # Step 3: get_tool_list
+    # if not run_cmd("get_tool_list", "python ./get_tool_list.py"):
+    #     print("server启动失败")
+    #     sys.exit(1)
 
     # Step 4: get_implementation (只在前面都成功的情况下执行)
     if not run_cmd("get_implementation", "python ./get_implementation.py"):

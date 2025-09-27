@@ -1,0 +1,450 @@
+[
+  {
+    "name": "get_session_info",
+    "description": "Get detailed information about the current Ableton session",
+    "input_schema": {
+      "properties": {},
+      "title": "get_session_infoArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/AbletonMCP/MCP_Server/server.py\n# module: MCP_Server.server\n# qname: MCP_Server.server.get_session_info\n# lines: 262-270\ndef get_session_info(ctx: Context) -> str:\n    \"\"\"Get detailed information about the current Ableton session\"\"\"\n    try:\n        ableton = get_ableton_connection()\n        result = ableton.send_command(\"get_session_info\")\n        return json.dumps(result, indent=2)\n    except Exception as e:\n        logger.error(f\"Error getting session info from Ableton: {str(e)}\")\n        return f\"Error getting session info: {str(e)}\"",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/AbletonMCP/MCP_Server/server.py\n# module: MCP_Server.server\n# qname: MCP_Server.server.get_ableton_connection\n# lines: 196-256\ndef get_ableton_connection():\n    \"\"\"Get or create a persistent Ableton connection\"\"\"\n    global _ableton_connection\n    \n    if _ableton_connection is not None:\n        try:\n            # Test the connection with a simple ping\n            # We'll try to send an empty message, which should fail if the connection is dead\n            # but won't affect Ableton if it's alive\n            _ableton_connection.sock.settimeout(1.0)\n            _ableton_connection.sock.sendall(b'')\n            return _ableton_connection\n        except Exception as e:\n            logger.warning(f\"Existing connection is no longer valid: {str(e)}\")\n            try:\n                _ableton_connection.disconnect()\n            except:\n                pass\n            _ableton_connection = None\n    \n    # Connection doesn't exist or is invalid, create a new one\n    if _ableton_connection is None:\n        # Try to connect up to 3 times with a short delay between attempts\n        max_attempts = 3\n        for attempt in range(1, max_attempts + 1):\n            try:\n                logger.info(f\"Connecting to Ableton (attempt {attempt}/{max_attempts})...\")\n                _ableton_connection = AbletonConnection(host=\"localhost\", port=9877)\n                if _ableton_connection.connect():\n                    logger.info(\"Created new persistent connection to Ableton\")\n                    \n                    # Validate connection with a simple command\n                    try:\n                        # Get session info as a test\n                        _ableton_connection.send_command(\"get_session_info\")\n                        logger.info(\"Connection validated successfully\")\n                        return _ableton_connection\n                    except Exception as e:\n                        logger.error(f\"Connection validation failed: {str(e)}\")\n                        _ableton_connection.disconnect()\n                        _ableton_connection = None\n                        # Continue to next attempt\n                else:\n                    _ableton_connection = None\n            except Exception as e:\n                logger.error(f\"Connection attempt {attempt} failed: {str(e)}\")\n                if _ableton_connection:\n                    _ableton_connection.disconnect()\n                    _ableton_connection = None\n            \n            # Wait before trying again, but only if we have more attempts left\n            if attempt < max_attempts:\n                import time\n                time.sleep(1.0)\n        \n        # If we get here, all connection attempts failed\n        if _ableton_connection is None:\n            logger.error(\"Failed to connect to Ableton after multiple attempts\")\n            raise Exception(\"Could not connect to Ableton. Make sure the Remote Script is running.\")\n    \n    return _ableton_connection"
+      ],
+      "depth_max": 1
+    }
+  },
+  {
+    "name": "get_track_info",
+    "description": "\n    Get detailed information about a specific track in Ableton.\n    \n    Parameters:\n    - track_index: The index of the track to get information about\n    ",
+    "input_schema": {
+      "properties": {
+        "track_index": {
+          "title": "Track Index",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "track_index"
+      ],
+      "title": "get_track_infoArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/AbletonMCP/MCP_Server/server.py\n# module: MCP_Server.server\n# qname: MCP_Server.server.get_track_info\n# lines: 273-286\ndef get_track_info(ctx: Context, track_index: int) -> str:\n    \"\"\"\n    Get detailed information about a specific track in Ableton.\n    \n    Parameters:\n    - track_index: The index of the track to get information about\n    \"\"\"\n    try:\n        ableton = get_ableton_connection()\n        result = ableton.send_command(\"get_track_info\", {\"track_index\": track_index})\n        return json.dumps(result, indent=2)\n    except Exception as e:\n        logger.error(f\"Error getting track info from Ableton: {str(e)}\")\n        return f\"Error getting track info: {str(e)}\"",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/AbletonMCP/MCP_Server/server.py\n# module: MCP_Server.server\n# qname: MCP_Server.server.get_ableton_connection\n# lines: 196-256\ndef get_ableton_connection():\n    \"\"\"Get or create a persistent Ableton connection\"\"\"\n    global _ableton_connection\n    \n    if _ableton_connection is not None:\n        try:\n            # Test the connection with a simple ping\n            # We'll try to send an empty message, which should fail if the connection is dead\n            # but won't affect Ableton if it's alive\n            _ableton_connection.sock.settimeout(1.0)\n            _ableton_connection.sock.sendall(b'')\n            return _ableton_connection\n        except Exception as e:\n            logger.warning(f\"Existing connection is no longer valid: {str(e)}\")\n            try:\n                _ableton_connection.disconnect()\n            except:\n                pass\n            _ableton_connection = None\n    \n    # Connection doesn't exist or is invalid, create a new one\n    if _ableton_connection is None:\n        # Try to connect up to 3 times with a short delay between attempts\n        max_attempts = 3\n        for attempt in range(1, max_attempts + 1):\n            try:\n                logger.info(f\"Connecting to Ableton (attempt {attempt}/{max_attempts})...\")\n                _ableton_connection = AbletonConnection(host=\"localhost\", port=9877)\n                if _ableton_connection.connect():\n                    logger.info(\"Created new persistent connection to Ableton\")\n                    \n                    # Validate connection with a simple command\n                    try:\n                        # Get session info as a test\n                        _ableton_connection.send_command(\"get_session_info\")\n                        logger.info(\"Connection validated successfully\")\n                        return _ableton_connection\n                    except Exception as e:\n                        logger.error(f\"Connection validation failed: {str(e)}\")\n                        _ableton_connection.disconnect()\n                        _ableton_connection = None\n                        # Continue to next attempt\n                else:\n                    _ableton_connection = None\n            except Exception as e:\n                logger.error(f\"Connection attempt {attempt} failed: {str(e)}\")\n                if _ableton_connection:\n                    _ableton_connection.disconnect()\n                    _ableton_connection = None\n            \n            # Wait before trying again, but only if we have more attempts left\n            if attempt < max_attempts:\n                import time\n                time.sleep(1.0)\n        \n        # If we get here, all connection attempts failed\n        if _ableton_connection is None:\n            logger.error(\"Failed to connect to Ableton after multiple attempts\")\n            raise Exception(\"Could not connect to Ableton. Make sure the Remote Script is running.\")\n    \n    return _ableton_connection"
+      ],
+      "depth_max": 1
+    }
+  },
+  {
+    "name": "create_midi_track",
+    "description": "\n    Create a new MIDI track in the Ableton session.\n    \n    Parameters:\n    - index: The index to insert the track at (-1 = end of list)\n    ",
+    "input_schema": {
+      "properties": {
+        "index": {
+          "default": -1,
+          "title": "Index",
+          "type": "integer"
+        }
+      },
+      "title": "create_midi_trackArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/AbletonMCP/MCP_Server/server.py\n# module: MCP_Server.server\n# qname: MCP_Server.server.create_midi_track\n# lines: 289-302\ndef create_midi_track(ctx: Context, index: int = -1) -> str:\n    \"\"\"\n    Create a new MIDI track in the Ableton session.\n    \n    Parameters:\n    - index: The index to insert the track at (-1 = end of list)\n    \"\"\"\n    try:\n        ableton = get_ableton_connection()\n        result = ableton.send_command(\"create_midi_track\", {\"index\": index})\n        return f\"Created new MIDI track: {result.get('name', 'unknown')}\"\n    except Exception as e:\n        logger.error(f\"Error creating MIDI track: {str(e)}\")\n        return f\"Error creating MIDI track: {str(e)}\"",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/AbletonMCP/MCP_Server/server.py\n# module: MCP_Server.server\n# qname: MCP_Server.server.get_ableton_connection\n# lines: 196-256\ndef get_ableton_connection():\n    \"\"\"Get or create a persistent Ableton connection\"\"\"\n    global _ableton_connection\n    \n    if _ableton_connection is not None:\n        try:\n            # Test the connection with a simple ping\n            # We'll try to send an empty message, which should fail if the connection is dead\n            # but won't affect Ableton if it's alive\n            _ableton_connection.sock.settimeout(1.0)\n            _ableton_connection.sock.sendall(b'')\n            return _ableton_connection\n        except Exception as e:\n            logger.warning(f\"Existing connection is no longer valid: {str(e)}\")\n            try:\n                _ableton_connection.disconnect()\n            except:\n                pass\n            _ableton_connection = None\n    \n    # Connection doesn't exist or is invalid, create a new one\n    if _ableton_connection is None:\n        # Try to connect up to 3 times with a short delay between attempts\n        max_attempts = 3\n        for attempt in range(1, max_attempts + 1):\n            try:\n                logger.info(f\"Connecting to Ableton (attempt {attempt}/{max_attempts})...\")\n                _ableton_connection = AbletonConnection(host=\"localhost\", port=9877)\n                if _ableton_connection.connect():\n                    logger.info(\"Created new persistent connection to Ableton\")\n                    \n                    # Validate connection with a simple command\n                    try:\n                        # Get session info as a test\n                        _ableton_connection.send_command(\"get_session_info\")\n                        logger.info(\"Connection validated successfully\")\n                        return _ableton_connection\n                    except Exception as e:\n                        logger.error(f\"Connection validation failed: {str(e)}\")\n                        _ableton_connection.disconnect()\n                        _ableton_connection = None\n                        # Continue to next attempt\n                else:\n                    _ableton_connection = None\n            except Exception as e:\n                logger.error(f\"Connection attempt {attempt} failed: {str(e)}\")\n                if _ableton_connection:\n                    _ableton_connection.disconnect()\n                    _ableton_connection = None\n            \n            # Wait before trying again, but only if we have more attempts left\n            if attempt < max_attempts:\n                import time\n                time.sleep(1.0)\n        \n        # If we get here, all connection attempts failed\n        if _ableton_connection is None:\n            logger.error(\"Failed to connect to Ableton after multiple attempts\")\n            raise Exception(\"Could not connect to Ableton. Make sure the Remote Script is running.\")\n    \n    return _ableton_connection"
+      ],
+      "depth_max": 1
+    }
+  },
+  {
+    "name": "set_track_name",
+    "description": "\n    Set the name of a track.\n    \n    Parameters:\n    - track_index: The index of the track to rename\n    - name: The new name for the track\n    ",
+    "input_schema": {
+      "properties": {
+        "track_index": {
+          "title": "Track Index",
+          "type": "integer"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "track_index",
+        "name"
+      ],
+      "title": "set_track_nameArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/AbletonMCP/MCP_Server/server.py\n# module: MCP_Server.server\n# qname: MCP_Server.server.set_track_name\n# lines: 306-320\ndef set_track_name(ctx: Context, track_index: int, name: str) -> str:\n    \"\"\"\n    Set the name of a track.\n    \n    Parameters:\n    - track_index: The index of the track to rename\n    - name: The new name for the track\n    \"\"\"\n    try:\n        ableton = get_ableton_connection()\n        result = ableton.send_command(\"set_track_name\", {\"track_index\": track_index, \"name\": name})\n        return f\"Renamed track to: {result.get('name', name)}\"\n    except Exception as e:\n        logger.error(f\"Error setting track name: {str(e)}\")\n        return f\"Error setting track name: {str(e)}\"",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/AbletonMCP/MCP_Server/server.py\n# module: MCP_Server.server\n# qname: MCP_Server.server.get_ableton_connection\n# lines: 196-256\ndef get_ableton_connection():\n    \"\"\"Get or create a persistent Ableton connection\"\"\"\n    global _ableton_connection\n    \n    if _ableton_connection is not None:\n        try:\n            # Test the connection with a simple ping\n            # We'll try to send an empty message, which should fail if the connection is dead\n            # but won't affect Ableton if it's alive\n            _ableton_connection.sock.settimeout(1.0)\n            _ableton_connection.sock.sendall(b'')\n            return _ableton_connection\n        except Exception as e:\n            logger.warning(f\"Existing connection is no longer valid: {str(e)}\")\n            try:\n                _ableton_connection.disconnect()\n            except:\n                pass\n            _ableton_connection = None\n    \n    # Connection doesn't exist or is invalid, create a new one\n    if _ableton_connection is None:\n        # Try to connect up to 3 times with a short delay between attempts\n        max_attempts = 3\n        for attempt in range(1, max_attempts + 1):\n            try:\n                logger.info(f\"Connecting to Ableton (attempt {attempt}/{max_attempts})...\")\n                _ableton_connection = AbletonConnection(host=\"localhost\", port=9877)\n                if _ableton_connection.connect():\n                    logger.info(\"Created new persistent connection to Ableton\")\n                    \n                    # Validate connection with a simple command\n                    try:\n                        # Get session info as a test\n                        _ableton_connection.send_command(\"get_session_info\")\n                        logger.info(\"Connection validated successfully\")\n                        return _ableton_connection\n                    except Exception as e:\n                        logger.error(f\"Connection validation failed: {str(e)}\")\n                        _ableton_connection.disconnect()\n                        _ableton_connection = None\n                        # Continue to next attempt\n                else:\n                    _ableton_connection = None\n            except Exception as e:\n                logger.error(f\"Connection attempt {attempt} failed: {str(e)}\")\n                if _ableton_connection:\n                    _ableton_connection.disconnect()\n                    _ableton_connection = None\n            \n            # Wait before trying again, but only if we have more attempts left\n            if attempt < max_attempts:\n                import time\n                time.sleep(1.0)\n        \n        # If we get here, all connection attempts failed\n        if _ableton_connection is None:\n            logger.error(\"Failed to connect to Ableton after multiple attempts\")\n            raise Exception(\"Could not connect to Ableton. Make sure the Remote Script is running.\")\n    \n    return _ableton_connection"
+      ],
+      "depth_max": 1
+    }
+  },
+  {
+    "name": "create_clip",
+    "description": "\n    Create a new MIDI clip in the specified track and clip slot.\n    \n    Parameters:\n    - track_index: The index of the track to create the clip in\n    - clip_index: The index of the clip slot to create the clip in\n    - length: The length of the clip in beats (default: 4.0)\n    ",
+    "input_schema": {
+      "properties": {
+        "track_index": {
+          "title": "Track Index",
+          "type": "integer"
+        },
+        "clip_index": {
+          "title": "Clip Index",
+          "type": "integer"
+        },
+        "length": {
+          "default": 4.0,
+          "title": "Length",
+          "type": "number"
+        }
+      },
+      "required": [
+        "track_index",
+        "clip_index"
+      ],
+      "title": "create_clipArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/AbletonMCP/MCP_Server/server.py\n# module: MCP_Server.server\n# qname: MCP_Server.server.create_clip\n# lines: 323-342\ndef create_clip(ctx: Context, track_index: int, clip_index: int, length: float = 4.0) -> str:\n    \"\"\"\n    Create a new MIDI clip in the specified track and clip slot.\n    \n    Parameters:\n    - track_index: The index of the track to create the clip in\n    - clip_index: The index of the clip slot to create the clip in\n    - length: The length of the clip in beats (default: 4.0)\n    \"\"\"\n    try:\n        ableton = get_ableton_connection()\n        result = ableton.send_command(\"create_clip\", {\n            \"track_index\": track_index, \n            \"clip_index\": clip_index, \n            \"length\": length\n        })\n        return f\"Created new clip at track {track_index}, slot {clip_index} with length {length} beats\"\n    except Exception as e:\n        logger.error(f\"Error creating clip: {str(e)}\")\n        return f\"Error creating clip: {str(e)}\"",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/AbletonMCP/MCP_Server/server.py\n# module: MCP_Server.server\n# qname: MCP_Server.server.get_ableton_connection\n# lines: 196-256\ndef get_ableton_connection():\n    \"\"\"Get or create a persistent Ableton connection\"\"\"\n    global _ableton_connection\n    \n    if _ableton_connection is not None:\n        try:\n            # Test the connection with a simple ping\n            # We'll try to send an empty message, which should fail if the connection is dead\n            # but won't affect Ableton if it's alive\n            _ableton_connection.sock.settimeout(1.0)\n            _ableton_connection.sock.sendall(b'')\n            return _ableton_connection\n        except Exception as e:\n            logger.warning(f\"Existing connection is no longer valid: {str(e)}\")\n            try:\n                _ableton_connection.disconnect()\n            except:\n                pass\n            _ableton_connection = None\n    \n    # Connection doesn't exist or is invalid, create a new one\n    if _ableton_connection is None:\n        # Try to connect up to 3 times with a short delay between attempts\n        max_attempts = 3\n        for attempt in range(1, max_attempts + 1):\n            try:\n                logger.info(f\"Connecting to Ableton (attempt {attempt}/{max_attempts})...\")\n                _ableton_connection = AbletonConnection(host=\"localhost\", port=9877)\n                if _ableton_connection.connect():\n                    logger.info(\"Created new persistent connection to Ableton\")\n                    \n                    # Validate connection with a simple command\n                    try:\n                        # Get session info as a test\n                        _ableton_connection.send_command(\"get_session_info\")\n                        logger.info(\"Connection validated successfully\")\n                        return _ableton_connection\n                    except Exception as e:\n                        logger.error(f\"Connection validation failed: {str(e)}\")\n                        _ableton_connection.disconnect()\n                        _ableton_connection = None\n                        # Continue to next attempt\n                else:\n                    _ableton_connection = None\n            except Exception as e:\n                logger.error(f\"Connection attempt {attempt} failed: {str(e)}\")\n                if _ableton_connection:\n                    _ableton_connection.disconnect()\n                    _ableton_connection = None\n            \n            # Wait before trying again, but only if we have more attempts left\n            if attempt < max_attempts:\n                import time\n                time.sleep(1.0)\n        \n        # If we get here, all connection attempts failed\n        if _ableton_connection is None:\n            logger.error(\"Failed to connect to Ableton after multiple attempts\")\n            raise Exception(\"Could not connect to Ableton. Make sure the Remote Script is running.\")\n    \n    return _ableton_connection"
+      ],
+      "depth_max": 1
+    }
+  },
+  {
+    "name": "add_notes_to_clip",
+    "description": "\n    Add MIDI notes to a clip.\n    \n    Parameters:\n    - track_index: The index of the track containing the clip\n    - clip_index: The index of the clip slot containing the clip\n    - notes: List of note dictionaries, each with pitch, start_time, duration, velocity, and mute\n    ",
+    "input_schema": {
+      "properties": {
+        "track_index": {
+          "title": "Track Index",
+          "type": "integer"
+        },
+        "clip_index": {
+          "title": "Clip Index",
+          "type": "integer"
+        },
+        "notes": {
+          "items": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "boolean"
+                }
+              ]
+            },
+            "type": "object"
+          },
+          "title": "Notes",
+          "type": "array"
+        }
+      },
+      "required": [
+        "track_index",
+        "clip_index",
+        "notes"
+      ],
+      "title": "add_notes_to_clipArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/AbletonMCP/MCP_Server/server.py\n# module: MCP_Server.server\n# qname: MCP_Server.server.add_notes_to_clip\n# lines: 345-369\ndef add_notes_to_clip(\n    ctx: Context, \n    track_index: int, \n    clip_index: int, \n    notes: List[Dict[str, Union[int, float, bool]]]\n) -> str:\n    \"\"\"\n    Add MIDI notes to a clip.\n    \n    Parameters:\n    - track_index: The index of the track containing the clip\n    - clip_index: The index of the clip slot containing the clip\n    - notes: List of note dictionaries, each with pitch, start_time, duration, velocity, and mute\n    \"\"\"\n    try:\n        ableton = get_ableton_connection()\n        result = ableton.send_command(\"add_notes_to_clip\", {\n            \"track_index\": track_index,\n            \"clip_index\": clip_index,\n            \"notes\": notes\n        })\n        return f\"Added {len(notes)} notes to clip at track {track_index}, slot {clip_index}\"\n    except Exception as e:\n        logger.error(f\"Error adding notes to clip: {str(e)}\")\n        return f\"Error adding notes to clip: {str(e)}\"",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/AbletonMCP/MCP_Server/server.py\n# module: MCP_Server.server\n# qname: MCP_Server.server.get_ableton_connection\n# lines: 196-256\ndef get_ableton_connection():\n    \"\"\"Get or create a persistent Ableton connection\"\"\"\n    global _ableton_connection\n    \n    if _ableton_connection is not None:\n        try:\n            # Test the connection with a simple ping\n            # We'll try to send an empty message, which should fail if the connection is dead\n            # but won't affect Ableton if it's alive\n            _ableton_connection.sock.settimeout(1.0)\n            _ableton_connection.sock.sendall(b'')\n            return _ableton_connection\n        except Exception as e:\n            logger.warning(f\"Existing connection is no longer valid: {str(e)}\")\n            try:\n                _ableton_connection.disconnect()\n            except:\n                pass\n            _ableton_connection = None\n    \n    # Connection doesn't exist or is invalid, create a new one\n    if _ableton_connection is None:\n        # Try to connect up to 3 times with a short delay between attempts\n        max_attempts = 3\n        for attempt in range(1, max_attempts + 1):\n            try:\n                logger.info(f\"Connecting to Ableton (attempt {attempt}/{max_attempts})...\")\n                _ableton_connection = AbletonConnection(host=\"localhost\", port=9877)\n                if _ableton_connection.connect():\n                    logger.info(\"Created new persistent connection to Ableton\")\n                    \n                    # Validate connection with a simple command\n                    try:\n                        # Get session info as a test\n                        _ableton_connection.send_command(\"get_session_info\")\n                        logger.info(\"Connection validated successfully\")\n                        return _ableton_connection\n                    except Exception as e:\n                        logger.error(f\"Connection validation failed: {str(e)}\")\n                        _ableton_connection.disconnect()\n                        _ableton_connection = None\n                        # Continue to next attempt\n                else:\n                    _ableton_connection = None\n            except Exception as e:\n                logger.error(f\"Connection attempt {attempt} failed: {str(e)}\")\n                if _ableton_connection:\n                    _ableton_connection.disconnect()\n                    _ableton_connection = None\n            \n            # Wait before trying again, but only if we have more attempts left\n            if attempt < max_attempts:\n                import time\n                time.sleep(1.0)\n        \n        # If we get here, all connection attempts failed\n        if _ableton_connection is None:\n            logger.error(\"Failed to connect to Ableton after multiple attempts\")\n            raise Exception(\"Could not connect to Ableton. Make sure the Remote Script is running.\")\n    \n    return _ableton_connection"
+      ],
+      "depth_max": 1
+    }
+  },
+  {
+    "name": "set_clip_name",
+    "description": "\n    Set the name of a clip.\n    \n    Parameters:\n    - track_index: The index of the track containing the clip\n    - clip_index: The index of the clip slot containing the clip\n    - name: The new name for the clip\n    ",
+    "input_schema": {
+      "properties": {
+        "track_index": {
+          "title": "Track Index",
+          "type": "integer"
+        },
+        "clip_index": {
+          "title": "Clip Index",
+          "type": "integer"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "track_index",
+        "clip_index",
+        "name"
+      ],
+      "title": "set_clip_nameArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/AbletonMCP/MCP_Server/server.py\n# module: MCP_Server.server\n# qname: MCP_Server.server.set_clip_name\n# lines: 372-391\ndef set_clip_name(ctx: Context, track_index: int, clip_index: int, name: str) -> str:\n    \"\"\"\n    Set the name of a clip.\n    \n    Parameters:\n    - track_index: The index of the track containing the clip\n    - clip_index: The index of the clip slot containing the clip\n    - name: The new name for the clip\n    \"\"\"\n    try:\n        ableton = get_ableton_connection()\n        result = ableton.send_command(\"set_clip_name\", {\n            \"track_index\": track_index,\n            \"clip_index\": clip_index,\n            \"name\": name\n        })\n        return f\"Renamed clip at track {track_index}, slot {clip_index} to '{name}'\"\n    except Exception as e:\n        logger.error(f\"Error setting clip name: {str(e)}\")\n        return f\"Error setting clip name: {str(e)}\"",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/AbletonMCP/MCP_Server/server.py\n# module: MCP_Server.server\n# qname: MCP_Server.server.get_ableton_connection\n# lines: 196-256\ndef get_ableton_connection():\n    \"\"\"Get or create a persistent Ableton connection\"\"\"\n    global _ableton_connection\n    \n    if _ableton_connection is not None:\n        try:\n            # Test the connection with a simple ping\n            # We'll try to send an empty message, which should fail if the connection is dead\n            # but won't affect Ableton if it's alive\n            _ableton_connection.sock.settimeout(1.0)\n            _ableton_connection.sock.sendall(b'')\n            return _ableton_connection\n        except Exception as e:\n            logger.warning(f\"Existing connection is no longer valid: {str(e)}\")\n            try:\n                _ableton_connection.disconnect()\n            except:\n                pass\n            _ableton_connection = None\n    \n    # Connection doesn't exist or is invalid, create a new one\n    if _ableton_connection is None:\n        # Try to connect up to 3 times with a short delay between attempts\n        max_attempts = 3\n        for attempt in range(1, max_attempts + 1):\n            try:\n                logger.info(f\"Connecting to Ableton (attempt {attempt}/{max_attempts})...\")\n                _ableton_connection = AbletonConnection(host=\"localhost\", port=9877)\n                if _ableton_connection.connect():\n                    logger.info(\"Created new persistent connection to Ableton\")\n                    \n                    # Validate connection with a simple command\n                    try:\n                        # Get session info as a test\n                        _ableton_connection.send_command(\"get_session_info\")\n                        logger.info(\"Connection validated successfully\")\n                        return _ableton_connection\n                    except Exception as e:\n                        logger.error(f\"Connection validation failed: {str(e)}\")\n                        _ableton_connection.disconnect()\n                        _ableton_connection = None\n                        # Continue to next attempt\n                else:\n                    _ableton_connection = None\n            except Exception as e:\n                logger.error(f\"Connection attempt {attempt} failed: {str(e)}\")\n                if _ableton_connection:\n                    _ableton_connection.disconnect()\n                    _ableton_connection = None\n            \n            # Wait before trying again, but only if we have more attempts left\n            if attempt < max_attempts:\n                import time\n                time.sleep(1.0)\n        \n        # If we get here, all connection attempts failed\n        if _ableton_connection is None:\n            logger.error(\"Failed to connect to Ableton after multiple attempts\")\n            raise Exception(\"Could not connect to Ableton. Make sure the Remote Script is running.\")\n    \n    return _ableton_connection"
+      ],
+      "depth_max": 1
+    }
+  },
+  {
+    "name": "set_tempo",
+    "description": "\n    Set the tempo of the Ableton session.\n    \n    Parameters:\n    - tempo: The new tempo in BPM\n    ",
+    "input_schema": {
+      "properties": {
+        "tempo": {
+          "title": "Tempo",
+          "type": "number"
+        }
+      },
+      "required": [
+        "tempo"
+      ],
+      "title": "set_tempoArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/AbletonMCP/MCP_Server/server.py\n# module: MCP_Server.server\n# qname: MCP_Server.server.set_tempo\n# lines: 394-407\ndef set_tempo(ctx: Context, tempo: float) -> str:\n    \"\"\"\n    Set the tempo of the Ableton session.\n    \n    Parameters:\n    - tempo: The new tempo in BPM\n    \"\"\"\n    try:\n        ableton = get_ableton_connection()\n        result = ableton.send_command(\"set_tempo\", {\"tempo\": tempo})\n        return f\"Set tempo to {tempo} BPM\"\n    except Exception as e:\n        logger.error(f\"Error setting tempo: {str(e)}\")\n        return f\"Error setting tempo: {str(e)}\"",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/AbletonMCP/MCP_Server/server.py\n# module: MCP_Server.server\n# qname: MCP_Server.server.get_ableton_connection\n# lines: 196-256\ndef get_ableton_connection():\n    \"\"\"Get or create a persistent Ableton connection\"\"\"\n    global _ableton_connection\n    \n    if _ableton_connection is not None:\n        try:\n            # Test the connection with a simple ping\n            # We'll try to send an empty message, which should fail if the connection is dead\n            # but won't affect Ableton if it's alive\n            _ableton_connection.sock.settimeout(1.0)\n            _ableton_connection.sock.sendall(b'')\n            return _ableton_connection\n        except Exception as e:\n            logger.warning(f\"Existing connection is no longer valid: {str(e)}\")\n            try:\n                _ableton_connection.disconnect()\n            except:\n                pass\n            _ableton_connection = None\n    \n    # Connection doesn't exist or is invalid, create a new one\n    if _ableton_connection is None:\n        # Try to connect up to 3 times with a short delay between attempts\n        max_attempts = 3\n        for attempt in range(1, max_attempts + 1):\n            try:\n                logger.info(f\"Connecting to Ableton (attempt {attempt}/{max_attempts})...\")\n                _ableton_connection = AbletonConnection(host=\"localhost\", port=9877)\n                if _ableton_connection.connect():\n                    logger.info(\"Created new persistent connection to Ableton\")\n                    \n                    # Validate connection with a simple command\n                    try:\n                        # Get session info as a test\n                        _ableton_connection.send_command(\"get_session_info\")\n                        logger.info(\"Connection validated successfully\")\n                        return _ableton_connection\n                    except Exception as e:\n                        logger.error(f\"Connection validation failed: {str(e)}\")\n                        _ableton_connection.disconnect()\n                        _ableton_connection = None\n                        # Continue to next attempt\n                else:\n                    _ableton_connection = None\n            except Exception as e:\n                logger.error(f\"Connection attempt {attempt} failed: {str(e)}\")\n                if _ableton_connection:\n                    _ableton_connection.disconnect()\n                    _ableton_connection = None\n            \n            # Wait before trying again, but only if we have more attempts left\n            if attempt < max_attempts:\n                import time\n                time.sleep(1.0)\n        \n        # If we get here, all connection attempts failed\n        if _ableton_connection is None:\n            logger.error(\"Failed to connect to Ableton after multiple attempts\")\n            raise Exception(\"Could not connect to Ableton. Make sure the Remote Script is running.\")\n    \n    return _ableton_connection"
+      ],
+      "depth_max": 1
+    }
+  },
+  {
+    "name": "load_instrument_or_effect",
+    "description": "\n    Load an instrument or effect onto a track using its URI.\n    \n    Parameters:\n    - track_index: The index of the track to load the instrument on\n    - uri: The URI of the instrument or effect to load (e.g., 'query:Synths#Instrument%20Rack:Bass:FileId_5116')\n    ",
+    "input_schema": {
+      "properties": {
+        "track_index": {
+          "title": "Track Index",
+          "type": "integer"
+        },
+        "uri": {
+          "title": "Uri",
+          "type": "string"
+        }
+      },
+      "required": [
+        "track_index",
+        "uri"
+      ],
+      "title": "load_instrument_or_effectArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/AbletonMCP/MCP_Server/server.py\n# module: MCP_Server.server\n# qname: MCP_Server.server.load_instrument_or_effect\n# lines: 411-438\ndef load_instrument_or_effect(ctx: Context, track_index: int, uri: str) -> str:\n    \"\"\"\n    Load an instrument or effect onto a track using its URI.\n    \n    Parameters:\n    - track_index: The index of the track to load the instrument on\n    - uri: The URI of the instrument or effect to load (e.g., 'query:Synths#Instrument%20Rack:Bass:FileId_5116')\n    \"\"\"\n    try:\n        ableton = get_ableton_connection()\n        result = ableton.send_command(\"load_browser_item\", {\n            \"track_index\": track_index,\n            \"item_uri\": uri\n        })\n        \n        # Check if the instrument was loaded successfully\n        if result.get(\"loaded\", False):\n            new_devices = result.get(\"new_devices\", [])\n            if new_devices:\n                return f\"Loaded instrument with URI '{uri}' on track {track_index}. New devices: {', '.join(new_devices)}\"\n            else:\n                devices = result.get(\"devices_after\", [])\n                return f\"Loaded instrument with URI '{uri}' on track {track_index}. Devices on track: {', '.join(devices)}\"\n        else:\n            return f\"Failed to load instrument with URI '{uri}'\"\n    except Exception as e:\n        logger.error(f\"Error loading instrument by URI: {str(e)}\")\n        return f\"Error loading instrument by URI: {str(e)}\"",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/AbletonMCP/MCP_Server/server.py\n# module: MCP_Server.server\n# qname: MCP_Server.server.get_ableton_connection\n# lines: 196-256\ndef get_ableton_connection():\n    \"\"\"Get or create a persistent Ableton connection\"\"\"\n    global _ableton_connection\n    \n    if _ableton_connection is not None:\n        try:\n            # Test the connection with a simple ping\n            # We'll try to send an empty message, which should fail if the connection is dead\n            # but won't affect Ableton if it's alive\n            _ableton_connection.sock.settimeout(1.0)\n            _ableton_connection.sock.sendall(b'')\n            return _ableton_connection\n        except Exception as e:\n            logger.warning(f\"Existing connection is no longer valid: {str(e)}\")\n            try:\n                _ableton_connection.disconnect()\n            except:\n                pass\n            _ableton_connection = None\n    \n    # Connection doesn't exist or is invalid, create a new one\n    if _ableton_connection is None:\n        # Try to connect up to 3 times with a short delay between attempts\n        max_attempts = 3\n        for attempt in range(1, max_attempts + 1):\n            try:\n                logger.info(f\"Connecting to Ableton (attempt {attempt}/{max_attempts})...\")\n                _ableton_connection = AbletonConnection(host=\"localhost\", port=9877)\n                if _ableton_connection.connect():\n                    logger.info(\"Created new persistent connection to Ableton\")\n                    \n                    # Validate connection with a simple command\n                    try:\n                        # Get session info as a test\n                        _ableton_connection.send_command(\"get_session_info\")\n                        logger.info(\"Connection validated successfully\")\n                        return _ableton_connection\n                    except Exception as e:\n                        logger.error(f\"Connection validation failed: {str(e)}\")\n                        _ableton_connection.disconnect()\n                        _ableton_connection = None\n                        # Continue to next attempt\n                else:\n                    _ableton_connection = None\n            except Exception as e:\n                logger.error(f\"Connection attempt {attempt} failed: {str(e)}\")\n                if _ableton_connection:\n                    _ableton_connection.disconnect()\n                    _ableton_connection = None\n            \n            # Wait before trying again, but only if we have more attempts left\n            if attempt < max_attempts:\n                import time\n                time.sleep(1.0)\n        \n        # If we get here, all connection attempts failed\n        if _ableton_connection is None:\n            logger.error(\"Failed to connect to Ableton after multiple attempts\")\n            raise Exception(\"Could not connect to Ableton. Make sure the Remote Script is running.\")\n    \n    return _ableton_connection"
+      ],
+      "depth_max": 1
+    }
+  },
+  {
+    "name": "fire_clip",
+    "description": "\n    Start playing a clip.\n    \n    Parameters:\n    - track_index: The index of the track containing the clip\n    - clip_index: The index of the clip slot containing the clip\n    ",
+    "input_schema": {
+      "properties": {
+        "track_index": {
+          "title": "Track Index",
+          "type": "integer"
+        },
+        "clip_index": {
+          "title": "Clip Index",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "track_index",
+        "clip_index"
+      ],
+      "title": "fire_clipArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/AbletonMCP/MCP_Server/server.py\n# module: MCP_Server.server\n# qname: MCP_Server.server.fire_clip\n# lines: 441-458\ndef fire_clip(ctx: Context, track_index: int, clip_index: int) -> str:\n    \"\"\"\n    Start playing a clip.\n    \n    Parameters:\n    - track_index: The index of the track containing the clip\n    - clip_index: The index of the clip slot containing the clip\n    \"\"\"\n    try:\n        ableton = get_ableton_connection()\n        result = ableton.send_command(\"fire_clip\", {\n            \"track_index\": track_index,\n            \"clip_index\": clip_index\n        })\n        return f\"Started playing clip at track {track_index}, slot {clip_index}\"\n    except Exception as e:\n        logger.error(f\"Error firing clip: {str(e)}\")\n        return f\"Error firing clip: {str(e)}\"",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/AbletonMCP/MCP_Server/server.py\n# module: MCP_Server.server\n# qname: MCP_Server.server.get_ableton_connection\n# lines: 196-256\ndef get_ableton_connection():\n    \"\"\"Get or create a persistent Ableton connection\"\"\"\n    global _ableton_connection\n    \n    if _ableton_connection is not None:\n        try:\n            # Test the connection with a simple ping\n            # We'll try to send an empty message, which should fail if the connection is dead\n            # but won't affect Ableton if it's alive\n            _ableton_connection.sock.settimeout(1.0)\n            _ableton_connection.sock.sendall(b'')\n            return _ableton_connection\n        except Exception as e:\n            logger.warning(f\"Existing connection is no longer valid: {str(e)}\")\n            try:\n                _ableton_connection.disconnect()\n            except:\n                pass\n            _ableton_connection = None\n    \n    # Connection doesn't exist or is invalid, create a new one\n    if _ableton_connection is None:\n        # Try to connect up to 3 times with a short delay between attempts\n        max_attempts = 3\n        for attempt in range(1, max_attempts + 1):\n            try:\n                logger.info(f\"Connecting to Ableton (attempt {attempt}/{max_attempts})...\")\n                _ableton_connection = AbletonConnection(host=\"localhost\", port=9877)\n                if _ableton_connection.connect():\n                    logger.info(\"Created new persistent connection to Ableton\")\n                    \n                    # Validate connection with a simple command\n                    try:\n                        # Get session info as a test\n                        _ableton_connection.send_command(\"get_session_info\")\n                        logger.info(\"Connection validated successfully\")\n                        return _ableton_connection\n                    except Exception as e:\n                        logger.error(f\"Connection validation failed: {str(e)}\")\n                        _ableton_connection.disconnect()\n                        _ableton_connection = None\n                        # Continue to next attempt\n                else:\n                    _ableton_connection = None\n            except Exception as e:\n                logger.error(f\"Connection attempt {attempt} failed: {str(e)}\")\n                if _ableton_connection:\n                    _ableton_connection.disconnect()\n                    _ableton_connection = None\n            \n            # Wait before trying again, but only if we have more attempts left\n            if attempt < max_attempts:\n                import time\n                time.sleep(1.0)\n        \n        # If we get here, all connection attempts failed\n        if _ableton_connection is None:\n            logger.error(\"Failed to connect to Ableton after multiple attempts\")\n            raise Exception(\"Could not connect to Ableton. Make sure the Remote Script is running.\")\n    \n    return _ableton_connection"
+      ],
+      "depth_max": 1
+    }
+  },
+  {
+    "name": "stop_clip",
+    "description": "\n    Stop playing a clip.\n    \n    Parameters:\n    - track_index: The index of the track containing the clip\n    - clip_index: The index of the clip slot containing the clip\n    ",
+    "input_schema": {
+      "properties": {
+        "track_index": {
+          "title": "Track Index",
+          "type": "integer"
+        },
+        "clip_index": {
+          "title": "Clip Index",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "track_index",
+        "clip_index"
+      ],
+      "title": "stop_clipArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/AbletonMCP/MCP_Server/server.py\n# module: MCP_Server.server\n# qname: MCP_Server.server.stop_clip\n# lines: 461-478\ndef stop_clip(ctx: Context, track_index: int, clip_index: int) -> str:\n    \"\"\"\n    Stop playing a clip.\n    \n    Parameters:\n    - track_index: The index of the track containing the clip\n    - clip_index: The index of the clip slot containing the clip\n    \"\"\"\n    try:\n        ableton = get_ableton_connection()\n        result = ableton.send_command(\"stop_clip\", {\n            \"track_index\": track_index,\n            \"clip_index\": clip_index\n        })\n        return f\"Stopped clip at track {track_index}, slot {clip_index}\"\n    except Exception as e:\n        logger.error(f\"Error stopping clip: {str(e)}\")\n        return f\"Error stopping clip: {str(e)}\"",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/AbletonMCP/MCP_Server/server.py\n# module: MCP_Server.server\n# qname: MCP_Server.server.get_ableton_connection\n# lines: 196-256\ndef get_ableton_connection():\n    \"\"\"Get or create a persistent Ableton connection\"\"\"\n    global _ableton_connection\n    \n    if _ableton_connection is not None:\n        try:\n            # Test the connection with a simple ping\n            # We'll try to send an empty message, which should fail if the connection is dead\n            # but won't affect Ableton if it's alive\n            _ableton_connection.sock.settimeout(1.0)\n            _ableton_connection.sock.sendall(b'')\n            return _ableton_connection\n        except Exception as e:\n            logger.warning(f\"Existing connection is no longer valid: {str(e)}\")\n            try:\n                _ableton_connection.disconnect()\n            except:\n                pass\n            _ableton_connection = None\n    \n    # Connection doesn't exist or is invalid, create a new one\n    if _ableton_connection is None:\n        # Try to connect up to 3 times with a short delay between attempts\n        max_attempts = 3\n        for attempt in range(1, max_attempts + 1):\n            try:\n                logger.info(f\"Connecting to Ableton (attempt {attempt}/{max_attempts})...\")\n                _ableton_connection = AbletonConnection(host=\"localhost\", port=9877)\n                if _ableton_connection.connect():\n                    logger.info(\"Created new persistent connection to Ableton\")\n                    \n                    # Validate connection with a simple command\n                    try:\n                        # Get session info as a test\n                        _ableton_connection.send_command(\"get_session_info\")\n                        logger.info(\"Connection validated successfully\")\n                        return _ableton_connection\n                    except Exception as e:\n                        logger.error(f\"Connection validation failed: {str(e)}\")\n                        _ableton_connection.disconnect()\n                        _ableton_connection = None\n                        # Continue to next attempt\n                else:\n                    _ableton_connection = None\n            except Exception as e:\n                logger.error(f\"Connection attempt {attempt} failed: {str(e)}\")\n                if _ableton_connection:\n                    _ableton_connection.disconnect()\n                    _ableton_connection = None\n            \n            # Wait before trying again, but only if we have more attempts left\n            if attempt < max_attempts:\n                import time\n                time.sleep(1.0)\n        \n        # If we get here, all connection attempts failed\n        if _ableton_connection is None:\n            logger.error(\"Failed to connect to Ableton after multiple attempts\")\n            raise Exception(\"Could not connect to Ableton. Make sure the Remote Script is running.\")\n    \n    return _ableton_connection"
+      ],
+      "depth_max": 1
+    }
+  },
+  {
+    "name": "start_playback",
+    "description": "Start playing the Ableton session.",
+    "input_schema": {
+      "properties": {},
+      "title": "start_playbackArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/AbletonMCP/MCP_Server/server.py\n# module: MCP_Server.server\n# qname: MCP_Server.server.start_playback\n# lines: 481-489\ndef start_playback(ctx: Context) -> str:\n    \"\"\"Start playing the Ableton session.\"\"\"\n    try:\n        ableton = get_ableton_connection()\n        result = ableton.send_command(\"start_playback\")\n        return \"Started playback\"\n    except Exception as e:\n        logger.error(f\"Error starting playback: {str(e)}\")\n        return f\"Error starting playback: {str(e)}\"",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/AbletonMCP/MCP_Server/server.py\n# module: MCP_Server.server\n# qname: MCP_Server.server.get_ableton_connection\n# lines: 196-256\ndef get_ableton_connection():\n    \"\"\"Get or create a persistent Ableton connection\"\"\"\n    global _ableton_connection\n    \n    if _ableton_connection is not None:\n        try:\n            # Test the connection with a simple ping\n            # We'll try to send an empty message, which should fail if the connection is dead\n            # but won't affect Ableton if it's alive\n            _ableton_connection.sock.settimeout(1.0)\n            _ableton_connection.sock.sendall(b'')\n            return _ableton_connection\n        except Exception as e:\n            logger.warning(f\"Existing connection is no longer valid: {str(e)}\")\n            try:\n                _ableton_connection.disconnect()\n            except:\n                pass\n            _ableton_connection = None\n    \n    # Connection doesn't exist or is invalid, create a new one\n    if _ableton_connection is None:\n        # Try to connect up to 3 times with a short delay between attempts\n        max_attempts = 3\n        for attempt in range(1, max_attempts + 1):\n            try:\n                logger.info(f\"Connecting to Ableton (attempt {attempt}/{max_attempts})...\")\n                _ableton_connection = AbletonConnection(host=\"localhost\", port=9877)\n                if _ableton_connection.connect():\n                    logger.info(\"Created new persistent connection to Ableton\")\n                    \n                    # Validate connection with a simple command\n                    try:\n                        # Get session info as a test\n                        _ableton_connection.send_command(\"get_session_info\")\n                        logger.info(\"Connection validated successfully\")\n                        return _ableton_connection\n                    except Exception as e:\n                        logger.error(f\"Connection validation failed: {str(e)}\")\n                        _ableton_connection.disconnect()\n                        _ableton_connection = None\n                        # Continue to next attempt\n                else:\n                    _ableton_connection = None\n            except Exception as e:\n                logger.error(f\"Connection attempt {attempt} failed: {str(e)}\")\n                if _ableton_connection:\n                    _ableton_connection.disconnect()\n                    _ableton_connection = None\n            \n            # Wait before trying again, but only if we have more attempts left\n            if attempt < max_attempts:\n                import time\n                time.sleep(1.0)\n        \n        # If we get here, all connection attempts failed\n        if _ableton_connection is None:\n            logger.error(\"Failed to connect to Ableton after multiple attempts\")\n            raise Exception(\"Could not connect to Ableton. Make sure the Remote Script is running.\")\n    \n    return _ableton_connection"
+      ],
+      "depth_max": 1
+    }
+  },
+  {
+    "name": "stop_playback",
+    "description": "Stop playing the Ableton session.",
+    "input_schema": {
+      "properties": {},
+      "title": "stop_playbackArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/AbletonMCP/MCP_Server/server.py\n# module: MCP_Server.server\n# qname: MCP_Server.server.stop_playback\n# lines: 492-500\ndef stop_playback(ctx: Context) -> str:\n    \"\"\"Stop playing the Ableton session.\"\"\"\n    try:\n        ableton = get_ableton_connection()\n        result = ableton.send_command(\"stop_playback\")\n        return \"Stopped playback\"\n    except Exception as e:\n        logger.error(f\"Error stopping playback: {str(e)}\")\n        return f\"Error stopping playback: {str(e)}\"",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/AbletonMCP/MCP_Server/server.py\n# module: MCP_Server.server\n# qname: MCP_Server.server.get_ableton_connection\n# lines: 196-256\ndef get_ableton_connection():\n    \"\"\"Get or create a persistent Ableton connection\"\"\"\n    global _ableton_connection\n    \n    if _ableton_connection is not None:\n        try:\n            # Test the connection with a simple ping\n            # We'll try to send an empty message, which should fail if the connection is dead\n            # but won't affect Ableton if it's alive\n            _ableton_connection.sock.settimeout(1.0)\n            _ableton_connection.sock.sendall(b'')\n            return _ableton_connection\n        except Exception as e:\n            logger.warning(f\"Existing connection is no longer valid: {str(e)}\")\n            try:\n                _ableton_connection.disconnect()\n            except:\n                pass\n            _ableton_connection = None\n    \n    # Connection doesn't exist or is invalid, create a new one\n    if _ableton_connection is None:\n        # Try to connect up to 3 times with a short delay between attempts\n        max_attempts = 3\n        for attempt in range(1, max_attempts + 1):\n            try:\n                logger.info(f\"Connecting to Ableton (attempt {attempt}/{max_attempts})...\")\n                _ableton_connection = AbletonConnection(host=\"localhost\", port=9877)\n                if _ableton_connection.connect():\n                    logger.info(\"Created new persistent connection to Ableton\")\n                    \n                    # Validate connection with a simple command\n                    try:\n                        # Get session info as a test\n                        _ableton_connection.send_command(\"get_session_info\")\n                        logger.info(\"Connection validated successfully\")\n                        return _ableton_connection\n                    except Exception as e:\n                        logger.error(f\"Connection validation failed: {str(e)}\")\n                        _ableton_connection.disconnect()\n                        _ableton_connection = None\n                        # Continue to next attempt\n                else:\n                    _ableton_connection = None\n            except Exception as e:\n                logger.error(f\"Connection attempt {attempt} failed: {str(e)}\")\n                if _ableton_connection:\n                    _ableton_connection.disconnect()\n                    _ableton_connection = None\n            \n            # Wait before trying again, but only if we have more attempts left\n            if attempt < max_attempts:\n                import time\n                time.sleep(1.0)\n        \n        # If we get here, all connection attempts failed\n        if _ableton_connection is None:\n            logger.error(\"Failed to connect to Ableton after multiple attempts\")\n            raise Exception(\"Could not connect to Ableton. Make sure the Remote Script is running.\")\n    \n    return _ableton_connection"
+      ],
+      "depth_max": 1
+    }
+  },
+  {
+    "name": "get_browser_tree",
+    "description": "\n    Get a hierarchical tree of browser categories from Ableton.\n    \n    Parameters:\n    - category_type: Type of categories to get ('all', 'instruments', 'sounds', 'drums', 'audio_effects', 'midi_effects')\n    ",
+    "input_schema": {
+      "properties": {
+        "category_type": {
+          "default": "all",
+          "title": "Category Type",
+          "type": "string"
+        }
+      },
+      "title": "get_browser_treeArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/AbletonMCP/AbletonMCP_Remote_Script/__init__.py\n# module: AbletonMCP_Remote_Script.__init__\n# qname: AbletonMCP_Remote_Script.__init__.AbletonMCP.get_browser_tree\n# lines: 823-937\n    def get_browser_tree(self, category_type=\"all\"):\n        \"\"\"\n        Get a simplified tree of browser categories.\n        \n        Args:\n            category_type: Type of categories to get ('all', 'instruments', 'sounds', etc.)\n            \n        Returns:\n            Dictionary with the browser tree structure\n        \"\"\"\n        try:\n            # Access the application's browser instance instead of creating a new one\n            app = self.application()\n            if not app:\n                raise RuntimeError(\"Could not access Live application\")\n                \n            # Check if browser is available\n            if not hasattr(app, 'browser') or app.browser is None:\n                raise RuntimeError(\"Browser is not available in the Live application\")\n            \n            # Log available browser attributes to help diagnose issues\n            browser_attrs = [attr for attr in dir(app.browser) if not attr.startswith('_')]\n            self.log_message(\"Available browser attributes: {0}\".format(browser_attrs))\n            \n            result = {\n                \"type\": category_type,\n                \"categories\": [],\n                \"available_categories\": browser_attrs\n            }\n            \n            # Helper function to process a browser item and its children\n            def process_item(item, depth=0):\n                if not item:\n                    return None\n                \n                result = {\n                    \"name\": item.name if hasattr(item, 'name') else \"Unknown\",\n                    \"is_folder\": hasattr(item, 'children') and bool(item.children),\n                    \"is_device\": hasattr(item, 'is_device') and item.is_device,\n                    \"is_loadable\": hasattr(item, 'is_loadable') and item.is_loadable,\n                    \"uri\": item.uri if hasattr(item, 'uri') else None,\n                    \"children\": []\n                }\n                \n                \n                return result\n            \n            # Process based on category type and available attributes\n            if (category_type == \"all\" or category_type == \"instruments\") and hasattr(app.browser, 'instruments'):\n                try:\n                    instruments = process_item(app.browser.instruments)\n                    if instruments:\n                        instruments[\"name\"] = \"Instruments\"  # Ensure consistent naming\n                        result[\"categories\"].append(instruments)\n                except Exception as e:\n                    self.log_message(\"Error processing instruments: {0}\".format(str(e)))\n            \n            if (category_type == \"all\" or category_type == \"sounds\") and hasattr(app.browser, 'sounds'):\n                try:\n                    sounds = process_item(app.browser.sounds)\n                    if sounds:\n                        sounds[\"name\"] = \"Sounds\"  # Ensure consistent naming\n                        result[\"categories\"].append(sounds)\n                except Exception as e:\n                    self.log_message(\"Error processing sounds: {0}\".format(str(e)))\n            \n            if (category_type == \"all\" or category_type == \"drums\") and hasattr(app.browser, 'drums'):\n                try:\n                    drums = process_item(app.browser.drums)\n                    if drums:\n                        drums[\"name\"] = \"Drums\"  # Ensure consistent naming\n                        result[\"categories\"].append(drums)\n                except Exception as e:\n                    self.log_message(\"Error processing drums: {0}\".format(str(e)))\n            \n            if (category_type == \"all\" or category_type == \"audio_effects\") and hasattr(app.browser, 'audio_effects'):\n                try:\n                    audio_effects = process_item(app.browser.audio_effects)\n                    if audio_effects:\n                        audio_effects[\"name\"] = \"Audio Effects\"  # Ensure consistent naming\n                        result[\"categories\"].append(audio_effects)\n                except Exception as e:\n                    self.log_message(\"Error processing audio_effects: {0}\".format(str(e)))\n            \n            if (category_type == \"all\" or category_type == \"midi_effects\") and hasattr(app.browser, 'midi_effects'):\n                try:\n                    midi_effects = process_item(app.browser.midi_effects)\n                    if midi_effects:\n                        midi_effects[\"name\"] = \"MIDI Effects\"\n                        result[\"categories\"].append(midi_effects)\n                except Exception as e:\n                    self.log_message(\"Error processing midi_effects: {0}\".format(str(e)))\n            \n            # Try to process other potentially available categories\n            for attr in browser_attrs:\n                if attr not in ['instruments', 'sounds', 'drums', 'audio_effects', 'midi_effects'] and \\\n                   (category_type == \"all\" or category_type == attr):\n                    try:\n                        item = getattr(app.browser, attr)\n                        if hasattr(item, 'children') or hasattr(item, 'name'):\n                            category = process_item(item)\n                            if category:\n                                category[\"name\"] = attr.capitalize()\n                                result[\"categories\"].append(category)\n                    except Exception as e:\n                        self.log_message(\"Error processing {0}: {1}\".format(attr, str(e)))\n            \n            self.log_message(\"Browser tree generated for {0} with {1} root categories\".format(\n                category_type, len(result['categories'])))\n            return result\n            \n        except Exception as e:\n            self.log_message(\"Error getting browser tree: {0}\".format(str(e)))\n            self.log_message(traceback.format_exc())\n            raise",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/AbletonMCP/MCP_Server/server.py\n# module: MCP_Server.server\n# qname: MCP_Server.server.get_ableton_connection\n# lines: 196-256\ndef get_ableton_connection():\n    \"\"\"Get or create a persistent Ableton connection\"\"\"\n    global _ableton_connection\n    \n    if _ableton_connection is not None:\n        try:\n            # Test the connection with a simple ping\n            # We'll try to send an empty message, which should fail if the connection is dead\n            # but won't affect Ableton if it's alive\n            _ableton_connection.sock.settimeout(1.0)\n            _ableton_connection.sock.sendall(b'')\n            return _ableton_connection\n        except Exception as e:\n            logger.warning(f\"Existing connection is no longer valid: {str(e)}\")\n            try:\n                _ableton_connection.disconnect()\n            except:\n                pass\n            _ableton_connection = None\n    \n    # Connection doesn't exist or is invalid, create a new one\n    if _ableton_connection is None:\n        # Try to connect up to 3 times with a short delay between attempts\n        max_attempts = 3\n        for attempt in range(1, max_attempts + 1):\n            try:\n                logger.info(f\"Connecting to Ableton (attempt {attempt}/{max_attempts})...\")\n                _ableton_connection = AbletonConnection(host=\"localhost\", port=9877)\n                if _ableton_connection.connect():\n                    logger.info(\"Created new persistent connection to Ableton\")\n                    \n                    # Validate connection with a simple command\n                    try:\n                        # Get session info as a test\n                        _ableton_connection.send_command(\"get_session_info\")\n                        logger.info(\"Connection validated successfully\")\n                        return _ableton_connection\n                    except Exception as e:\n                        logger.error(f\"Connection validation failed: {str(e)}\")\n                        _ableton_connection.disconnect()\n                        _ableton_connection = None\n                        # Continue to next attempt\n                else:\n                    _ableton_connection = None\n            except Exception as e:\n                logger.error(f\"Connection attempt {attempt} failed: {str(e)}\")\n                if _ableton_connection:\n                    _ableton_connection.disconnect()\n                    _ableton_connection = None\n            \n            # Wait before trying again, but only if we have more attempts left\n            if attempt < max_attempts:\n                import time\n                time.sleep(1.0)\n        \n        # If we get here, all connection attempts failed\n        if _ableton_connection is None:\n            logger.error(\"Failed to connect to Ableton after multiple attempts\")\n            raise Exception(\"Could not connect to Ableton. Make sure the Remote Script is running.\")\n    \n    return _ableton_connection"
+      ],
+      "depth_max": 1
+    }
+  },
+  {
+    "name": "get_browser_items_at_path",
+    "description": "\n    Get browser items at a specific path in Ableton's browser.\n    \n    Parameters:\n    - path: Path in the format \"category/folder/subfolder\"\n            where category is one of the available browser categories in Ableton\n    ",
+    "input_schema": {
+      "properties": {
+        "path": {
+          "title": "Path",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path"
+      ],
+      "title": "get_browser_items_at_pathArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/AbletonMCP/AbletonMCP_Remote_Script/__init__.py\n# module: AbletonMCP_Remote_Script.__init__\n# qname: AbletonMCP_Remote_Script.__init__.AbletonMCP.get_browser_items_at_path\n# lines: 939-1062\n    def get_browser_items_at_path(self, path):\n        \"\"\"\n        Get browser items at a specific path.\n        \n        Args:\n            path: Path in the format \"category/folder/subfolder\"\n                 where category is one of: instruments, sounds, drums, audio_effects, midi_effects\n                 or any other available browser category\n                 \n        Returns:\n            Dictionary with items at the specified path\n        \"\"\"\n        try:\n            # Access the application's browser instance instead of creating a new one\n            app = self.application()\n            if not app:\n                raise RuntimeError(\"Could not access Live application\")\n                \n            # Check if browser is available\n            if not hasattr(app, 'browser') or app.browser is None:\n                raise RuntimeError(\"Browser is not available in the Live application\")\n            \n            # Log available browser attributes to help diagnose issues\n            browser_attrs = [attr for attr in dir(app.browser) if not attr.startswith('_')]\n            self.log_message(\"Available browser attributes: {0}\".format(browser_attrs))\n                \n            # Parse the path\n            path_parts = path.split(\"/\")\n            if not path_parts:\n                raise ValueError(\"Invalid path\")\n            \n            # Determine the root category\n            root_category = path_parts[0].lower()\n            current_item = None\n            \n            # Check standard categories first\n            if root_category == \"instruments\" and hasattr(app.browser, 'instruments'):\n                current_item = app.browser.instruments\n            elif root_category == \"sounds\" and hasattr(app.browser, 'sounds'):\n                current_item = app.browser.sounds\n            elif root_category == \"drums\" and hasattr(app.browser, 'drums'):\n                current_item = app.browser.drums\n            elif root_category == \"audio_effects\" and hasattr(app.browser, 'audio_effects'):\n                current_item = app.browser.audio_effects\n            elif root_category == \"midi_effects\" and hasattr(app.browser, 'midi_effects'):\n                current_item = app.browser.midi_effects\n            else:\n                # Try to find the category in other browser attributes\n                found = False\n                for attr in browser_attrs:\n                    if attr.lower() == root_category:\n                        try:\n                            current_item = getattr(app.browser, attr)\n                            found = True\n                            break\n                        except Exception as e:\n                            self.log_message(\"Error accessing browser attribute {0}: {1}\".format(attr, str(e)))\n                \n                if not found:\n                    # If we still haven't found the category, return available categories\n                    return {\n                        \"path\": path,\n                        \"error\": \"Unknown or unavailable category: {0}\".format(root_category),\n                        \"available_categories\": browser_attrs,\n                        \"items\": []\n                    }\n            \n            # Navigate through the path\n            for i in range(1, len(path_parts)):\n                part = path_parts[i]\n                if not part:  # Skip empty parts\n                    continue\n                \n                if not hasattr(current_item, 'children'):\n                    return {\n                        \"path\": path,\n                        \"error\": \"Item at '{0}' has no children\".format('/'.join(path_parts[:i])),\n                        \"items\": []\n                    }\n                \n                found = False\n                for child in current_item.children:\n                    if hasattr(child, 'name') and child.name.lower() == part.lower():\n                        current_item = child\n                        found = True\n                        break\n                \n                if not found:\n                    return {\n                        \"path\": path,\n                        \"error\": \"Path part '{0}' not found\".format(part),\n                        \"items\": []\n                    }\n            \n            # Get items at the current path\n            items = []\n            if hasattr(current_item, 'children'):\n                for child in current_item.children:\n                    item_info = {\n                        \"name\": child.name if hasattr(child, 'name') else \"Unknown\",\n                        \"is_folder\": hasattr(child, 'children') and bool(child.children),\n                        \"is_device\": hasattr(child, 'is_device') and child.is_device,\n                        \"is_loadable\": hasattr(child, 'is_loadable') and child.is_loadable,\n                        \"uri\": child.uri if hasattr(child, 'uri') else None\n                    }\n                    items.append(item_info)\n            \n            result = {\n                \"path\": path,\n                \"name\": current_item.name if hasattr(current_item, 'name') else \"Unknown\",\n                \"uri\": current_item.uri if hasattr(current_item, 'uri') else None,\n                \"is_folder\": hasattr(current_item, 'children') and bool(current_item.children),\n                \"is_device\": hasattr(current_item, 'is_device') and current_item.is_device,\n                \"is_loadable\": hasattr(current_item, 'is_loadable') and current_item.is_loadable,\n                \"items\": items\n            }\n            \n            self.log_message(\"Retrieved {0} items at path: {1}\".format(len(items), path))\n            return result\n            \n        except Exception as e:\n            self.log_message(\"Error getting browser items at path: {0}\".format(str(e)))\n            self.log_message(traceback.format_exc())\n            raise",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/AbletonMCP/MCP_Server/server.py\n# module: MCP_Server.server\n# qname: MCP_Server.server.get_ableton_connection\n# lines: 196-256\ndef get_ableton_connection():\n    \"\"\"Get or create a persistent Ableton connection\"\"\"\n    global _ableton_connection\n    \n    if _ableton_connection is not None:\n        try:\n            # Test the connection with a simple ping\n            # We'll try to send an empty message, which should fail if the connection is dead\n            # but won't affect Ableton if it's alive\n            _ableton_connection.sock.settimeout(1.0)\n            _ableton_connection.sock.sendall(b'')\n            return _ableton_connection\n        except Exception as e:\n            logger.warning(f\"Existing connection is no longer valid: {str(e)}\")\n            try:\n                _ableton_connection.disconnect()\n            except:\n                pass\n            _ableton_connection = None\n    \n    # Connection doesn't exist or is invalid, create a new one\n    if _ableton_connection is None:\n        # Try to connect up to 3 times with a short delay between attempts\n        max_attempts = 3\n        for attempt in range(1, max_attempts + 1):\n            try:\n                logger.info(f\"Connecting to Ableton (attempt {attempt}/{max_attempts})...\")\n                _ableton_connection = AbletonConnection(host=\"localhost\", port=9877)\n                if _ableton_connection.connect():\n                    logger.info(\"Created new persistent connection to Ableton\")\n                    \n                    # Validate connection with a simple command\n                    try:\n                        # Get session info as a test\n                        _ableton_connection.send_command(\"get_session_info\")\n                        logger.info(\"Connection validated successfully\")\n                        return _ableton_connection\n                    except Exception as e:\n                        logger.error(f\"Connection validation failed: {str(e)}\")\n                        _ableton_connection.disconnect()\n                        _ableton_connection = None\n                        # Continue to next attempt\n                else:\n                    _ableton_connection = None\n            except Exception as e:\n                logger.error(f\"Connection attempt {attempt} failed: {str(e)}\")\n                if _ableton_connection:\n                    _ableton_connection.disconnect()\n                    _ableton_connection = None\n            \n            # Wait before trying again, but only if we have more attempts left\n            if attempt < max_attempts:\n                import time\n                time.sleep(1.0)\n        \n        # If we get here, all connection attempts failed\n        if _ableton_connection is None:\n            logger.error(\"Failed to connect to Ableton after multiple attempts\")\n            raise Exception(\"Could not connect to Ableton. Make sure the Remote Script is running.\")\n    \n    return _ableton_connection"
+      ],
+      "depth_max": 1
+    }
+  },
+  {
+    "name": "load_drum_kit",
+    "description": "\n    Load a drum rack and then load a specific drum kit into it.\n    \n    Parameters:\n    - track_index: The index of the track to load on\n    - rack_uri: The URI of the drum rack to load (e.g., 'Drums/Drum Rack')\n    - kit_path: Path to the drum kit inside the browser (e.g., 'drums/acoustic/kit1')\n    ",
+    "input_schema": {
+      "properties": {
+        "track_index": {
+          "title": "Track Index",
+          "type": "integer"
+        },
+        "rack_uri": {
+          "title": "Rack Uri",
+          "type": "string"
+        },
+        "kit_path": {
+          "title": "Kit Path",
+          "type": "string"
+        }
+      },
+      "required": [
+        "track_index",
+        "rack_uri",
+        "kit_path"
+      ],
+      "title": "load_drum_kitArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/AbletonMCP/MCP_Server/server.py\n# module: MCP_Server.server\n# qname: MCP_Server.server.load_drum_kit\n# lines: 607-653\ndef load_drum_kit(ctx: Context, track_index: int, rack_uri: str, kit_path: str) -> str:\n    \"\"\"\n    Load a drum rack and then load a specific drum kit into it.\n    \n    Parameters:\n    - track_index: The index of the track to load on\n    - rack_uri: The URI of the drum rack to load (e.g., 'Drums/Drum Rack')\n    - kit_path: Path to the drum kit inside the browser (e.g., 'drums/acoustic/kit1')\n    \"\"\"\n    try:\n        ableton = get_ableton_connection()\n        \n        # Step 1: Load the drum rack\n        result = ableton.send_command(\"load_browser_item\", {\n            \"track_index\": track_index,\n            \"item_uri\": rack_uri\n        })\n        \n        if not result.get(\"loaded\", False):\n            return f\"Failed to load drum rack with URI '{rack_uri}'\"\n        \n        # Step 2: Get the drum kit items at the specified path\n        kit_result = ableton.send_command(\"get_browser_items_at_path\", {\n            \"path\": kit_path\n        })\n        \n        if \"error\" in kit_result:\n            return f\"Loaded drum rack but failed to find drum kit: {kit_result.get('error')}\"\n        \n        # Step 3: Find a loadable drum kit\n        kit_items = kit_result.get(\"items\", [])\n        loadable_kits = [item for item in kit_items if item.get(\"is_loadable\", False)]\n        \n        if not loadable_kits:\n            return f\"Loaded drum rack but no loadable drum kits found at '{kit_path}'\"\n        \n        # Step 4: Load the first loadable kit\n        kit_uri = loadable_kits[0].get(\"uri\")\n        load_result = ableton.send_command(\"load_browser_item\", {\n            \"track_index\": track_index,\n            \"item_uri\": kit_uri\n        })\n        \n        return f\"Loaded drum rack and kit '{loadable_kits[0].get('name')}' on track {track_index}\"\n    except Exception as e:\n        logger.error(f\"Error loading drum kit: {str(e)}\")\n        return f\"Error loading drum kit: {str(e)}\"",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/AbletonMCP/MCP_Server/server.py\n# module: MCP_Server.server\n# qname: MCP_Server.server.get_ableton_connection\n# lines: 196-256\ndef get_ableton_connection():\n    \"\"\"Get or create a persistent Ableton connection\"\"\"\n    global _ableton_connection\n    \n    if _ableton_connection is not None:\n        try:\n            # Test the connection with a simple ping\n            # We'll try to send an empty message, which should fail if the connection is dead\n            # but won't affect Ableton if it's alive\n            _ableton_connection.sock.settimeout(1.0)\n            _ableton_connection.sock.sendall(b'')\n            return _ableton_connection\n        except Exception as e:\n            logger.warning(f\"Existing connection is no longer valid: {str(e)}\")\n            try:\n                _ableton_connection.disconnect()\n            except:\n                pass\n            _ableton_connection = None\n    \n    # Connection doesn't exist or is invalid, create a new one\n    if _ableton_connection is None:\n        # Try to connect up to 3 times with a short delay between attempts\n        max_attempts = 3\n        for attempt in range(1, max_attempts + 1):\n            try:\n                logger.info(f\"Connecting to Ableton (attempt {attempt}/{max_attempts})...\")\n                _ableton_connection = AbletonConnection(host=\"localhost\", port=9877)\n                if _ableton_connection.connect():\n                    logger.info(\"Created new persistent connection to Ableton\")\n                    \n                    # Validate connection with a simple command\n                    try:\n                        # Get session info as a test\n                        _ableton_connection.send_command(\"get_session_info\")\n                        logger.info(\"Connection validated successfully\")\n                        return _ableton_connection\n                    except Exception as e:\n                        logger.error(f\"Connection validation failed: {str(e)}\")\n                        _ableton_connection.disconnect()\n                        _ableton_connection = None\n                        # Continue to next attempt\n                else:\n                    _ableton_connection = None\n            except Exception as e:\n                logger.error(f\"Connection attempt {attempt} failed: {str(e)}\")\n                if _ableton_connection:\n                    _ableton_connection.disconnect()\n                    _ableton_connection = None\n            \n            # Wait before trying again, but only if we have more attempts left\n            if attempt < max_attempts:\n                import time\n                time.sleep(1.0)\n        \n        # If we get here, all connection attempts failed\n        if _ableton_connection is None:\n            logger.error(\"Failed to connect to Ableton after multiple attempts\")\n            raise Exception(\"Could not connect to Ableton. Make sure the Remote Script is running.\")\n    \n    return _ableton_connection"
+      ],
+      "depth_max": 1
+    }
+  }
+]

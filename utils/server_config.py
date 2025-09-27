@@ -7,10 +7,35 @@ OUT_BASE = Path("/Users/xue/workspace/mcp_project/NPL4MCP/results/py_cg")
 # ---------------- Server config ----------------
 config = {
     "mcpServers": {
-        "twolven_mcp-server-puppeteer-py": {
-            "command": "python",
-            "args": [f"{REPO_BASE}/twolven_mcp-server-puppeteer-py/puppeteer.py"]
-        },
+        # "AbletonMCP": {
+        #     "command": "uvx",
+        #     "args": [
+        #         "ableton-mcp"
+        #     ]
+        # },
+        # "blender": {
+        #     "command": "uvx",
+        #     "args": [
+        #         "blender-mcp"
+        #     ]
+        # },
+        # "time": {
+        #     "command": "uvx",
+        #     "args": ["mcp-server-time"]
+        # },
+        # "fetch": {
+        #     "command": "uvx",
+        #     "args": ["mcp-server-fetch"]
+        # },
+        # "git": {
+        #     "command": "uvx",
+        #     "args": ["mcp-server-git"]
+        # },
+
+        # "twolven_mcp-server-puppeteer-py": {
+        #     "command": "python",
+        #     "args": [f"{REPO_BASE}/twolven_mcp-server-puppeteer-py/puppeteer.py"]
+        # },
         # "AgentWong_optimized-memory-mcp-serverv2": {
         #     "command": "python",
         #     "args": ["-m", "src.main"]
@@ -22,44 +47,53 @@ config = {
         #         f"{REPO_BASE}/Medical_calculator_MCP/server.py"
         #     ]
         # },
-        "mcp-aiven": {
-            "command": "uv",
-            "args": [
-                "--directory",
-                f"{REPO_BASE}/mcp-aiven",
-                "run",
-                "--with-editable",
-                f"{REPO_BASE}/mcp-aiven",
-                "--python",
-                "3.13",
-                "mcp-aiven",
-            ],
+        # "mcp-aiven": {
+        #     "command": "uv",
+        #     "args": [
+        #         "--directory",
+        #         f"{REPO_BASE}/mcp-aiven",
+        #         "run",
+        #         "--with-editable",
+        #         f"{REPO_BASE}/mcp-aiven",
+        #         "--python",
+        #         "3.13",
+        #         "mcp-aiven",
+        #     ],
+        #     "env": {
+        #         "AIVEN_BASE_URL": "https://api.aiven.io",
+        #         "AIVEN_TOKEN": os.environ.get("AIVEN_TOKEN", ""),
+        #     },
+        # },
+        # "chronulus-mcp": {
+        #     "command": "uvx",
+        #     "args": ["chronulus-mcp"],
+        #     "env": {"CHRONULUS_API_KEY": os.environ.get("CHRONULUS_API_KEY", "")},
+        # },
+        # "meilisearch-mcp": {
+        #     "command": "uvx",
+        #     "args": ["-n", "meilisearch-mcp"]
+        # },
+        # "python-notebook-mcp": {
+        #     "command": "python", 
+        #     "args": [
+        #         f"{REPO_BASE}/python-notebook-mcp/server.py"
+        #         ],
+        #     "autoApprove": ["initialize_workspace"]
+        # }
+        
+
+# ---------------- 需要配置的server ----------------        
+
+        "ElevenLabs": {
+            "command": "uvx",
+            "args": ["elevenlabs-mcp"],
             "env": {
-                "AIVEN_BASE_URL": "https://api.aiven.io",
-                "AIVEN_TOKEN": os.environ.get("AIVEN_TOKEN", ""),
-            },
+                "ELEVENLABS_API_KEY": "f9e85540026f9fc5ebe1901fa5bbe368afab6637768a4623d6752589f480a8d8"
+            }
         },
-        "chronulus-mcp": {
-            "command": "uvx",
-            "args": ["chronulus-mcp"],
-            "env": {"CHRONULUS_API_KEY": os.environ.get("CHRONULUS_API_KEY", "")},
-        },
-        "meilisearch-mcp": {
-            "command": "uvx",
-            "args": ["-n", "meilisearch-mcp"]
-        },
-        "python-notebook-mcp": {
-            "command": "python", 
-            "args": [
-                f"{REPO_BASE}/python-notebook-mcp/server.py"
-                ],
-            "autoApprove": ["initialize_workspace"]
-        }
-        
-        
 
 
-# ---------------- 有问题或需要配置的server ----------------
+# ---------------- 有问题的server ----------------
         # "MemProcFS-mcp-server": {
         #     "command": "python",
         #     "args": [

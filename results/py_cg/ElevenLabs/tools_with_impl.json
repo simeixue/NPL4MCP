@@ -1,0 +1,1307 @@
+[
+  {
+    "name": "text_to_speech",
+    "description": "Convert text to speech with a given voice and save the output audio file to a given directory.\n    Directory is optional, if not provided, the output file will be saved to $HOME/Desktop.\n    Only one of voice_id or voice_name can be provided. If none are provided, the default voice will be used.\n\n    ⚠️ COST WARNING: This tool makes an API call to ElevenLabs which may incur costs. Only use when explicitly requested by the user.\n\n     Args:\n        text (str): The text to convert to speech.\n        voice_name (str, optional): The name of the voice to use.\n        model_id (str, optional): The model ID to use for speech synthesis. Options include:\n            - eleven_multilingual_v2: High quality multilingual model (29 languages)\n            - eleven_flash_v2_5: Fastest model with ultra-low latency (32 languages)\n            - eleven_turbo_v2_5: Balanced quality and speed (32 languages)\n            - eleven_flash_v2: Fast English-only model\n            - eleven_turbo_v2: Balanced English-only model\n            - eleven_monolingual_v1: Legacy English model\n            Defaults to eleven_multilingual_v2 or environment variable ELEVENLABS_MODEL_ID.\n        stability (float, optional): Stability of the generated audio. Determines how stable the voice is and the randomness between each generation. Lower values introduce broader emotional range for the voice. Higher values can result in a monotonous voice with limited emotion. Range is 0 to 1.\n        similarity_boost (float, optional): Similarity boost of the generated audio. Determines how closely the AI should adhere to the original voice when attempting to replicate it. Range is 0 to 1.\n        style (float, optional): Style of the generated audio. Determines the style exaggeration of the voice. This setting attempts to amplify the style of the original speaker. It does consume additional computational resources and might increase latency if set to anything other than 0. Range is 0 to 1.\n        use_speaker_boost (bool, optional): Use speaker boost of the generated audio. This setting boosts the similarity to the original speaker. Using this setting requires a slightly higher computational load, which in turn increases latency.\n        speed (float, optional): Speed of the generated audio. Controls the speed of the generated speech. Values range from 0.7 to 1.2, with 1.0 being the default speed. Lower values create slower, more deliberate speech while higher values produce faster-paced speech. Extreme values can impact the quality of the generated speech. Range is 0.7 to 1.2.\n        output_directory (str, optional): Directory where files should be saved.\n            Defaults to $HOME/Desktop if not provided.\n        language: ISO 639-1 language code for the voice.\n        output_format (str, optional): Output format of the generated audio. Formatted as codec_sample_rate_bitrate. So an mp3 with 22.05kHz sample rate at 32kbs is represented as mp3_22050_32. MP3 with 192kbps bitrate requires you to be subscribed to Creator tier or above. PCM with 44.1kHz sample rate requires you to be subscribed to Pro tier or above. Note that the μ-law format (sometimes written mu-law, often approximated as u-law) is commonly used for Twilio audio inputs.\n            Defaults to \"mp3_44100_128\". Must be one of:\n            mp3_22050_32\n            mp3_44100_32\n            mp3_44100_64\n            mp3_44100_96\n            mp3_44100_128\n            mp3_44100_192\n            pcm_8000\n            pcm_16000\n            pcm_22050\n            pcm_24000\n            pcm_44100\n            ulaw_8000\n            alaw_8000\n            opus_48000_32\n            opus_48000_64\n            opus_48000_96\n            opus_48000_128\n            opus_48000_192\n\n    Returns:\n        Text content with the path to the output file and name of the voice used.\n    ",
+    "input_schema": {
+      "properties": {
+        "text": {
+          "title": "Text",
+          "type": "string"
+        },
+        "voice_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Voice Name"
+        },
+        "output_directory": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Output Directory"
+        },
+        "voice_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Voice Id"
+        },
+        "stability": {
+          "default": 0.5,
+          "title": "Stability",
+          "type": "number"
+        },
+        "similarity_boost": {
+          "default": 0.75,
+          "title": "Similarity Boost",
+          "type": "number"
+        },
+        "style": {
+          "default": 0,
+          "title": "Style",
+          "type": "number"
+        },
+        "use_speaker_boost": {
+          "default": true,
+          "title": "Use Speaker Boost",
+          "type": "boolean"
+        },
+        "speed": {
+          "default": 1.0,
+          "title": "Speed",
+          "type": "number"
+        },
+        "language": {
+          "default": "en",
+          "title": "Language",
+          "type": "string"
+        },
+        "output_format": {
+          "default": "mp3_44100_128",
+          "title": "Output Format",
+          "type": "string"
+        },
+        "model_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Model Id"
+        }
+      },
+      "required": [
+        "text"
+      ],
+      "title": "text_to_speechArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/server.py\n# module: elevenlabs_mcp.server\n# qname: elevenlabs_mcp.server.text_to_speech\n# lines: 195-260\ndef text_to_speech(\n    text: str,\n    voice_name: str | None = None,\n    output_directory: str | None = None,\n    voice_id: str | None = None,\n    stability: float = 0.5,\n    similarity_boost: float = 0.75,\n    style: float = 0,\n    use_speaker_boost: bool = True,\n    speed: float = 1.0,\n    language: str = \"en\",\n    output_format: str = \"mp3_44100_128\",\n    model_id: str | None = None,\n):\n    if text == \"\":\n        make_error(\"Text is required.\")\n\n    if voice_id is not None and voice_name is not None:\n        make_error(\"voice_id and voice_name cannot both be provided.\")\n\n    voice = None\n    if voice_id is not None:\n        voice = client.voices.get(voice_id=voice_id)\n    elif voice_name is not None:\n        voices = client.voices.search(search=voice_name)\n        if len(voices.voices) == 0:\n            make_error(\"No voices found with that name.\")\n        voice = next((v for v in voices.voices if v.name == voice_name), None)\n        if voice is None:\n            make_error(f\"Voice with name: {voice_name} does not exist.\")\n\n    voice_id = voice.voice_id if voice else DEFAULT_VOICE_ID\n\n    output_path = make_output_path(output_directory, base_path)\n    output_file_name = make_output_file(\"tts\", text, output_path, \"mp3\")\n\n    if model_id is None:\n        model_id = (\n            \"eleven_flash_v2_5\"\n            if language in [\"hu\", \"no\", \"vi\"]\n            else \"eleven_multilingual_v2\"\n        )\n\n    audio_data = client.text_to_speech.convert(\n        text=text,\n        voice_id=voice_id,\n        model_id=model_id,\n        output_format=output_format,\n        voice_settings={\n            \"stability\": stability,\n            \"similarity_boost\": similarity_boost,\n            \"style\": style,\n            \"use_speaker_boost\": use_speaker_boost,\n            \"speed\": speed,\n        },\n    )\n    audio_bytes = b\"\".join(audio_data)\n\n    output_path.parent.mkdir(parents=True, exist_ok=True)\n    with open(output_path / output_file_name, \"wb\") as f:\n        f.write(audio_bytes)\n\n    return TextContent(\n        type=\"text\",\n        text=f\"Success. File saved as: {output_path / output_file_name}. Voice used: {voice.name if voice else DEFAULT_VOICE_ID}\",\n    )",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.make_error\n# lines: 12-13\ndef make_error(error_text: str):\n    raise ElevenLabsMcpError(error_text)",
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.make_output_file\n# lines: 23-29\ndef make_output_file(\n    tool: str, text: str, output_path: Path, extension: str, full_id: bool = False\n) -> Path:\n    id = text if full_id else text[:5]\n\n    output_file_name = f\"{tool}_{id.replace(' ', '_')}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.{extension}\"\n    return output_path / output_file_name",
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.make_output_path\n# lines: 32-45\ndef make_output_path(\n    output_directory: str | None, base_path: str | None = None\n) -> Path:\n    output_path = None\n    if output_directory is None:\n        output_path = Path.home() / \"Desktop\"\n    elif not os.path.isabs(output_directory) and base_path:\n        output_path = Path(os.path.expanduser(base_path)) / Path(output_directory)\n    else:\n        output_path = Path(os.path.expanduser(output_directory))\n    if not is_file_writeable(output_path):\n        make_error(f\"Directory ({output_path}) is not writeable\")\n    output_path.mkdir(parents=True, exist_ok=True)\n    return output_path"
+      ],
+      "depth_2": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.is_file_writeable\n# lines: 16-20\ndef is_file_writeable(path: Path) -> bool:\n    if path.exists():\n        return os.access(path, os.W_OK)\n    parent_dir = path.parent\n    return os.access(parent_dir, os.W_OK)"
+      ],
+      "depth_max": 2
+    }
+  },
+  {
+    "name": "speech_to_text",
+    "description": "Transcribe speech from an audio file and either save the output text file to a given directory or return the text to the client directly.\n\n    ⚠️ COST WARNING: This tool makes an API call to ElevenLabs which may incur costs. Only use when explicitly requested by the user.\n\n    Args:\n        file_path: Path to the audio file to transcribe\n        language_code: ISO 639-3 language code for transcription. If not provided, the language will be detected automatically.\n        diarize: Whether to diarize the audio file. If True, which speaker is currently speaking will be annotated in the transcription.\n        save_transcript_to_file: Whether to save the transcript to a file.\n        return_transcript_to_client_directly: Whether to return the transcript to the client directly.\n        output_directory: Directory where files should be saved.\n            Defaults to $HOME/Desktop if not provided.\n\n    Returns:\n        TextContent containing the transcription. If save_transcript_to_file is True, the transcription will be saved to a file in the output directory.\n    ",
+    "input_schema": {
+      "properties": {
+        "input_file_path": {
+          "title": "Input File Path",
+          "type": "string"
+        },
+        "language_code": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Language Code"
+        },
+        "diarize": {
+          "default": false,
+          "title": "Diarize",
+          "type": "boolean"
+        },
+        "save_transcript_to_file": {
+          "default": true,
+          "title": "Save Transcript To File",
+          "type": "boolean"
+        },
+        "return_transcript_to_client_directly": {
+          "default": false,
+          "title": "Return Transcript To Client Directly",
+          "type": "boolean"
+        },
+        "output_directory": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Output Directory"
+        }
+      },
+      "required": [
+        "input_file_path"
+      ],
+      "title": "speech_to_textArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/server.py\n# module: elevenlabs_mcp.server\n# qname: elevenlabs_mcp.server.speech_to_text\n# lines: 281-325\ndef speech_to_text(\n    input_file_path: str,\n    language_code: str | None = None,\n    diarize: bool = False,\n    save_transcript_to_file: bool = True,\n    return_transcript_to_client_directly: bool = False,\n    output_directory: str | None = None,\n) -> TextContent:\n    if not save_transcript_to_file and not return_transcript_to_client_directly:\n        make_error(\"Must save transcript to file or return it to the client directly.\")\n    file_path = handle_input_file(input_file_path)\n    if save_transcript_to_file:\n        output_path = make_output_path(output_directory, base_path)\n        output_file_name = make_output_file(\"stt\", file_path.name, output_path, \"txt\")\n    with file_path.open(\"rb\") as f:\n        audio_bytes = f.read()\n\n    if language_code == \"\" or language_code is None:\n        language_code = None\n\n    transcription = client.speech_to_text.convert(\n        model_id=\"scribe_v1\",\n        file=audio_bytes,\n        language_code=language_code,\n        enable_logging=True,\n        diarize=diarize,\n        tag_audio_events=True,\n    )\n\n    # Format transcript with speaker identification if diarization was enabled\n    if diarize:\n        formatted_transcript = format_diarized_transcript(transcription)\n    else:\n        formatted_transcript = transcription.text\n\n    if save_transcript_to_file:\n        with open(output_path / output_file_name, \"w\") as f:\n            f.write(formatted_transcript)\n\n    if return_transcript_to_client_directly:\n        return TextContent(type=\"text\", text=formatted_transcript)\n    else:\n        return TextContent(\n            type=\"text\", text=f\"Transcription saved to {output_path / output_file_name}\"\n        )",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/server.py\n# module: elevenlabs_mcp.server\n# qname: elevenlabs_mcp.server.format_diarized_transcript\n# lines: 63-141\ndef format_diarized_transcript(transcription) -> str:\n    \"\"\"Format transcript with speaker labels from diarized response.\"\"\"\n    try:\n        # Try to access words array - the exact attribute might vary\n        words = None\n        if hasattr(transcription, \"words\"):\n            words = transcription.words\n        elif hasattr(transcription, \"__dict__\"):\n            # Try to find words in the response dict\n            for key, value in transcription.__dict__.items():\n                if key == \"words\" or (\n                    isinstance(value, list)\n                    and len(value) > 0\n                    and (\n                        hasattr(value[0], \"speaker_id\")\n                        if hasattr(value[0], \"__dict__\")\n                        else (\n                            \"speaker_id\" in value[0]\n                            if isinstance(value[0], dict)\n                            else False\n                        )\n                    )\n                ):\n                    words = value\n                    break\n\n        if not words:\n            return transcription.text\n\n        formatted_lines = []\n        current_speaker = None\n        current_text = []\n\n        for word in words:\n            # Get speaker_id - might be an attribute or dict key\n            word_speaker = None\n            if hasattr(word, \"speaker_id\"):\n                word_speaker = word.speaker_id\n            elif isinstance(word, dict) and \"speaker_id\" in word:\n                word_speaker = word[\"speaker_id\"]\n\n            # Get text - might be an attribute or dict key\n            word_text = None\n            if hasattr(word, \"text\"):\n                word_text = word.text\n            elif isinstance(word, dict) and \"text\" in word:\n                word_text = word[\"text\"]\n\n            if not word_speaker or not word_text:\n                continue\n\n            # Skip spacing/punctuation types if they exist\n            if hasattr(word, \"type\") and word.type == \"spacing\":\n                continue\n            elif isinstance(word, dict) and word.get(\"type\") == \"spacing\":\n                continue\n\n            if current_speaker != word_speaker:\n                # Save previous speaker's text\n                if current_speaker and current_text:\n                    speaker_label = current_speaker.upper().replace(\"_\", \" \")\n                    formatted_lines.append(f\"{speaker_label}: {' '.join(current_text)}\")\n\n                # Start new speaker\n                current_speaker = word_speaker\n                current_text = [word_text.strip()]\n            else:\n                current_text.append(word_text.strip())\n\n        # Add final speaker's text\n        if current_speaker and current_text:\n            speaker_label = current_speaker.upper().replace(\"_\", \" \")\n            formatted_lines.append(f\"{speaker_label}: {' '.join(current_text)}\")\n\n        return \"\\n\\n\".join(formatted_lines)\n\n    except Exception:\n        # Fallback to regular text if something goes wrong\n        return transcription.text",
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.handle_input_file\n# lines: 114-136\ndef handle_input_file(file_path: str, audio_content_check: bool = True) -> Path:\n    if not os.path.isabs(file_path) and not os.environ.get(\"ELEVENLABS_MCP_BASE_PATH\"):\n        make_error(\n            \"File path must be an absolute path if ELEVENLABS_MCP_BASE_PATH is not set\"\n        )\n    path = Path(file_path)\n    if not path.exists() and path.parent.exists():\n        parent_directory = path.parent\n        similar_files = try_find_similar_files(path.name, parent_directory)\n        similar_files_formatted = \",\".join([str(file) for file in similar_files])\n        if similar_files:\n            make_error(\n                f\"File ({path}) does not exist. Did you mean any of these files: {similar_files_formatted}?\"\n            )\n        make_error(f\"File ({path}) does not exist\")\n    elif not path.exists():\n        make_error(f\"File ({path}) does not exist\")\n    elif not path.is_file():\n        make_error(f\"File ({path}) is not a file\")\n\n    if audio_content_check and not check_audio_file(path):\n        make_error(f\"File ({path}) is not an audio or video file\")\n    return path",
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.make_error\n# lines: 12-13\ndef make_error(error_text: str):\n    raise ElevenLabsMcpError(error_text)",
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.make_output_file\n# lines: 23-29\ndef make_output_file(\n    tool: str, text: str, output_path: Path, extension: str, full_id: bool = False\n) -> Path:\n    id = text if full_id else text[:5]\n\n    output_file_name = f\"{tool}_{id.replace(' ', '_')}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.{extension}\"\n    return output_path / output_file_name",
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.make_output_path\n# lines: 32-45\ndef make_output_path(\n    output_directory: str | None, base_path: str | None = None\n) -> Path:\n    output_path = None\n    if output_directory is None:\n        output_path = Path.home() / \"Desktop\"\n    elif not os.path.isabs(output_directory) and base_path:\n        output_path = Path(os.path.expanduser(base_path)) / Path(output_directory)\n    else:\n        output_path = Path(os.path.expanduser(output_directory))\n    if not is_file_writeable(output_path):\n        make_error(f\"Directory ({output_path}) is not writeable\")\n    output_path.mkdir(parents=True, exist_ok=True)\n    return output_path"
+      ],
+      "depth_2": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.check_audio_file\n# lines: 98-111\ndef check_audio_file(path: Path) -> bool:\n    audio_extensions = {\n        \".wav\",\n        \".mp3\",\n        \".m4a\",\n        \".aac\",\n        \".ogg\",\n        \".flac\",\n        \".mp4\",\n        \".avi\",\n        \".mov\",\n        \".wmv\",\n    }\n    return path.suffix.lower() in audio_extensions",
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.is_file_writeable\n# lines: 16-20\ndef is_file_writeable(path: Path) -> bool:\n    if path.exists():\n        return os.access(path, os.W_OK)\n    parent_dir = path.parent\n    return os.access(parent_dir, os.W_OK)",
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.try_find_similar_files\n# lines: 82-95\ndef try_find_similar_files(\n    filename: str, directory: Path, take_n: int = 5\n) -> list[Path]:\n    similar_files = find_similar_filenames(filename, directory)\n    if not similar_files:\n        return []\n\n    filtered_files = []\n\n    for path, _ in similar_files[:take_n]:\n        if check_audio_file(path):\n            filtered_files.append(path)\n\n    return filtered_files"
+      ],
+      "depth_3": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.find_similar_filenames\n# lines: 48-79\ndef find_similar_filenames(\n    target_file: str, directory: Path, threshold: int = 70\n) -> list[tuple[str, int]]:\n    \"\"\"\n    Find files with names similar to the target file using fuzzy matching.\n\n    Args:\n        target_file (str): The reference filename to compare against\n        directory (str): Directory to search in (defaults to current directory)\n        threshold (int): Similarity threshold (0 to 100, where 100 is identical)\n\n    Returns:\n        list: List of similar filenames with their similarity scores\n    \"\"\"\n    target_filename = os.path.basename(target_file)\n    similar_files = []\n    for root, _, files in os.walk(directory):\n        for filename in files:\n            if (\n                filename == target_filename\n                and os.path.join(root, filename) == target_file\n            ):\n                continue\n            similarity = fuzz.token_sort_ratio(target_filename, filename)\n\n            if similarity >= threshold:\n                file_path = Path(root) / filename\n                similar_files.append((file_path, similarity))\n\n    similar_files.sort(key=lambda x: x[1], reverse=True)\n\n    return similar_files"
+      ],
+      "depth_max": 3
+    }
+  },
+  {
+    "name": "text_to_sound_effects",
+    "description": "Convert text description of a sound effect to sound effect with a given duration and save the output audio file to a given directory.\n    Directory is optional, if not provided, the output file will be saved to $HOME/Desktop.\n    Duration must be between 0.5 and 5 seconds.\n\n    ⚠️ COST WARNING: This tool makes an API call to ElevenLabs which may incur costs. Only use when explicitly requested by the user.\n\n    Args:\n        text: Text description of the sound effect\n        duration_seconds: Duration of the sound effect in seconds\n        output_directory: Directory where files should be saved.\n            Defaults to $HOME/Desktop if not provided.\n        loop: Whether to loop the sound effect. Defaults to False.\n        output_format (str, optional): Output format of the generated audio. Formatted as codec_sample_rate_bitrate. So an mp3 with 22.05kHz sample rate at 32kbs is represented as mp3_22050_32. MP3 with 192kbps bitrate requires you to be subscribed to Creator tier or above. PCM with 44.1kHz sample rate requires you to be subscribed to Pro tier or above. Note that the μ-law format (sometimes written mu-law, often approximated as u-law) is commonly used for Twilio audio inputs.\n            Defaults to \"mp3_44100_128\". Must be one of:\n            mp3_22050_32\n            mp3_44100_32\n            mp3_44100_64\n            mp3_44100_96\n            mp3_44100_128\n            mp3_44100_192\n            pcm_8000\n            pcm_16000\n            pcm_22050\n            pcm_24000\n            pcm_44100\n            ulaw_8000\n            alaw_8000\n            opus_48000_32\n            opus_48000_64\n            opus_48000_96\n            opus_48000_128\n            opus_48000_192\n    ",
+    "input_schema": {
+      "properties": {
+        "text": {
+          "title": "Text",
+          "type": "string"
+        },
+        "duration_seconds": {
+          "default": 2.0,
+          "title": "Duration Seconds",
+          "type": "number"
+        },
+        "output_directory": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Output Directory"
+        },
+        "output_format": {
+          "default": "mp3_44100_128",
+          "title": "Output Format",
+          "type": "string"
+        },
+        "loop": {
+          "default": false,
+          "title": "Loop",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "text"
+      ],
+      "title": "text_to_sound_effectsArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/server.py\n# module: elevenlabs_mcp.server\n# qname: elevenlabs_mcp.server.text_to_sound_effects\n# lines: 363-389\ndef text_to_sound_effects(\n    text: str,\n    duration_seconds: float = 2.0,\n    output_directory: str | None = None,\n    output_format: str = \"mp3_44100_128\",\n    loop: bool = False,\n) -> TextContent:\n    if duration_seconds < 0.5 or duration_seconds > 5:\n        make_error(\"Duration must be between 0.5 and 5 seconds\")\n    output_path = make_output_path(output_directory, base_path)\n    output_file_name = make_output_file(\"sfx\", text, output_path, \"mp3\")\n\n    audio_data = client.text_to_sound_effects.convert(\n        text=text,\n        output_format=output_format,\n        duration_seconds=duration_seconds,\n        loop=loop,\n    )\n    audio_bytes = b\"\".join(audio_data)\n\n    with open(output_path / output_file_name, \"wb\") as f:\n        f.write(audio_bytes)\n\n    return TextContent(\n        type=\"text\",\n        text=f\"Success. File saved as: {output_path / output_file_name}\",\n    )",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.make_error\n# lines: 12-13\ndef make_error(error_text: str):\n    raise ElevenLabsMcpError(error_text)",
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.make_output_file\n# lines: 23-29\ndef make_output_file(\n    tool: str, text: str, output_path: Path, extension: str, full_id: bool = False\n) -> Path:\n    id = text if full_id else text[:5]\n\n    output_file_name = f\"{tool}_{id.replace(' ', '_')}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.{extension}\"\n    return output_path / output_file_name",
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.make_output_path\n# lines: 32-45\ndef make_output_path(\n    output_directory: str | None, base_path: str | None = None\n) -> Path:\n    output_path = None\n    if output_directory is None:\n        output_path = Path.home() / \"Desktop\"\n    elif not os.path.isabs(output_directory) and base_path:\n        output_path = Path(os.path.expanduser(base_path)) / Path(output_directory)\n    else:\n        output_path = Path(os.path.expanduser(output_directory))\n    if not is_file_writeable(output_path):\n        make_error(f\"Directory ({output_path}) is not writeable\")\n    output_path.mkdir(parents=True, exist_ok=True)\n    return output_path"
+      ],
+      "depth_2": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.is_file_writeable\n# lines: 16-20\ndef is_file_writeable(path: Path) -> bool:\n    if path.exists():\n        return os.access(path, os.W_OK)\n    parent_dir = path.parent\n    return os.access(parent_dir, os.W_OK)"
+      ],
+      "depth_max": 2
+    }
+  },
+  {
+    "name": "search_voices",
+    "description": "\n    Search for existing voices, a voice that has already been added to the user's ElevenLabs voice library.\n    Searches in name, description, labels and category.\n\n    Args:\n        search: Search term to filter voices by. Searches in name, description, labels and category.\n        sort: Which field to sort by. `created_at_unix` might not be available for older voices.\n        sort_direction: Sort order, either ascending or descending.\n\n    Returns:\n        List of voices that match the search criteria.\n    ",
+    "input_schema": {
+      "properties": {
+        "search": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Search"
+        },
+        "sort": {
+          "default": "name",
+          "enum": [
+            "created_at_unix",
+            "name"
+          ],
+          "title": "Sort",
+          "type": "string"
+        },
+        "sort_direction": {
+          "default": "desc",
+          "enum": [
+            "asc",
+            "desc"
+          ],
+          "title": "Sort Direction",
+          "type": "string"
+        }
+      },
+      "title": "search_voicesArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/server.py\n# module: elevenlabs_mcp.server\n# qname: elevenlabs_mcp.server.search_voices\n# lines: 406-417\ndef search_voices(\n    search: str | None = None,\n    sort: Literal[\"created_at_unix\", \"name\"] = \"name\",\n    sort_direction: Literal[\"asc\", \"desc\"] = \"desc\",\n) -> list[McpVoice]:\n    response = client.voices.search(\n        search=search, sort=sort, sort_direction=sort_direction\n    )\n    return [\n        McpVoice(id=voice.voice_id, name=voice.name, category=voice.category)\n        for voice in response.voices\n    ]",
+      "depth_max": 0
+    }
+  },
+  {
+    "name": "list_models",
+    "description": "List all available models",
+    "input_schema": {
+      "properties": {},
+      "title": "list_modelsArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/server.py\n# module: elevenlabs_mcp.server\n# qname: elevenlabs_mcp.server.list_models\n# lines: 421-433\ndef list_models() -> list[McpModel]:\n    response = client.models.list()\n    return [\n        McpModel(\n            id=model.model_id,\n            name=model.name,\n            languages=[\n                McpLanguage(language_id=lang.language_id, name=lang.name)\n                for lang in model.languages\n            ],\n        )\n        for model in response\n    ]",
+      "depth_max": 0
+    }
+  },
+  {
+    "name": "get_voice",
+    "description": "Get details of a specific voice",
+    "input_schema": {
+      "properties": {
+        "voice_id": {
+          "title": "Voice Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "voice_id"
+      ],
+      "title": "get_voiceArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/server.py\n# module: elevenlabs_mcp.server\n# qname: elevenlabs_mcp.server.get_voice\n# lines: 437-445\ndef get_voice(voice_id: str) -> McpVoice:\n    \"\"\"Get details of a specific voice.\"\"\"\n    response = client.voices.get(voice_id=voice_id)\n    return McpVoice(\n        id=response.voice_id,\n        name=response.name,\n        category=response.category,\n        fine_tuning_status=response.fine_tuning.state,\n    )",
+      "depth_max": 0
+    }
+  },
+  {
+    "name": "voice_clone",
+    "description": "Create an instant voice clone of a voice using provided audio files.\n\n    ⚠️ COST WARNING: This tool makes an API call to ElevenLabs which may incur costs. Only use when explicitly requested by the user.\n    ",
+    "input_schema": {
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "files": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Files",
+          "type": "array"
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Description"
+        }
+      },
+      "required": [
+        "name",
+        "files"
+      ],
+      "title": "voice_cloneArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/server.py\n# module: elevenlabs_mcp.server\n# qname: elevenlabs_mcp.server.voice_clone\n# lines: 454-468\ndef voice_clone(\n    name: str, files: list[str], description: str | None = None\n) -> TextContent:\n    input_files = [str(handle_input_file(file).absolute()) for file in files]\n    voice = client.voices.ivc.create(\n        name=name, description=description, files=input_files\n    )\n\n    return TextContent(\n        type=\"text\",\n        text=f\"\"\"Voice cloned successfully: Name: {voice.name}\n        ID: {voice.voice_id}\n        Category: {voice.category}\n        Description: {voice.description or \"N/A\"}\"\"\",\n    )",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.handle_input_file\n# lines: 114-136\ndef handle_input_file(file_path: str, audio_content_check: bool = True) -> Path:\n    if not os.path.isabs(file_path) and not os.environ.get(\"ELEVENLABS_MCP_BASE_PATH\"):\n        make_error(\n            \"File path must be an absolute path if ELEVENLABS_MCP_BASE_PATH is not set\"\n        )\n    path = Path(file_path)\n    if not path.exists() and path.parent.exists():\n        parent_directory = path.parent\n        similar_files = try_find_similar_files(path.name, parent_directory)\n        similar_files_formatted = \",\".join([str(file) for file in similar_files])\n        if similar_files:\n            make_error(\n                f\"File ({path}) does not exist. Did you mean any of these files: {similar_files_formatted}?\"\n            )\n        make_error(f\"File ({path}) does not exist\")\n    elif not path.exists():\n        make_error(f\"File ({path}) does not exist\")\n    elif not path.is_file():\n        make_error(f\"File ({path}) is not a file\")\n\n    if audio_content_check and not check_audio_file(path):\n        make_error(f\"File ({path}) is not an audio or video file\")\n    return path"
+      ],
+      "depth_2": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.check_audio_file\n# lines: 98-111\ndef check_audio_file(path: Path) -> bool:\n    audio_extensions = {\n        \".wav\",\n        \".mp3\",\n        \".m4a\",\n        \".aac\",\n        \".ogg\",\n        \".flac\",\n        \".mp4\",\n        \".avi\",\n        \".mov\",\n        \".wmv\",\n    }\n    return path.suffix.lower() in audio_extensions",
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.make_error\n# lines: 12-13\ndef make_error(error_text: str):\n    raise ElevenLabsMcpError(error_text)",
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.try_find_similar_files\n# lines: 82-95\ndef try_find_similar_files(\n    filename: str, directory: Path, take_n: int = 5\n) -> list[Path]:\n    similar_files = find_similar_filenames(filename, directory)\n    if not similar_files:\n        return []\n\n    filtered_files = []\n\n    for path, _ in similar_files[:take_n]:\n        if check_audio_file(path):\n            filtered_files.append(path)\n\n    return filtered_files"
+      ],
+      "depth_3": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.find_similar_filenames\n# lines: 48-79\ndef find_similar_filenames(\n    target_file: str, directory: Path, threshold: int = 70\n) -> list[tuple[str, int]]:\n    \"\"\"\n    Find files with names similar to the target file using fuzzy matching.\n\n    Args:\n        target_file (str): The reference filename to compare against\n        directory (str): Directory to search in (defaults to current directory)\n        threshold (int): Similarity threshold (0 to 100, where 100 is identical)\n\n    Returns:\n        list: List of similar filenames with their similarity scores\n    \"\"\"\n    target_filename = os.path.basename(target_file)\n    similar_files = []\n    for root, _, files in os.walk(directory):\n        for filename in files:\n            if (\n                filename == target_filename\n                and os.path.join(root, filename) == target_file\n            ):\n                continue\n            similarity = fuzz.token_sort_ratio(target_filename, filename)\n\n            if similarity >= threshold:\n                file_path = Path(root) / filename\n                similar_files.append((file_path, similarity))\n\n    similar_files.sort(key=lambda x: x[1], reverse=True)\n\n    return similar_files"
+      ],
+      "depth_max": 3
+    }
+  },
+  {
+    "name": "isolate_audio",
+    "description": "Isolate audio from a file and save the output audio file to a given directory.\n    Directory is optional, if not provided, the output file will be saved to $HOME/Desktop.\n\n    ⚠️ COST WARNING: This tool makes an API call to ElevenLabs which may incur costs. Only use when explicitly requested by the user.\n    ",
+    "input_schema": {
+      "properties": {
+        "input_file_path": {
+          "title": "Input File Path",
+          "type": "string"
+        },
+        "output_directory": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Output Directory"
+        }
+      },
+      "required": [
+        "input_file_path"
+      ],
+      "title": "isolate_audioArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/server.py\n# module: elevenlabs_mcp.server\n# qname: elevenlabs_mcp.server.isolate_audio\n# lines: 478-497\ndef isolate_audio(\n    input_file_path: str, output_directory: str | None = None\n) -> TextContent:\n    file_path = handle_input_file(input_file_path)\n    output_path = make_output_path(output_directory, base_path)\n    output_file_name = make_output_file(\"iso\", file_path.name, output_path, \"mp3\")\n    with file_path.open(\"rb\") as f:\n        audio_bytes = f.read()\n    audio_data = client.audio_isolation.convert(\n        audio=audio_bytes,\n    )\n    audio_bytes = b\"\".join(audio_data)\n\n    with open(output_path / output_file_name, \"wb\") as f:\n        f.write(audio_bytes)\n\n    return TextContent(\n        type=\"text\",\n        text=f\"Success. File saved as: {output_path / output_file_name}\",\n    )",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.handle_input_file\n# lines: 114-136\ndef handle_input_file(file_path: str, audio_content_check: bool = True) -> Path:\n    if not os.path.isabs(file_path) and not os.environ.get(\"ELEVENLABS_MCP_BASE_PATH\"):\n        make_error(\n            \"File path must be an absolute path if ELEVENLABS_MCP_BASE_PATH is not set\"\n        )\n    path = Path(file_path)\n    if not path.exists() and path.parent.exists():\n        parent_directory = path.parent\n        similar_files = try_find_similar_files(path.name, parent_directory)\n        similar_files_formatted = \",\".join([str(file) for file in similar_files])\n        if similar_files:\n            make_error(\n                f\"File ({path}) does not exist. Did you mean any of these files: {similar_files_formatted}?\"\n            )\n        make_error(f\"File ({path}) does not exist\")\n    elif not path.exists():\n        make_error(f\"File ({path}) does not exist\")\n    elif not path.is_file():\n        make_error(f\"File ({path}) is not a file\")\n\n    if audio_content_check and not check_audio_file(path):\n        make_error(f\"File ({path}) is not an audio or video file\")\n    return path",
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.make_output_file\n# lines: 23-29\ndef make_output_file(\n    tool: str, text: str, output_path: Path, extension: str, full_id: bool = False\n) -> Path:\n    id = text if full_id else text[:5]\n\n    output_file_name = f\"{tool}_{id.replace(' ', '_')}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.{extension}\"\n    return output_path / output_file_name",
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.make_output_path\n# lines: 32-45\ndef make_output_path(\n    output_directory: str | None, base_path: str | None = None\n) -> Path:\n    output_path = None\n    if output_directory is None:\n        output_path = Path.home() / \"Desktop\"\n    elif not os.path.isabs(output_directory) and base_path:\n        output_path = Path(os.path.expanduser(base_path)) / Path(output_directory)\n    else:\n        output_path = Path(os.path.expanduser(output_directory))\n    if not is_file_writeable(output_path):\n        make_error(f\"Directory ({output_path}) is not writeable\")\n    output_path.mkdir(parents=True, exist_ok=True)\n    return output_path"
+      ],
+      "depth_2": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.check_audio_file\n# lines: 98-111\ndef check_audio_file(path: Path) -> bool:\n    audio_extensions = {\n        \".wav\",\n        \".mp3\",\n        \".m4a\",\n        \".aac\",\n        \".ogg\",\n        \".flac\",\n        \".mp4\",\n        \".avi\",\n        \".mov\",\n        \".wmv\",\n    }\n    return path.suffix.lower() in audio_extensions",
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.is_file_writeable\n# lines: 16-20\ndef is_file_writeable(path: Path) -> bool:\n    if path.exists():\n        return os.access(path, os.W_OK)\n    parent_dir = path.parent\n    return os.access(parent_dir, os.W_OK)",
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.make_error\n# lines: 12-13\ndef make_error(error_text: str):\n    raise ElevenLabsMcpError(error_text)",
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.try_find_similar_files\n# lines: 82-95\ndef try_find_similar_files(\n    filename: str, directory: Path, take_n: int = 5\n) -> list[Path]:\n    similar_files = find_similar_filenames(filename, directory)\n    if not similar_files:\n        return []\n\n    filtered_files = []\n\n    for path, _ in similar_files[:take_n]:\n        if check_audio_file(path):\n            filtered_files.append(path)\n\n    return filtered_files"
+      ],
+      "depth_3": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.find_similar_filenames\n# lines: 48-79\ndef find_similar_filenames(\n    target_file: str, directory: Path, threshold: int = 70\n) -> list[tuple[str, int]]:\n    \"\"\"\n    Find files with names similar to the target file using fuzzy matching.\n\n    Args:\n        target_file (str): The reference filename to compare against\n        directory (str): Directory to search in (defaults to current directory)\n        threshold (int): Similarity threshold (0 to 100, where 100 is identical)\n\n    Returns:\n        list: List of similar filenames with their similarity scores\n    \"\"\"\n    target_filename = os.path.basename(target_file)\n    similar_files = []\n    for root, _, files in os.walk(directory):\n        for filename in files:\n            if (\n                filename == target_filename\n                and os.path.join(root, filename) == target_file\n            ):\n                continue\n            similarity = fuzz.token_sort_ratio(target_filename, filename)\n\n            if similarity >= threshold:\n                file_path = Path(root) / filename\n                similar_files.append((file_path, similarity))\n\n    similar_files.sort(key=lambda x: x[1], reverse=True)\n\n    return similar_files"
+      ],
+      "depth_max": 3
+    }
+  },
+  {
+    "name": "check_subscription",
+    "description": "Check the current subscription status. Could be used to measure the usage of the API.",
+    "input_schema": {
+      "properties": {},
+      "title": "check_subscriptionArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/server.py\n# module: elevenlabs_mcp.server\n# qname: elevenlabs_mcp.server.check_subscription\n# lines: 503-505\ndef check_subscription() -> TextContent:\n    subscription = client.user.subscription.get()\n    return TextContent(type=\"text\", text=f\"{subscription.model_dump_json(indent=2)}\")",
+      "depth_max": 0
+    }
+  },
+  {
+    "name": "create_agent",
+    "description": "Create a conversational AI agent with custom configuration.\n\n    ⚠️ COST WARNING: This tool makes an API call to ElevenLabs which may incur costs. Only use when explicitly requested by the user.\n\n    Args:\n        name: Name of the agent\n        first_message: First message the agent will say i.e. \"Hi, how can I help you today?\"\n        system_prompt: System prompt for the agent\n        voice_id: ID of the voice to use for the agent\n        language: ISO 639-1 language code for the agent\n        llm: LLM to use for the agent\n        temperature: Temperature for the agent. The lower the temperature, the more deterministic the agent's responses will be. Range is 0 to 1.\n        max_tokens: Maximum number of tokens to generate.\n        asr_quality: Quality of the ASR. `high` or `low`.\n        model_id: ID of the ElevenLabs model to use for the agent.\n        optimize_streaming_latency: Optimize streaming latency. Range is 0 to 4.\n        stability: Stability for the agent. Range is 0 to 1.\n        similarity_boost: Similarity boost for the agent. Range is 0 to 1.\n        turn_timeout: Timeout for the agent to respond in seconds. Defaults to 7 seconds.\n        max_duration_seconds: Maximum duration of a conversation in seconds. Defaults to 600 seconds (10 minutes).\n        record_voice: Whether to record the agent's voice.\n        retention_days: Number of days to retain the agent's data.\n    ",
+    "input_schema": {
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "first_message": {
+          "title": "First Message",
+          "type": "string"
+        },
+        "system_prompt": {
+          "title": "System Prompt",
+          "type": "string"
+        },
+        "voice_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": "cgSgspJ2msm6clMCkdW9",
+          "title": "Voice Id"
+        },
+        "language": {
+          "default": "en",
+          "title": "Language",
+          "type": "string"
+        },
+        "llm": {
+          "default": "gemini-2.0-flash-001",
+          "title": "Llm",
+          "type": "string"
+        },
+        "temperature": {
+          "default": 0.5,
+          "title": "Temperature",
+          "type": "number"
+        },
+        "max_tokens": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Tokens"
+        },
+        "asr_quality": {
+          "default": "high",
+          "title": "Asr Quality",
+          "type": "string"
+        },
+        "model_id": {
+          "default": "eleven_turbo_v2",
+          "title": "Model Id",
+          "type": "string"
+        },
+        "optimize_streaming_latency": {
+          "default": 3,
+          "title": "Optimize Streaming Latency",
+          "type": "integer"
+        },
+        "stability": {
+          "default": 0.5,
+          "title": "Stability",
+          "type": "number"
+        },
+        "similarity_boost": {
+          "default": 0.8,
+          "title": "Similarity Boost",
+          "type": "number"
+        },
+        "turn_timeout": {
+          "default": 7,
+          "title": "Turn Timeout",
+          "type": "integer"
+        },
+        "max_duration_seconds": {
+          "default": 300,
+          "title": "Max Duration Seconds",
+          "type": "integer"
+        },
+        "record_voice": {
+          "default": true,
+          "title": "Record Voice",
+          "type": "boolean"
+        },
+        "retention_days": {
+          "default": 730,
+          "title": "Retention Days",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "name",
+        "first_message",
+        "system_prompt"
+      ],
+      "title": "create_agentArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/server.py\n# module: elevenlabs_mcp.server\n# qname: elevenlabs_mcp.server.create_agent\n# lines: 533-583\ndef create_agent(\n    name: str,\n    first_message: str,\n    system_prompt: str,\n    voice_id: str | None = DEFAULT_VOICE_ID,\n    language: str = \"en\",\n    llm: str = \"gemini-2.0-flash-001\",\n    temperature: float = 0.5,\n    max_tokens: int | None = None,\n    asr_quality: str = \"high\",\n    model_id: str = \"eleven_turbo_v2\",\n    optimize_streaming_latency: int = 3,\n    stability: float = 0.5,\n    similarity_boost: float = 0.8,\n    turn_timeout: int = 7,\n    max_duration_seconds: int = 300,\n    record_voice: bool = True,\n    retention_days: int = 730,\n) -> TextContent:\n    conversation_config = create_conversation_config(\n        language=language,\n        system_prompt=system_prompt,\n        llm=llm,\n        first_message=first_message,\n        temperature=temperature,\n        max_tokens=max_tokens,\n        asr_quality=asr_quality,\n        voice_id=voice_id,\n        model_id=model_id,\n        optimize_streaming_latency=optimize_streaming_latency,\n        stability=stability,\n        similarity_boost=similarity_boost,\n        turn_timeout=turn_timeout,\n        max_duration_seconds=max_duration_seconds,\n    )\n\n    platform_settings = create_platform_settings(\n        record_voice=record_voice,\n        retention_days=retention_days,\n    )\n\n    response = client.conversational_ai.agents.create(\n        name=name,\n        conversation_config=conversation_config,\n        platform_settings=platform_settings,\n    )\n\n    return TextContent(\n        type=\"text\",\n        text=f\"\"\"Agent created successfully: Name: {name}, Agent ID: {response.agent_id}, System Prompt: {system_prompt}, Voice ID: {voice_id or \"Default\"}, Language: {language}, LLM: {llm}, You can use this agent ID for future interactions with the agent.\"\"\",\n    )",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/convai.py\n# module: elevenlabs_mcp.convai\n# qname: elevenlabs_mcp.convai.create_conversation_config\n# lines: 1-59\ndef create_conversation_config(\n    language: str,\n    system_prompt: str,\n    llm: str,\n    first_message: str | None,\n    temperature: float,\n    max_tokens: int | None,\n    asr_quality: str,\n    voice_id: str | None,\n    model_id: str,\n    optimize_streaming_latency: int,\n    stability: float,\n    similarity_boost: float,\n    turn_timeout: int,\n    max_duration_seconds: int,\n) -> dict:\n    return {\n        \"agent\": {\n            \"language\": language,\n            \"prompt\": {\n                \"prompt\": system_prompt,\n                \"llm\": llm,\n                \"tools\": [{\"type\": \"system\", \"name\": \"end_call\", \"description\": \"\"}],\n                \"knowledge_base\": [],\n                \"temperature\": temperature,\n                **({\"max_tokens\": max_tokens} if max_tokens else {}),\n            },\n            **({\"first_message\": first_message} if first_message else {}),\n            \"dynamic_variables\": {\"dynamic_variable_placeholders\": {}},\n        },\n        \"asr\": {\n            \"quality\": asr_quality,\n            \"provider\": \"elevenlabs\",\n            \"user_input_audio_format\": \"pcm_16000\",\n            \"keywords\": [],\n        },\n        \"tts\": {\n            **({\"voice_id\": voice_id} if voice_id else {}),\n            \"model_id\": model_id,\n            \"agent_output_audio_format\": \"pcm_16000\",\n            \"optimize_streaming_latency\": optimize_streaming_latency,\n            \"stability\": stability,\n            \"similarity_boost\": similarity_boost,\n        },\n        \"turn\": {\"turn_timeout\": turn_timeout},\n        \"conversation\": {\n            \"max_duration_seconds\": max_duration_seconds,\n            \"client_events\": [\n                \"audio\",\n                \"interruption\",\n                \"user_transcript\",\n                \"agent_response\",\n                \"agent_response_correction\",\n            ],\n        },\n        \"language_presets\": {},\n        \"is_blocked_ivc\": False,\n        \"is_blocked_non_ivc\": False,\n    }",
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/convai.py\n# module: elevenlabs_mcp.convai\n# qname: elevenlabs_mcp.convai.create_platform_settings\n# lines: 62-86\ndef create_platform_settings(\n    record_voice: bool,\n    retention_days: int,\n) -> dict:\n    return {\n        \"widget\": {\n            \"variant\": \"full\",\n            \"avatar\": {\"type\": \"orb\", \"color_1\": \"#6DB035\", \"color_2\": \"#F5CABB\"},\n            \"feedback_mode\": \"during\",\n            \"terms_text\": '#### Terms and conditions\\n\\nBy clicking \"Agree,\" and each time I interact with this AI agent, I consent to the recording, storage, and sharing of my communications with third-party service providers, and as described in the Privacy Policy.\\nIf you do not wish to have your conversations recorded, please refrain from using this service.',\n            \"show_avatar_when_collapsed\": True,\n        },\n        \"evaluation\": {},\n        \"auth\": {\"allowlist\": []},\n        \"overrides\": {},\n        \"call_limits\": {\"agent_concurrency_limit\": -1, \"daily_limit\": 100000},\n        \"privacy\": {\n            \"record_voice\": record_voice,\n            \"retention_days\": retention_days,\n            \"delete_transcript_and_pii\": True,\n            \"delete_audio\": True,\n            \"apply_to_existing_conversations\": False,\n        },\n        \"data_collection\": {},\n    }"
+      ],
+      "depth_max": 1
+    }
+  },
+  {
+    "name": "add_knowledge_base_to_agent",
+    "description": "Add a knowledge base to ElevenLabs workspace. Allowed types are epub, pdf, docx, txt, html.\n\n    ⚠️ COST WARNING: This tool makes an API call to ElevenLabs which may incur costs. Only use when explicitly requested by the user.\n\n    Args:\n        agent_id: ID of the agent to add the knowledge base to.\n        knowledge_base_name: Name of the knowledge base.\n        url: URL of the knowledge base.\n        input_file_path: Path to the file to add to the knowledge base.\n        text: Text to add to the knowledge base.\n    ",
+    "input_schema": {
+      "properties": {
+        "agent_id": {
+          "title": "Agent Id",
+          "type": "string"
+        },
+        "knowledge_base_name": {
+          "title": "Knowledge Base Name",
+          "type": "string"
+        },
+        "url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Url"
+        },
+        "input_file_path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Input File Path"
+        },
+        "text": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Text"
+        }
+      },
+      "required": [
+        "agent_id",
+        "knowledge_base_name"
+      ],
+      "title": "add_knowledge_base_to_agentArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/server.py\n# module: elevenlabs_mcp.server\n# qname: elevenlabs_mcp.server.add_knowledge_base_to_agent\n# lines: 599-662\ndef add_knowledge_base_to_agent(\n    agent_id: str,\n    knowledge_base_name: str,\n    url: str | None = None,\n    input_file_path: str | None = None,\n    text: str | None = None,\n) -> TextContent:\n    provided_params = [\n        param for param in [url, input_file_path, text] if param is not None\n    ]\n    if len(provided_params) == 0:\n        make_error(\"Must provide either a URL, a file, or text\")\n    if len(provided_params) > 1:\n        make_error(\"Must provide exactly one of: URL, file, or text\")\n\n    if url is not None:\n        response = client.conversational_ai.knowledge_base.documents.create_from_url(\n            name=knowledge_base_name,\n            url=url,\n        )\n    else:\n        if text is not None:\n            text_bytes = text.encode(\"utf-8\")\n            text_io = BytesIO(text_bytes)\n            text_io.name = \"text.txt\"\n            text_io.content_type = \"text/plain\"\n            file = text_io\n        elif input_file_path is not None:\n            path = handle_input_file(\n                file_path=input_file_path, audio_content_check=False\n            )\n            file = open(path, \"rb\")\n\n        response = client.conversational_ai.knowledge_base.documents.create_from_file(\n            name=knowledge_base_name,\n            file=file,\n        )\n\n    agent = client.conversational_ai.agents.get(agent_id=agent_id)\n\n    agent_config = agent.conversation_config.agent\n    knowledge_base_list = (\n        agent_config.get(\"prompt\", {}).get(\"knowledge_base\", []) if agent_config else []\n    )\n    knowledge_base_list.append(\n        KnowledgeBaseLocator(\n            type=\"file\" if file else \"url\",\n            name=knowledge_base_name,\n            id=response.id,\n        )\n    )\n\n    if agent_config and \"prompt\" not in agent_config:\n        agent_config[\"prompt\"] = {}\n    if agent_config:\n        agent_config[\"prompt\"][\"knowledge_base\"] = knowledge_base_list\n\n    client.conversational_ai.agents.update(\n        agent_id=agent_id, conversation_config=agent.conversation_config\n    )\n    return TextContent(\n        type=\"text\",\n        text=f\"\"\"Knowledge base created with ID: {response.id} and added to agent {agent_id} successfully.\"\"\",\n    )",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.handle_input_file\n# lines: 114-136\ndef handle_input_file(file_path: str, audio_content_check: bool = True) -> Path:\n    if not os.path.isabs(file_path) and not os.environ.get(\"ELEVENLABS_MCP_BASE_PATH\"):\n        make_error(\n            \"File path must be an absolute path if ELEVENLABS_MCP_BASE_PATH is not set\"\n        )\n    path = Path(file_path)\n    if not path.exists() and path.parent.exists():\n        parent_directory = path.parent\n        similar_files = try_find_similar_files(path.name, parent_directory)\n        similar_files_formatted = \",\".join([str(file) for file in similar_files])\n        if similar_files:\n            make_error(\n                f\"File ({path}) does not exist. Did you mean any of these files: {similar_files_formatted}?\"\n            )\n        make_error(f\"File ({path}) does not exist\")\n    elif not path.exists():\n        make_error(f\"File ({path}) does not exist\")\n    elif not path.is_file():\n        make_error(f\"File ({path}) is not a file\")\n\n    if audio_content_check and not check_audio_file(path):\n        make_error(f\"File ({path}) is not an audio or video file\")\n    return path",
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.make_error\n# lines: 12-13\ndef make_error(error_text: str):\n    raise ElevenLabsMcpError(error_text)"
+      ],
+      "depth_2": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.check_audio_file\n# lines: 98-111\ndef check_audio_file(path: Path) -> bool:\n    audio_extensions = {\n        \".wav\",\n        \".mp3\",\n        \".m4a\",\n        \".aac\",\n        \".ogg\",\n        \".flac\",\n        \".mp4\",\n        \".avi\",\n        \".mov\",\n        \".wmv\",\n    }\n    return path.suffix.lower() in audio_extensions",
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.try_find_similar_files\n# lines: 82-95\ndef try_find_similar_files(\n    filename: str, directory: Path, take_n: int = 5\n) -> list[Path]:\n    similar_files = find_similar_filenames(filename, directory)\n    if not similar_files:\n        return []\n\n    filtered_files = []\n\n    for path, _ in similar_files[:take_n]:\n        if check_audio_file(path):\n            filtered_files.append(path)\n\n    return filtered_files"
+      ],
+      "depth_3": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.find_similar_filenames\n# lines: 48-79\ndef find_similar_filenames(\n    target_file: str, directory: Path, threshold: int = 70\n) -> list[tuple[str, int]]:\n    \"\"\"\n    Find files with names similar to the target file using fuzzy matching.\n\n    Args:\n        target_file (str): The reference filename to compare against\n        directory (str): Directory to search in (defaults to current directory)\n        threshold (int): Similarity threshold (0 to 100, where 100 is identical)\n\n    Returns:\n        list: List of similar filenames with their similarity scores\n    \"\"\"\n    target_filename = os.path.basename(target_file)\n    similar_files = []\n    for root, _, files in os.walk(directory):\n        for filename in files:\n            if (\n                filename == target_filename\n                and os.path.join(root, filename) == target_file\n            ):\n                continue\n            similarity = fuzz.token_sort_ratio(target_filename, filename)\n\n            if similarity >= threshold:\n                file_path = Path(root) / filename\n                similar_files.append((file_path, similarity))\n\n    similar_files.sort(key=lambda x: x[1], reverse=True)\n\n    return similar_files"
+      ],
+      "depth_max": 3
+    }
+  },
+  {
+    "name": "list_agents",
+    "description": "List all available conversational AI agents",
+    "input_schema": {
+      "properties": {},
+      "title": "list_agentsArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/server.py\n# module: elevenlabs_mcp.server\n# qname: elevenlabs_mcp.server.list_agents\n# lines: 666-681\ndef list_agents() -> TextContent:\n    \"\"\"List all available conversational AI agents.\n\n    Returns:\n        TextContent with a formatted list of available agents\n    \"\"\"\n    response = client.conversational_ai.agents.list()\n\n    if not response.agents:\n        return TextContent(type=\"text\", text=\"No agents found.\")\n\n    agent_list = \",\".join(\n        f\"{agent.name} (ID: {agent.agent_id})\" for agent in response.agents\n    )\n\n    return TextContent(type=\"text\", text=f\"Available agents: {agent_list}\")",
+      "depth_max": 0
+    }
+  },
+  {
+    "name": "get_agent",
+    "description": "Get details about a specific conversational AI agent",
+    "input_schema": {
+      "properties": {
+        "agent_id": {
+          "title": "Agent Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "agent_id"
+      ],
+      "title": "get_agentArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/server.py\n# module: elevenlabs_mcp.server\n# qname: elevenlabs_mcp.server.get_agent\n# lines: 685-703\ndef get_agent(agent_id: str) -> TextContent:\n    \"\"\"Get details about a specific conversational AI agent.\n\n    Args:\n        agent_id: The ID of the agent to retrieve\n\n    Returns:\n        TextContent with detailed information about the agent\n    \"\"\"\n    response = client.conversational_ai.agents.get(agent_id=agent_id)\n\n    voice_info = \"None\"\n    if response.conversation_config.tts:\n        voice_info = f\"Voice ID: {response.conversation_config.tts.voice_id}\"\n\n    return TextContent(\n        type=\"text\",\n        text=f\"Agent Details: Name: {response.name}, Agent ID: {response.agent_id}, Voice Configuration: {voice_info}, Created At: {datetime.fromtimestamp(response.metadata.created_at_unix_secs).strftime('%Y-%m-%d %H:%M:%S')}\",\n    )",
+      "depth_max": 0
+    }
+  },
+  {
+    "name": "get_conversation",
+    "description": "Gets conversation with transcript. Returns: conversation details and full transcript. Use when: analyzing completed agent conversations.\n\n    Args:\n        conversation_id: The unique identifier of the conversation to retrieve, you can get the ids from the list_conversations tool.\n    ",
+    "input_schema": {
+      "properties": {
+        "conversation_id": {
+          "title": "Conversation Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "conversation_id"
+      ],
+      "title": "get_conversationArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/server.py\n# module: elevenlabs_mcp.server\n# qname: elevenlabs_mcp.server.get_conversation\n# lines: 713-757\ndef get_conversation(\n    conversation_id: str,\n) -> TextContent:\n    \"\"\"Get conversation details with transcript\"\"\"\n    try:\n        response = client.conversational_ai.conversations.get(conversation_id)\n\n        # Parse transcript using utility function\n        transcript, _ = parse_conversation_transcript(response.transcript)\n\n        response_text = f\"\"\"Conversation Details:\nID: {response.conversation_id}\nStatus: {response.status}\nAgent ID: {response.agent_id}\nMessage Count: {len(response.transcript)}\n\nTranscript:\n{transcript}\"\"\"\n\n        if response.metadata:\n            metadata = response.metadata\n            duration = getattr(\n                metadata,\n                \"call_duration_secs\",\n                getattr(metadata, \"duration_seconds\", \"N/A\"),\n            )\n            started_at = getattr(\n                metadata, \"start_time_unix_secs\", getattr(metadata, \"started_at\", \"N/A\")\n            )\n            response_text += (\n                f\"\\n\\nMetadata:\\nDuration: {duration} seconds\\nStarted: {started_at}\"\n            )\n\n        if response.analysis:\n            analysis_summary = getattr(\n                response.analysis, \"summary\", \"Analysis available but no summary\"\n            )\n            response_text += f\"\\n\\nAnalysis:\\n{analysis_summary}\"\n\n        return TextContent(type=\"text\", text=response_text)\n\n    except Exception as e:\n        make_error(f\"Failed to fetch conversation: {str(e)}\")\n        # satisfies type checker\n        return TextContent(type=\"text\", text=\"\")",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.make_error\n# lines: 12-13\ndef make_error(error_text: str):\n    raise ElevenLabsMcpError(error_text)",
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.parse_conversation_transcript\n# lines: 165-213\ndef parse_conversation_transcript(transcript_entries, max_length: int = 50000):\n    \"\"\"\n    Parse conversation transcript entries into a formatted string.\n    If transcript is too long, save to temporary file and return file path.\n\n    Args:\n        transcript_entries: List of transcript entries from conversation response\n        max_length: Maximum character length before saving to temp file\n\n    Returns:\n        tuple: (transcript_text_or_path, is_temp_file)\n    \"\"\"\n    transcript_lines = []\n    for entry in transcript_entries:\n        speaker = getattr(entry, \"role\", \"Unknown\")\n        text = getattr(entry, \"message\", getattr(entry, \"text\", \"\"))\n        timestamp = getattr(entry, \"timestamp\", None)\n\n        if timestamp:\n            transcript_lines.append(f\"[{timestamp}] {speaker}: {text}\")\n        else:\n            transcript_lines.append(f\"{speaker}: {text}\")\n\n    transcript = (\n        \"\\n\".join(transcript_lines) if transcript_lines else \"No transcript available\"\n    )\n\n    # Check if transcript is too long for LLM context window\n    if len(transcript) > max_length:\n        # Create temporary file\n        temp_file = tempfile.SpooledTemporaryFile(\n            mode=\"w+\", max_size=0, encoding=\"utf-8\"\n        )\n        temp_file.write(transcript)\n        temp_file.seek(0)\n\n        # Get a persistent temporary file path\n        with tempfile.NamedTemporaryFile(\n            mode=\"w\", suffix=\".txt\", delete=False, encoding=\"utf-8\"\n        ) as persistent_temp:\n            persistent_temp.write(transcript)\n            temp_path = persistent_temp.name\n\n        return (\n            f\"Transcript saved to temporary file: {temp_path}\\nUse the Read tool to access the full transcript.\",\n            True,\n        )\n\n    return transcript, False"
+      ],
+      "depth_max": 1
+    }
+  },
+  {
+    "name": "list_conversations",
+    "description": "Lists agent conversations. Returns: conversation list with metadata. Use when: asked about conversation history.\n\n    Args:\n        agent_id (str, optional): Filter conversations by specific agent ID\n        cursor (str, optional): Pagination cursor for retrieving next page of results\n        call_start_before_unix (int, optional): Filter conversations that started before this Unix timestamp\n        call_start_after_unix (int, optional): Filter conversations that started after this Unix timestamp\n        page_size (int, optional): Number of conversations to return per page (1-100, defaults to 30)\n        max_length (int, optional): Maximum character length of the response text (defaults to 10000)\n    ",
+    "input_schema": {
+      "properties": {
+        "agent_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Agent Id"
+        },
+        "cursor": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Cursor"
+        },
+        "call_start_before_unix": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Call Start Before Unix"
+        },
+        "call_start_after_unix": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Call Start After Unix"
+        },
+        "page_size": {
+          "default": 30,
+          "title": "Page Size",
+          "type": "integer"
+        },
+        "max_length": {
+          "default": 10000,
+          "title": "Max Length",
+          "type": "integer"
+        }
+      },
+      "title": "list_conversationsArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/server.py\n# module: elevenlabs_mcp.server\n# qname: elevenlabs_mcp.server.list_conversations\n# lines: 772-831\ndef list_conversations(\n    agent_id: str | None = None,\n    cursor: str | None = None,\n    call_start_before_unix: int | None = None,\n    call_start_after_unix: int | None = None,\n    page_size: int = 30,\n    max_length: int = 10000,\n) -> TextContent:\n    \"\"\"List conversations with filtering options.\"\"\"\n    page_size = min(page_size, 100)\n\n    try:\n        response = client.conversational_ai.conversations.list(\n            cursor=cursor,\n            agent_id=agent_id,\n            call_start_before_unix=call_start_before_unix,\n            call_start_after_unix=call_start_after_unix,\n            page_size=page_size,\n        )\n\n        if not response.conversations:\n            return TextContent(type=\"text\", text=\"No conversations found.\")\n\n        conv_list = []\n        for conv in response.conversations:\n            start_time = datetime.fromtimestamp(conv.start_time_unix_secs).strftime(\n                \"%Y-%m-%d %H:%M:%S\"\n            )\n\n            conv_info = f\"\"\"Conversation ID: {conv.conversation_id}\nStatus: {conv.status}\nAgent: {conv.agent_name or 'N/A'} (ID: {conv.agent_id})\nStarted: {start_time}\nDuration: {conv.call_duration_secs} seconds\nMessages: {conv.message_count}\nCall Successful: {conv.call_successful}\"\"\"\n\n            conv_list.append(conv_info)\n\n        formatted_list = \"\\n\\n\".join(conv_list)\n\n        pagination_info = f\"Showing {len(response.conversations)} conversations\"\n        if response.has_more:\n            pagination_info += f\" (more available, next cursor: {response.next_cursor})\"\n\n        full_text = f\"{pagination_info}\\n\\n{formatted_list}\"\n\n        # Use utility to handle large text content\n        result_text = handle_large_text(full_text, max_length, \"conversation list\")\n\n        # If content was saved to file, prepend pagination info\n        if result_text != full_text:\n            result_text = f\"{pagination_info}\\n\\n{result_text}\"\n\n        return TextContent(type=\"text\", text=result_text)\n\n    except Exception as e:\n        make_error(f\"Failed to list conversations: {str(e)}\")\n        # This line is unreachable but satisfies type checker\n        return TextContent(type=\"text\", text=\"\")",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.handle_large_text\n# lines: 139-162\ndef handle_large_text(\n    text: str, max_length: int = 10000, content_type: str = \"content\"\n):\n    \"\"\"\n    Handle large text content by saving to temporary file if it exceeds max_length.\n\n    Args:\n        text: The text content to handle\n        max_length: Maximum character length before saving to temp file\n        content_type: Description of the content type for user messages\n\n    Returns:\n        str: Either the original text or a message with temp file path\n    \"\"\"\n    if len(text) > max_length:\n        with tempfile.NamedTemporaryFile(\n            mode=\"w\", suffix=\".txt\", delete=False, encoding=\"utf-8\"\n        ) as temp_file:\n            temp_file.write(text)\n            temp_path = temp_file.name\n\n        return f\"{content_type.capitalize()} saved to temporary file: {temp_path}\\nUse the Read tool to access the full {content_type}.\"\n\n    return text",
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.make_error\n# lines: 12-13\ndef make_error(error_text: str):\n    raise ElevenLabsMcpError(error_text)"
+      ],
+      "depth_max": 1
+    }
+  },
+  {
+    "name": "speech_to_speech",
+    "description": "Transform audio from one voice to another using provided audio files.\n\n    ⚠️ COST WARNING: This tool makes an API call to ElevenLabs which may incur costs. Only use when explicitly requested by the user.\n    ",
+    "input_schema": {
+      "properties": {
+        "input_file_path": {
+          "title": "Input File Path",
+          "type": "string"
+        },
+        "voice_name": {
+          "default": "Adam",
+          "title": "Voice Name",
+          "type": "string"
+        },
+        "output_directory": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Output Directory"
+        }
+      },
+      "required": [
+        "input_file_path"
+      ],
+      "title": "speech_to_speechArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/server.py\n# module: elevenlabs_mcp.server\n# qname: elevenlabs_mcp.server.speech_to_speech\n# lines: 840-876\ndef speech_to_speech(\n    input_file_path: str,\n    voice_name: str = \"Adam\",\n    output_directory: str | None = None,\n) -> TextContent:\n    voices = client.voices.search(search=voice_name)\n\n    if len(voices.voices) == 0:\n        make_error(\"No voice found with that name.\")\n\n    voice = next((v for v in voices.voices if v.name == voice_name), None)\n\n    if voice is None:\n        make_error(f\"Voice with name: {voice_name} does not exist.\")\n\n    assert voice is not None  # Type assertion for type checker\n    file_path = handle_input_file(input_file_path)\n    output_path = make_output_path(output_directory, base_path)\n    output_file_name = make_output_file(\"sts\", file_path.name, output_path, \"mp3\")\n\n    with file_path.open(\"rb\") as f:\n        audio_bytes = f.read()\n\n    audio_data = client.speech_to_speech.convert(\n        model_id=\"eleven_multilingual_sts_v2\",\n        voice_id=voice.voice_id,\n        audio=audio_bytes,\n    )\n\n    audio_bytes = b\"\".join(audio_data)\n\n    with open(output_path / output_file_name, \"wb\") as f:\n        f.write(audio_bytes)\n\n    return TextContent(\n        type=\"text\", text=f\"Success. File saved as: {output_path / output_file_name}\"\n    )",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.handle_input_file\n# lines: 114-136\ndef handle_input_file(file_path: str, audio_content_check: bool = True) -> Path:\n    if not os.path.isabs(file_path) and not os.environ.get(\"ELEVENLABS_MCP_BASE_PATH\"):\n        make_error(\n            \"File path must be an absolute path if ELEVENLABS_MCP_BASE_PATH is not set\"\n        )\n    path = Path(file_path)\n    if not path.exists() and path.parent.exists():\n        parent_directory = path.parent\n        similar_files = try_find_similar_files(path.name, parent_directory)\n        similar_files_formatted = \",\".join([str(file) for file in similar_files])\n        if similar_files:\n            make_error(\n                f\"File ({path}) does not exist. Did you mean any of these files: {similar_files_formatted}?\"\n            )\n        make_error(f\"File ({path}) does not exist\")\n    elif not path.exists():\n        make_error(f\"File ({path}) does not exist\")\n    elif not path.is_file():\n        make_error(f\"File ({path}) is not a file\")\n\n    if audio_content_check and not check_audio_file(path):\n        make_error(f\"File ({path}) is not an audio or video file\")\n    return path",
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.make_error\n# lines: 12-13\ndef make_error(error_text: str):\n    raise ElevenLabsMcpError(error_text)",
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.make_output_file\n# lines: 23-29\ndef make_output_file(\n    tool: str, text: str, output_path: Path, extension: str, full_id: bool = False\n) -> Path:\n    id = text if full_id else text[:5]\n\n    output_file_name = f\"{tool}_{id.replace(' ', '_')}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.{extension}\"\n    return output_path / output_file_name",
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.make_output_path\n# lines: 32-45\ndef make_output_path(\n    output_directory: str | None, base_path: str | None = None\n) -> Path:\n    output_path = None\n    if output_directory is None:\n        output_path = Path.home() / \"Desktop\"\n    elif not os.path.isabs(output_directory) and base_path:\n        output_path = Path(os.path.expanduser(base_path)) / Path(output_directory)\n    else:\n        output_path = Path(os.path.expanduser(output_directory))\n    if not is_file_writeable(output_path):\n        make_error(f\"Directory ({output_path}) is not writeable\")\n    output_path.mkdir(parents=True, exist_ok=True)\n    return output_path"
+      ],
+      "depth_2": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.check_audio_file\n# lines: 98-111\ndef check_audio_file(path: Path) -> bool:\n    audio_extensions = {\n        \".wav\",\n        \".mp3\",\n        \".m4a\",\n        \".aac\",\n        \".ogg\",\n        \".flac\",\n        \".mp4\",\n        \".avi\",\n        \".mov\",\n        \".wmv\",\n    }\n    return path.suffix.lower() in audio_extensions",
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.is_file_writeable\n# lines: 16-20\ndef is_file_writeable(path: Path) -> bool:\n    if path.exists():\n        return os.access(path, os.W_OK)\n    parent_dir = path.parent\n    return os.access(parent_dir, os.W_OK)",
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.try_find_similar_files\n# lines: 82-95\ndef try_find_similar_files(\n    filename: str, directory: Path, take_n: int = 5\n) -> list[Path]:\n    similar_files = find_similar_filenames(filename, directory)\n    if not similar_files:\n        return []\n\n    filtered_files = []\n\n    for path, _ in similar_files[:take_n]:\n        if check_audio_file(path):\n            filtered_files.append(path)\n\n    return filtered_files"
+      ],
+      "depth_3": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.find_similar_filenames\n# lines: 48-79\ndef find_similar_filenames(\n    target_file: str, directory: Path, threshold: int = 70\n) -> list[tuple[str, int]]:\n    \"\"\"\n    Find files with names similar to the target file using fuzzy matching.\n\n    Args:\n        target_file (str): The reference filename to compare against\n        directory (str): Directory to search in (defaults to current directory)\n        threshold (int): Similarity threshold (0 to 100, where 100 is identical)\n\n    Returns:\n        list: List of similar filenames with their similarity scores\n    \"\"\"\n    target_filename = os.path.basename(target_file)\n    similar_files = []\n    for root, _, files in os.walk(directory):\n        for filename in files:\n            if (\n                filename == target_filename\n                and os.path.join(root, filename) == target_file\n            ):\n                continue\n            similarity = fuzz.token_sort_ratio(target_filename, filename)\n\n            if similarity >= threshold:\n                file_path = Path(root) / filename\n                similar_files.append((file_path, similarity))\n\n    similar_files.sort(key=lambda x: x[1], reverse=True)\n\n    return similar_files"
+      ],
+      "depth_max": 3
+    }
+  },
+  {
+    "name": "text_to_voice",
+    "description": "Create voice previews from a text prompt. Creates three previews with slight variations. Saves the previews to a given directory. If no text is provided, the tool will auto-generate text.\n\n    Voice preview files are saved as: voice_design_(generated_voice_id)_(timestamp).mp3\n\n    Example file name: voice_design_Ya2J5uIa5Pq14DNPsbC1_20250403_164949.mp3\n\n    ⚠️ COST WARNING: This tool makes an API call to ElevenLabs which may incur costs. Only use when explicitly requested by the user.\n    ",
+    "input_schema": {
+      "properties": {
+        "voice_description": {
+          "title": "Voice Description",
+          "type": "string"
+        },
+        "text": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Text"
+        },
+        "output_directory": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Output Directory"
+        }
+      },
+      "required": [
+        "voice_description"
+      ],
+      "title": "text_to_voiceArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/server.py\n# module: elevenlabs_mcp.server\n# qname: elevenlabs_mcp.server.text_to_voice\n# lines: 889-922\ndef text_to_voice(\n    voice_description: str,\n    text: str | None = None,\n    output_directory: str | None = None,\n) -> TextContent:\n    if voice_description == \"\":\n        make_error(\"Voice description is required.\")\n\n    previews = client.text_to_voice.create_previews(\n        voice_description=voice_description,\n        text=text,\n        auto_generate_text=True if text is None else False,\n    )\n\n    output_path = make_output_path(output_directory, base_path)\n\n    generated_voice_ids = []\n    output_file_paths = []\n\n    for preview in previews.previews:\n        output_file_name = make_output_file(\n            \"voice_design\", preview.generated_voice_id, output_path, \"mp3\", full_id=True\n        )\n        output_file_paths.append(str(output_file_name))\n        generated_voice_ids.append(preview.generated_voice_id)\n        audio_bytes = base64.b64decode(preview.audio_base_64)\n\n        with open(output_path / output_file_name, \"wb\") as f:\n            f.write(audio_bytes)\n\n    return TextContent(\n        type=\"text\",\n        text=f\"Success. Files saved at: {', '.join(output_file_paths)}. Generated voice IDs are: {', '.join(generated_voice_ids)}\",\n    )",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.make_error\n# lines: 12-13\ndef make_error(error_text: str):\n    raise ElevenLabsMcpError(error_text)",
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.make_output_file\n# lines: 23-29\ndef make_output_file(\n    tool: str, text: str, output_path: Path, extension: str, full_id: bool = False\n) -> Path:\n    id = text if full_id else text[:5]\n\n    output_file_name = f\"{tool}_{id.replace(' ', '_')}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.{extension}\"\n    return output_path / output_file_name",
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.make_output_path\n# lines: 32-45\ndef make_output_path(\n    output_directory: str | None, base_path: str | None = None\n) -> Path:\n    output_path = None\n    if output_directory is None:\n        output_path = Path.home() / \"Desktop\"\n    elif not os.path.isabs(output_directory) and base_path:\n        output_path = Path(os.path.expanduser(base_path)) / Path(output_directory)\n    else:\n        output_path = Path(os.path.expanduser(output_directory))\n    if not is_file_writeable(output_path):\n        make_error(f\"Directory ({output_path}) is not writeable\")\n    output_path.mkdir(parents=True, exist_ok=True)\n    return output_path"
+      ],
+      "depth_2": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.is_file_writeable\n# lines: 16-20\ndef is_file_writeable(path: Path) -> bool:\n    if path.exists():\n        return os.access(path, os.W_OK)\n    parent_dir = path.parent\n    return os.access(parent_dir, os.W_OK)"
+      ],
+      "depth_max": 2
+    }
+  },
+  {
+    "name": "create_voice_from_preview",
+    "description": "Add a generated voice to the voice library. Uses the voice ID from the `text_to_voice` tool.\n\n    ⚠️ COST WARNING: This tool makes an API call to ElevenLabs which may incur costs. Only use when explicitly requested by the user.\n    ",
+    "input_schema": {
+      "properties": {
+        "generated_voice_id": {
+          "title": "Generated Voice Id",
+          "type": "string"
+        },
+        "voice_name": {
+          "title": "Voice Name",
+          "type": "string"
+        },
+        "voice_description": {
+          "title": "Voice Description",
+          "type": "string"
+        }
+      },
+      "required": [
+        "generated_voice_id",
+        "voice_name",
+        "voice_description"
+      ],
+      "title": "create_voice_from_previewArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/server.py\n# module: elevenlabs_mcp.server\n# qname: elevenlabs_mcp.server.create_voice_from_preview\n# lines: 931-945\ndef create_voice_from_preview(\n    generated_voice_id: str,\n    voice_name: str,\n    voice_description: str,\n) -> TextContent:\n    voice = client.text_to_voice.create_voice_from_preview(\n        voice_name=voice_name,\n        voice_description=voice_description,\n        generated_voice_id=generated_voice_id,\n    )\n\n    return TextContent(\n        type=\"text\",\n        text=f\"Success. Voice created: {voice.name} with ID:{voice.voice_id}\",\n    )",
+      "depth_max": 0
+    }
+  },
+  {
+    "name": "make_outbound_call",
+    "description": "Make an outbound call using an ElevenLabs agent. Automatically detects provider type (Twilio or SIP trunk) and uses the appropriate API.\n\n    ⚠️ COST WARNING: This tool makes an API call to ElevenLabs which may incur costs. Only use when explicitly requested by the user.\n\n    Args:\n        agent_id: The ID of the agent that will handle the call\n        agent_phone_number_id: The ID of the phone number to use for the call\n        to_number: The phone number to call (E.164 format: +1xxxxxxxxxx)\n\n    Returns:\n        TextContent containing information about the call\n    ",
+    "input_schema": {
+      "properties": {
+        "agent_id": {
+          "title": "Agent Id",
+          "type": "string"
+        },
+        "agent_phone_number_id": {
+          "title": "Agent Phone Number Id",
+          "type": "string"
+        },
+        "to_number": {
+          "title": "To Number",
+          "type": "string"
+        }
+      },
+      "required": [
+        "agent_id",
+        "agent_phone_number_id",
+        "to_number"
+      ],
+      "title": "make_outbound_callArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/server.py\n# module: elevenlabs_mcp.server\n# qname: elevenlabs_mcp.server.make_outbound_call\n# lines: 971-998\ndef make_outbound_call(\n    agent_id: str,\n    agent_phone_number_id: str,\n    to_number: str,\n) -> TextContent:\n    # Get phone number details to determine provider type\n    phone_number = _get_phone_number_by_id(agent_phone_number_id)\n\n    if phone_number.provider.lower() == \"twilio\":\n        response = client.conversational_ai.twilio.outbound_call(\n            agent_id=agent_id,\n            agent_phone_number_id=agent_phone_number_id,\n            to_number=to_number,\n        )\n        provider_info = \"Twilio\"\n    elif phone_number.provider.lower() == \"sip_trunk\":\n        response = client.conversational_ai.sip_trunk.outbound_call(\n            agent_id=agent_id,\n            agent_phone_number_id=agent_phone_number_id,\n            to_number=to_number,\n        )\n        provider_info = \"SIP trunk\"\n    else:\n        make_error(f\"Unsupported provider type: {phone_number.provider}\")\n\n    return TextContent(\n        type=\"text\", text=f\"Outbound call initiated via {provider_info}: {response}.\"\n    )",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/server.py\n# module: elevenlabs_mcp.server\n# qname: elevenlabs_mcp.server._get_phone_number_by_id\n# lines: 948-954\ndef _get_phone_number_by_id(phone_number_id: str):\n    \"\"\"Helper function to get phone number details by ID.\"\"\"\n    phone_numbers = client.conversational_ai.phone_numbers.list()\n    for phone in phone_numbers:\n        if phone.phone_number_id == phone_number_id:\n            return phone\n    make_error(f\"Phone number with ID {phone_number_id} not found.\")",
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.make_error\n# lines: 12-13\ndef make_error(error_text: str):\n    raise ElevenLabsMcpError(error_text)"
+      ],
+      "depth_max": 1
+    }
+  },
+  {
+    "name": "search_voice_library",
+    "description": "Search for a voice across the entire ElevenLabs voice library.\n\n    Args:\n        page: Page number to return (0-indexed)\n        page_size: Number of voices to return per page (1-100)\n        search: Search term to filter voices by\n\n    Returns:\n        TextContent containing information about the shared voices\n    ",
+    "input_schema": {
+      "properties": {
+        "page": {
+          "default": 0,
+          "title": "Page",
+          "type": "integer"
+        },
+        "page_size": {
+          "default": 10,
+          "title": "Page Size",
+          "type": "integer"
+        },
+        "search": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Search"
+        }
+      },
+      "title": "search_voice_libraryArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/server.py\n# module: elevenlabs_mcp.server\n# qname: elevenlabs_mcp.server.search_voice_library\n# lines: 1013-1069\ndef search_voice_library(\n    page: int = 0,\n    page_size: int = 10,\n    search: str | None = None,\n) -> TextContent:\n    response = client.voices.get_shared(\n        page=page,\n        page_size=page_size,\n        search=search,\n    )\n\n    if not response.voices:\n        return TextContent(\n            type=\"text\", text=\"No shared voices found with the specified criteria.\"\n        )\n\n    voice_list = []\n    for voice in response.voices:\n        language_info = \"N/A\"\n        if hasattr(voice, \"verified_languages\") and voice.verified_languages:\n            languages = []\n            for lang in voice.verified_languages:\n                accent_info = (\n                    f\" ({lang.accent})\"\n                    if hasattr(lang, \"accent\") and lang.accent\n                    else \"\"\n                )\n                languages.append(f\"{lang.language}{accent_info}\")\n            language_info = \", \".join(languages)\n\n        details = [\n            f\"Name: {voice.name}\",\n            f\"ID: {voice.voice_id}\",\n            f\"Category: {getattr(voice, 'category', 'N/A')}\",\n        ]\n        # TODO: Make cleaner\n        if hasattr(voice, \"gender\") and voice.gender:\n            details.append(f\"Gender: {voice.gender}\")\n        if hasattr(voice, \"age\") and voice.age:\n            details.append(f\"Age: {voice.age}\")\n        if hasattr(voice, \"accent\") and voice.accent:\n            details.append(f\"Accent: {voice.accent}\")\n        if hasattr(voice, \"description\") and voice.description:\n            details.append(f\"Description: {voice.description}\")\n        if hasattr(voice, \"use_case\") and voice.use_case:\n            details.append(f\"Use Case: {voice.use_case}\")\n\n        details.append(f\"Languages: {language_info}\")\n\n        if hasattr(voice, \"preview_url\") and voice.preview_url:\n            details.append(f\"Preview URL: {voice.preview_url}\")\n\n        voice_info = \"\\n\".join(details)\n        voice_list.append(voice_info)\n\n    formatted_info = \"\\n\\n\".join(voice_list)\n    return TextContent(type=\"text\", text=f\"Shared Voices:\\n\\n{formatted_info}\")",
+      "depth_max": 0
+    }
+  },
+  {
+    "name": "list_phone_numbers",
+    "description": "List all phone numbers associated with the ElevenLabs account",
+    "input_schema": {
+      "properties": {},
+      "title": "list_phone_numbersArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/server.py\n# module: elevenlabs_mcp.server\n# qname: elevenlabs_mcp.server.list_phone_numbers\n# lines: 1073-1099\ndef list_phone_numbers() -> TextContent:\n    \"\"\"List all phone numbers associated with the ElevenLabs account.\n\n    Returns:\n        TextContent containing formatted information about the phone numbers\n    \"\"\"\n    response = client.conversational_ai.phone_numbers.list()\n\n    if not response:\n        return TextContent(type=\"text\", text=\"No phone numbers found.\")\n\n    phone_info = []\n    for phone in response:\n        assigned_agent = \"None\"\n        if phone.assigned_agent:\n            assigned_agent = f\"{phone.assigned_agent.agent_name} (ID: {phone.assigned_agent.agent_id})\"\n\n        phone_info.append(\n            f\"Phone Number: {phone.phone_number}\\n\"\n            f\"ID: {phone.phone_number_id}\\n\"\n            f\"Provider: {phone.provider}\\n\"\n            f\"Label: {phone.label}\\n\"\n            f\"Assigned Agent: {assigned_agent}\"\n        )\n\n    formatted_info = \"\\n\\n\".join(phone_info)\n    return TextContent(type=\"text\", text=f\"Phone Numbers:\\n\\n{formatted_info}\")",
+      "depth_max": 0
+    }
+  },
+  {
+    "name": "play_audio",
+    "description": "Play an audio file. Supports WAV and MP3 formats.",
+    "input_schema": {
+      "properties": {
+        "input_file_path": {
+          "title": "Input File Path",
+          "type": "string"
+        }
+      },
+      "required": [
+        "input_file_path"
+      ],
+      "title": "play_audioArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/server.py\n# module: elevenlabs_mcp.server\n# qname: elevenlabs_mcp.server.play_audio\n# lines: 1103-1106\ndef play_audio(input_file_path: str) -> TextContent:\n    file_path = handle_input_file(input_file_path)\n    play(open(file_path, \"rb\").read(), use_ffmpeg=False)\n    return TextContent(type=\"text\", text=f\"Successfully played audio file: {file_path}\")",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.handle_input_file\n# lines: 114-136\ndef handle_input_file(file_path: str, audio_content_check: bool = True) -> Path:\n    if not os.path.isabs(file_path) and not os.environ.get(\"ELEVENLABS_MCP_BASE_PATH\"):\n        make_error(\n            \"File path must be an absolute path if ELEVENLABS_MCP_BASE_PATH is not set\"\n        )\n    path = Path(file_path)\n    if not path.exists() and path.parent.exists():\n        parent_directory = path.parent\n        similar_files = try_find_similar_files(path.name, parent_directory)\n        similar_files_formatted = \",\".join([str(file) for file in similar_files])\n        if similar_files:\n            make_error(\n                f\"File ({path}) does not exist. Did you mean any of these files: {similar_files_formatted}?\"\n            )\n        make_error(f\"File ({path}) does not exist\")\n    elif not path.exists():\n        make_error(f\"File ({path}) does not exist\")\n    elif not path.is_file():\n        make_error(f\"File ({path}) is not a file\")\n\n    if audio_content_check and not check_audio_file(path):\n        make_error(f\"File ({path}) is not an audio or video file\")\n    return path"
+      ],
+      "depth_2": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.check_audio_file\n# lines: 98-111\ndef check_audio_file(path: Path) -> bool:\n    audio_extensions = {\n        \".wav\",\n        \".mp3\",\n        \".m4a\",\n        \".aac\",\n        \".ogg\",\n        \".flac\",\n        \".mp4\",\n        \".avi\",\n        \".mov\",\n        \".wmv\",\n    }\n    return path.suffix.lower() in audio_extensions",
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.make_error\n# lines: 12-13\ndef make_error(error_text: str):\n    raise ElevenLabsMcpError(error_text)",
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.try_find_similar_files\n# lines: 82-95\ndef try_find_similar_files(\n    filename: str, directory: Path, take_n: int = 5\n) -> list[Path]:\n    similar_files = find_similar_filenames(filename, directory)\n    if not similar_files:\n        return []\n\n    filtered_files = []\n\n    for path, _ in similar_files[:take_n]:\n        if check_audio_file(path):\n            filtered_files.append(path)\n\n    return filtered_files"
+      ],
+      "depth_3": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.find_similar_filenames\n# lines: 48-79\ndef find_similar_filenames(\n    target_file: str, directory: Path, threshold: int = 70\n) -> list[tuple[str, int]]:\n    \"\"\"\n    Find files with names similar to the target file using fuzzy matching.\n\n    Args:\n        target_file (str): The reference filename to compare against\n        directory (str): Directory to search in (defaults to current directory)\n        threshold (int): Similarity threshold (0 to 100, where 100 is identical)\n\n    Returns:\n        list: List of similar filenames with their similarity scores\n    \"\"\"\n    target_filename = os.path.basename(target_file)\n    similar_files = []\n    for root, _, files in os.walk(directory):\n        for filename in files:\n            if (\n                filename == target_filename\n                and os.path.join(root, filename) == target_file\n            ):\n                continue\n            similarity = fuzz.token_sort_ratio(target_filename, filename)\n\n            if similarity >= threshold:\n                file_path = Path(root) / filename\n                similar_files.append((file_path, similarity))\n\n    similar_files.sort(key=lambda x: x[1], reverse=True)\n\n    return similar_files"
+      ],
+      "depth_max": 3
+    }
+  },
+  {
+    "name": "compose_music",
+    "description": "Convert a prompt to music and save the output audio file to a given directory.\n    Directory is optional, if not provided, the output file will be saved to $HOME/Desktop.\n\n    Args:\n        prompt: Prompt to convert to music. Must provide either prompt or composition_plan.\n        output_directory: Directory to save the output audio file\n        composition_plan: Composition plan to use for the music. Must provide either prompt or composition_plan.\n        music_length_ms: Length of the generated music in milliseconds. Cannot be used if composition_plan is provided.\n\n    ⚠️ COST WARNING: This tool makes an API call to ElevenLabs which may incur costs. Only use when explicitly requested by the user.",
+    "input_schema": {
+      "$defs": {
+        "MusicPrompt": {
+          "additionalProperties": true,
+          "properties": {
+            "positive_global_styles": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Positive Global Styles",
+              "type": "array"
+            },
+            "negative_global_styles": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Negative Global Styles",
+              "type": "array"
+            },
+            "sections": {
+              "items": {
+                "$ref": "#/$defs/SongSection"
+              },
+              "title": "Sections",
+              "type": "array"
+            }
+          },
+          "required": [
+            "positive_global_styles",
+            "negative_global_styles",
+            "sections"
+          ],
+          "title": "MusicPrompt",
+          "type": "object"
+        },
+        "SongSection": {
+          "additionalProperties": true,
+          "properties": {
+            "section_name": {
+              "title": "Section Name",
+              "type": "string"
+            },
+            "positive_local_styles": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Positive Local Styles",
+              "type": "array"
+            },
+            "negative_local_styles": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Negative Local Styles",
+              "type": "array"
+            },
+            "duration_ms": {
+              "title": "Duration Ms",
+              "type": "integer"
+            },
+            "lines": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Lines",
+              "type": "array"
+            }
+          },
+          "required": [
+            "section_name",
+            "positive_local_styles",
+            "negative_local_styles",
+            "duration_ms",
+            "lines"
+          ],
+          "title": "SongSection",
+          "type": "object"
+        }
+      },
+      "properties": {
+        "prompt": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Prompt"
+        },
+        "output_directory": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Output Directory"
+        },
+        "composition_plan": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MusicPrompt"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "music_length_ms": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Music Length Ms"
+        }
+      },
+      "title": "compose_musicArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/server.py\n# module: elevenlabs_mcp.server\n# qname: elevenlabs_mcp.server.compose_music\n# lines: 1121-1156\ndef compose_music(\n    prompt: str | None = None,\n    output_directory: str | None = None,\n    composition_plan: MusicPrompt | None = None,\n    music_length_ms: int | None = None,\n) -> TextContent:\n    if prompt is None and composition_plan is None:\n        make_error(\n            f\"Either prompt or composition_plan must be provided. Prompt: {prompt}\"\n        )\n\n    if prompt is not None and composition_plan is not None:\n        make_error(\"Only one of prompt or composition_plan must be provided\")\n\n    if music_length_ms is not None and composition_plan is not None:\n        make_error(\"music_length_ms cannot be used if composition_plan is provided\")\n\n    output_path = make_output_path(output_directory, base_path)\n    output_file_name = make_output_file(\"music\", \"\", output_path, \"mp3\")\n\n    audio_data = client.music.compose(\n        prompt=prompt,\n        music_length_ms=music_length_ms,\n        composition_plan=composition_plan,\n    )\n\n    audio_bytes = b\"\".join(audio_data)\n\n    output_path.parent.mkdir(parents=True, exist_ok=True)\n    with open(output_path / output_file_name, \"wb\") as f:\n        f.write(audio_bytes)\n\n    return TextContent(\n        type=\"text\",\n        text=f\"Success. File saved as: {output_path / output_file_name}.\",\n    )",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.make_error\n# lines: 12-13\ndef make_error(error_text: str):\n    raise ElevenLabsMcpError(error_text)",
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.make_output_file\n# lines: 23-29\ndef make_output_file(\n    tool: str, text: str, output_path: Path, extension: str, full_id: bool = False\n) -> Path:\n    id = text if full_id else text[:5]\n\n    output_file_name = f\"{tool}_{id.replace(' ', '_')}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.{extension}\"\n    return output_path / output_file_name",
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.make_output_path\n# lines: 32-45\ndef make_output_path(\n    output_directory: str | None, base_path: str | None = None\n) -> Path:\n    output_path = None\n    if output_directory is None:\n        output_path = Path.home() / \"Desktop\"\n    elif not os.path.isabs(output_directory) and base_path:\n        output_path = Path(os.path.expanduser(base_path)) / Path(output_directory)\n    else:\n        output_path = Path(os.path.expanduser(output_directory))\n    if not is_file_writeable(output_path):\n        make_error(f\"Directory ({output_path}) is not writeable\")\n    output_path.mkdir(parents=True, exist_ok=True)\n    return output_path"
+      ],
+      "depth_2": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/utils.py\n# module: elevenlabs_mcp.utils\n# qname: elevenlabs_mcp.utils.is_file_writeable\n# lines: 16-20\ndef is_file_writeable(path: Path) -> bool:\n    if path.exists():\n        return os.access(path, os.W_OK)\n    parent_dir = path.parent\n    return os.access(parent_dir, os.W_OK)"
+      ],
+      "depth_max": 2
+    }
+  },
+  {
+    "name": "create_composition_plan",
+    "description": "Create a composition plan for music generation. Usage of this endpoint does not cost any credits but is subject to rate limiting depending on your tier. Composition plans can be used when generating music with the compose_music tool.\n\n    Args:\n        prompt: Prompt to create a composition plan for\n        music_length_ms: The length of the composition plan to generate in milliseconds. Must be between 10000ms and 300000ms. Optional - if not provided, the model will choose a length based on the prompt.\n        source_composition_plan: An optional composition plan to use as a source for the new composition plan\n    ",
+    "input_schema": {
+      "$defs": {
+        "MusicPrompt": {
+          "additionalProperties": true,
+          "properties": {
+            "positive_global_styles": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Positive Global Styles",
+              "type": "array"
+            },
+            "negative_global_styles": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Negative Global Styles",
+              "type": "array"
+            },
+            "sections": {
+              "items": {
+                "$ref": "#/$defs/SongSection"
+              },
+              "title": "Sections",
+              "type": "array"
+            }
+          },
+          "required": [
+            "positive_global_styles",
+            "negative_global_styles",
+            "sections"
+          ],
+          "title": "MusicPrompt",
+          "type": "object"
+        },
+        "SongSection": {
+          "additionalProperties": true,
+          "properties": {
+            "section_name": {
+              "title": "Section Name",
+              "type": "string"
+            },
+            "positive_local_styles": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Positive Local Styles",
+              "type": "array"
+            },
+            "negative_local_styles": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Negative Local Styles",
+              "type": "array"
+            },
+            "duration_ms": {
+              "title": "Duration Ms",
+              "type": "integer"
+            },
+            "lines": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Lines",
+              "type": "array"
+            }
+          },
+          "required": [
+            "section_name",
+            "positive_local_styles",
+            "negative_local_styles",
+            "duration_ms",
+            "lines"
+          ],
+          "title": "SongSection",
+          "type": "object"
+        }
+      },
+      "properties": {
+        "prompt": {
+          "title": "Prompt",
+          "type": "string"
+        },
+        "music_length_ms": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Music Length Ms"
+        },
+        "source_composition_plan": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MusicPrompt"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "prompt"
+      ],
+      "title": "create_composition_planArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/elevenlabs/elevenlabs_mcp/server.py\n# module: elevenlabs_mcp.server\n# qname: elevenlabs_mcp.server.create_composition_plan\n# lines: 1168-1179\ndef create_composition_plan(\n    prompt: str,\n    music_length_ms: int | None = None,\n    source_composition_plan: MusicPrompt | None = None,\n) -> MusicPrompt:\n    composition_plan = client.music.composition_plan.create(\n        prompt=prompt,\n        music_length_ms=music_length_ms,\n        source_composition_plan=source_composition_plan,\n    )\n\n    return composition_plan",
+      "depth_max": 0
+    }
+  }
+]

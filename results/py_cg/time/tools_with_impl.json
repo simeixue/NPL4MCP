@@ -1,0 +1,54 @@
+[
+  {
+    "name": "get_current_time",
+    "description": "Get current time in a specific timezones",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "timezone": {
+          "type": "string",
+          "description": "IANA timezone name (e.g., 'America/New_York', 'Europe/London'). Use 'Asia/Shanghai' as local timezone if no timezone provided by the user."
+        }
+      },
+      "required": [
+        "timezone"
+      ]
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/time/src/mcp_server_time/server.py\n# module: src.mcp_server_time.server\n# qname: src.mcp_server_time.server.TimeServer.get_current_time\n# lines: 61-71\n    def get_current_time(self, timezone_name: str) -> TimeResult:\n        \"\"\"Get current time in specified timezone\"\"\"\n        timezone = get_zoneinfo(timezone_name)\n        current_time = datetime.now(timezone)\n\n        return TimeResult(\n            timezone=timezone_name,\n            datetime=current_time.isoformat(timespec=\"seconds\"),\n            day_of_week=current_time.strftime(\"%A\"),\n            is_dst=bool(current_time.dst()),\n        )",
+      "depth_max": 0
+    }
+  },
+  {
+    "name": "convert_time",
+    "description": "Convert time between timezones",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "source_timezone": {
+          "type": "string",
+          "description": "Source IANA timezone name (e.g., 'America/New_York', 'Europe/London'). Use 'Asia/Shanghai' as local timezone if no source timezone provided by the user."
+        },
+        "time": {
+          "type": "string",
+          "description": "Time to convert in 24-hour format (HH:MM)"
+        },
+        "target_timezone": {
+          "type": "string",
+          "description": "Target IANA timezone name (e.g., 'Asia/Tokyo', 'America/San_Francisco'). Use 'Asia/Shanghai' as local timezone if no target timezone provided by the user."
+        }
+      },
+      "required": [
+        "source_timezone",
+        "time",
+        "target_timezone"
+      ]
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/time/src/mcp_server_time/server.py\n# module: src.mcp_server_time.server\n# qname: src.mcp_server_time.server.TimeServer.convert_time\n# lines: 73-120\n    def convert_time(\n        self, source_tz: str, time_str: str, target_tz: str\n    ) -> TimeConversionResult:\n        \"\"\"Convert time between timezones\"\"\"\n        source_timezone = get_zoneinfo(source_tz)\n        target_timezone = get_zoneinfo(target_tz)\n\n        try:\n            parsed_time = datetime.strptime(time_str, \"%H:%M\").time()\n        except ValueError:\n            raise ValueError(\"Invalid time format. Expected HH:MM [24-hour format]\")\n\n        now = datetime.now(source_timezone)\n        source_time = datetime(\n            now.year,\n            now.month,\n            now.day,\n            parsed_time.hour,\n            parsed_time.minute,\n            tzinfo=source_timezone,\n        )\n\n        target_time = source_time.astimezone(target_timezone)\n        source_offset = source_time.utcoffset() or timedelta()\n        target_offset = target_time.utcoffset() or timedelta()\n        hours_difference = (target_offset - source_offset).total_seconds() / 3600\n\n        if hours_difference.is_integer():\n            time_diff_str = f\"{hours_difference:+.1f}h\"\n        else:\n            # For fractional hours like Nepal's UTC+5:45\n            time_diff_str = f\"{hours_difference:+.2f}\".rstrip(\"0\").rstrip(\".\") + \"h\"\n\n        return TimeConversionResult(\n            source=TimeResult(\n                timezone=source_tz,\n                datetime=source_time.isoformat(timespec=\"seconds\"),\n                day_of_week=source_time.strftime(\"%A\"),\n                is_dst=bool(source_time.dst()),\n            ),\n            target=TimeResult(\n                timezone=target_tz,\n                datetime=target_time.isoformat(timespec=\"seconds\"),\n                day_of_week=target_time.strftime(\"%A\"),\n                is_dst=bool(target_time.dst()),\n            ),\n            time_difference=time_diff_str,\n        )",
+      "depth_max": 0
+    }
+  }
+]
