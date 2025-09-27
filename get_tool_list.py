@@ -19,16 +19,17 @@ def serialize_tool(tool):
 
 config = {
     "mcpServers": {
-        "twolven_mcp-server-puppeteer-py": {
+        "Medical_calculator_MCP": {
             "command": "python",
-            "args": [f"{REPO_BASE}/twolven_mcp-server-puppeteer-py/puppeteer.py"]
-        }
-        # "Medical_calculator_MCP":{
+            "args": [
+                f"{REPO_BASE}/Medical_calculator_MCP/server.py"
+            ]
+        },
+        # "twolven_mcp-server-puppeteer-py": {
         #     "command": "python",
-        #     "args": [
-        #         f"{REPO_BASE}/Medical_calculator_MCP/server.py"
-        #     ]
-        # }
+        #     "args": [f"{REPO_BASE}/twolven_mcp-server-puppeteer-py/puppeteer.py"]
+        # },
+        
         # "mcp-aiven": {
         #     "command": "uv",
         #     "args": [

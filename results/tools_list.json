@@ -1,6 +1,6 @@
 [
   {
-    "name": "puppeteer_navigate",
+    "name": "twolven_mcp-server-puppeteer-py_puppeteer_navigate",
     "description": "Navigate to a URL",
     "input_schema": {
       "type": "object",
@@ -20,7 +20,7 @@
     "annotations": null
   },
   {
-    "name": "puppeteer_screenshot",
+    "name": "twolven_mcp-server-puppeteer-py_puppeteer_screenshot",
     "description": "Take a screenshot of the current page or a specific element",
     "input_schema": {
       "type": "object",
@@ -53,7 +53,7 @@
     "annotations": null
   },
   {
-    "name": "puppeteer_click",
+    "name": "twolven_mcp-server-puppeteer-py_puppeteer_click",
     "description": "Click an element on the page",
     "input_schema": {
       "type": "object",
@@ -74,7 +74,7 @@
     "annotations": null
   },
   {
-    "name": "puppeteer_fill",
+    "name": "twolven_mcp-server-puppeteer-py_puppeteer_fill",
     "description": "Fill out an input field",
     "input_schema": {
       "type": "object",
@@ -100,7 +100,7 @@
     "annotations": null
   },
   {
-    "name": "puppeteer_evaluate",
+    "name": "twolven_mcp-server-puppeteer-py_puppeteer_evaluate",
     "description": "Execute JavaScript in the browser console",
     "input_schema": {
       "type": "object",
