@@ -109,23 +109,48 @@ config = {
         #         ],
         #     "autoApprove": ["initialize_workspace"]
         # },
-        "mcp-clickhouse": {
-            "command": "uv",
+        # "mcp-clickhouse": {
+        #     "command": "uv",
+        #     "args": [
+        #         "run",
+        #         "--with",
+        #         "mcp-clickhouse",
+        #         "mcp-clickhouse"
+        #     ],
+        #     "env": {
+        #         "CLICKHOUSE_HOST": "sql-clickhouse.clickhouse.com",
+        #         "CLICKHOUSE_PORT": "8443",
+        #         "CLICKHOUSE_USER": "demo",
+        #         "CLICKHOUSE_PASSWORD": "",
+        #         "CLICKHOUSE_SECURE": "true",
+        #         "CLICKHOUSE_VERIFY": "true",
+        #         "CLICKHOUSE_CONNECT_TIMEOUT": "30",
+        #         "CLICKHOUSE_SEND_RECEIVE_TIMEOUT": "30"
+        #     }
+        # },
+        # "dappier-mcp": {
+        #     "command": "uvx",
+        #     "args": ["dappier-mcp"],
+        #     "env": {
+        #         "DAPPIER_API_KEY": "YOUR_API_KEY_HERE"
+        #     }
+        # },
+        # "atla-mcp-server": {
+        #     "command": "uvx",
+        #     "args": ["atla-mcp-server"],
+        #     "env": {
+        #         "ATLA_API_KEY": "<your-atla-api-key>"
+        #     }
+        # },
+        "mcp-metricool": {
+            "command": "uvx",
             "args": [
-                "run",
-                "--with",
-                "mcp-clickhouse",
-                "mcp-clickhouse"
+                "--upgrade",
+                "mcp-metricool"
             ],
             "env": {
-                "CLICKHOUSE_HOST": "sql-clickhouse.clickhouse.com",
-                "CLICKHOUSE_PORT": "8443",
-                "CLICKHOUSE_USER": "demo",
-                "CLICKHOUSE_PASSWORD": "",
-                "CLICKHOUSE_SECURE": "true",
-                "CLICKHOUSE_VERIFY": "true",
-                "CLICKHOUSE_CONNECT_TIMEOUT": "30",
-                "CLICKHOUSE_SEND_RECEIVE_TIMEOUT": "30"
+                "METRICOOL_USER_TOKEN": "<METRICOOL_USER_TOKEN>",
+                "METRICOOL_USER_ID": "<METRICOOL_USER_ID>"
             }
         },
         

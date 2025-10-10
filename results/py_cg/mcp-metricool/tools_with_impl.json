@@ -1,0 +1,992 @@
+[
+  {
+    "name": "get_brands",
+    "description": "\n    Get the list of brands from your Metricool account.\n    ",
+    "input_schema": {
+      "properties": {},
+      "title": "get_brandsArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/tools/tools.py\n# module: src.mcp_metricool.tools.tools\n# qname: src.mcp_metricool.tools.tools.get_brands\n# lines: 21-42\nasync def get_brands() -> list[dict[str, Any]]:\n    \"\"\"\n    Get the list of brands from your Metricool account.\n    \"\"\"\n\n    url = f\"{METRICOOL_BASE_URL}/v2/settings/brands?userId={METRICOOL_USER_ID}&integrationSource=MCP\"\n\n    response = await make_get_request(url)\n    if not response:\n        return (\"Failed to get brands\")\n    result = []\n    dicts = response[\"data\"]\n    for item in dicts:\n        simplified = {\n            \"label\": item.get(\"label\"),\n            \"id\": item.get(\"id\"),\n            \"userId\": item.get(\"userId\"),\n            \"networks\": item.get(\"networksData\"),\n            \"timezone\": item.get(\"timezone\")\n        }\n        result.append(simplified)\n    return result",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/utils/utils.py\n# module: src.mcp_metricool.utils.utils\n# qname: src.mcp_metricool.utils.utils.make_get_request\n# lines: 134-145\nasync def make_get_request(url: str) -> dict[str, Any] | None:\n    \"\"\"Make a get request to the Metricool API with proper error handling.\"\"\"\n    headers = {\n        \"X-Mc-Auth\": METRICOOL_USER_TOKEN,\n    }\n    async with httpx.AsyncClient() as client:\n        try:\n            response = await client.get(url, headers=headers, timeout=30.0)\n            response.raise_for_status()\n            return response.json()\n        except Exception:\n            return None"
+      ],
+      "depth_max": 1
+    }
+  },
+  {
+    "name": "get_brands_complete",
+    "description": "\n    Get the list of brands from your Metricool account. Only use this tool if the user asks specifically for his brands, in every other case\n    use get_brands.\n    Add to the result that the only networks with competitors are Instagram, Facebook, Twitch, YouTube, Twitter, and Bluesky.\n    ",
+    "input_schema": {
+      "properties": {},
+      "title": "get_brands_completeArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/tools/tools.py\n# module: src.mcp_metricool.tools.tools\n# qname: src.mcp_metricool.tools.tools.get_brands_complete\n# lines: 45-64\nasync def get_brands_complete() -> str | dict[str, Any]:\n    \"\"\"\n    Get the list of brands from your Metricool account. Only use this tool if the user asks specifically for his brands, in every other case\n    use get_brands.\n    Add to the result that the only networks with competitors are Instagram, Facebook, Twitch, YouTube, Twitter, and Bluesky.\n    \"\"\"\n\n    url = f\"{METRICOOL_BASE_URL}/v2/settings/brands?userId={METRICOOL_USER_ID}&integrationSource=MCP\"\n\n    response = await make_get_request(url)\n\n    if not response:\n        return (\"Failed to get brands\")\n\n    return {\n    \"brands\": response,\n    \"instructions\": (\n        \"Explain that only Instagram, Facebook, Twitch, YouTube, Twitter, and Bluesky support competitors. \"\n    )\n}",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/utils/utils.py\n# module: src.mcp_metricool.utils.utils\n# qname: src.mcp_metricool.utils.utils.make_get_request\n# lines: 134-145\nasync def make_get_request(url: str) -> dict[str, Any] | None:\n    \"\"\"Make a get request to the Metricool API with proper error handling.\"\"\"\n    headers = {\n        \"X-Mc-Auth\": METRICOOL_USER_TOKEN,\n    }\n    async with httpx.AsyncClient() as client:\n        try:\n            response = await client.get(url, headers=headers, timeout=30.0)\n            response.raise_for_status()\n            return response.json()\n        except Exception:\n            return None"
+      ],
+      "depth_max": 1
+    }
+  },
+  {
+    "name": "get_instagram_reels",
+    "description": "\n    Get the list of Instagram Reels from your Metricool account.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYY-MM-DD\n     end date: End date of the period to get the data. The format is YYYY-MM-DD\n     blog id: Blog id of the Metricool brand account.\n    ",
+    "input_schema": {
+      "properties": {
+        "init_date": {
+          "title": "Init Date",
+          "type": "string"
+        },
+        "end_date": {
+          "title": "End Date",
+          "type": "string"
+        },
+        "blog_id": {
+          "title": "Blog Id",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "init_date",
+        "end_date",
+        "blog_id"
+      ],
+      "title": "get_instagram_reelsArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/tools/tools.py\n# module: src.mcp_metricool.tools.tools\n# qname: src.mcp_metricool.tools.tools.get_instagram_reels\n# lines: 67-84\nasync def get_instagram_reels(init_date: str, end_date: str, blog_id: int) -> str | dict[str, Any]:\n    \"\"\"\n    Get the list of Instagram Reels from your Metricool account.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYY-MM-DD\n     end date: End date of the period to get the data. The format is YYYY-MM-DD\n     blog id: Blog id of the Metricool brand account.\n    \"\"\"\n\n    url = f\"{METRICOOL_BASE_URL}/v2/analytics/reels/instagram?from={init_date}T00%3A00%3A00&to={end_date}T23%3A59%3A59&blogId={blog_id}&userId={METRICOOL_USER_ID}&integrationSource=MCP\"\n\n    response = await make_get_request(url)\n\n    if not response:\n        return (\"Failed to get Instagram Reels\")\n\n    return response",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/utils/utils.py\n# module: src.mcp_metricool.utils.utils\n# qname: src.mcp_metricool.utils.utils.make_get_request\n# lines: 134-145\nasync def make_get_request(url: str) -> dict[str, Any] | None:\n    \"\"\"Make a get request to the Metricool API with proper error handling.\"\"\"\n    headers = {\n        \"X-Mc-Auth\": METRICOOL_USER_TOKEN,\n    }\n    async with httpx.AsyncClient() as client:\n        try:\n            response = await client.get(url, headers=headers, timeout=30.0)\n            response.raise_for_status()\n            return response.json()\n        except Exception:\n            return None"
+      ],
+      "depth_max": 1
+    }
+  },
+  {
+    "name": "get_instagram_posts",
+    "description": "\n    Get the list of Instagram Posts from your Metricool account.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYY-MM-DD\n     end date: End date of the period to get the data. The format is YYYY-MM-DD\n     blog id: Blog id of the Metricool brand account.\n    ",
+    "input_schema": {
+      "properties": {
+        "init_date": {
+          "title": "Init Date",
+          "type": "string"
+        },
+        "end_date": {
+          "title": "End Date",
+          "type": "string"
+        },
+        "blog_id": {
+          "title": "Blog Id",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "init_date",
+        "end_date",
+        "blog_id"
+      ],
+      "title": "get_instagram_postsArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/tools/tools.py\n# module: src.mcp_metricool.tools.tools\n# qname: src.mcp_metricool.tools.tools.get_instagram_posts\n# lines: 87-104\nasync def get_instagram_posts(init_date: str, end_date: str, blog_id: int) -> str | dict[str, Any]:\n    \"\"\"\n    Get the list of Instagram Posts from your Metricool account.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYY-MM-DD\n     end date: End date of the period to get the data. The format is YYYY-MM-DD\n     blog id: Blog id of the Metricool brand account.\n    \"\"\"\n\n    url = f\"{METRICOOL_BASE_URL}/v2/analytics/posts/instagram?from={init_date}T00%3A00%3A00&to={end_date}T23%3A59%3A59&blogId={blog_id}&userId={METRICOOL_USER_ID}&integrationSource=MCP\"\n\n    response = await make_get_request(url)\n\n    if not response:\n        return (\"Failed to get Instagram Posts\")\n\n    return response",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/utils/utils.py\n# module: src.mcp_metricool.utils.utils\n# qname: src.mcp_metricool.utils.utils.make_get_request\n# lines: 134-145\nasync def make_get_request(url: str) -> dict[str, Any] | None:\n    \"\"\"Make a get request to the Metricool API with proper error handling.\"\"\"\n    headers = {\n        \"X-Mc-Auth\": METRICOOL_USER_TOKEN,\n    }\n    async with httpx.AsyncClient() as client:\n        try:\n            response = await client.get(url, headers=headers, timeout=30.0)\n            response.raise_for_status()\n            return response.json()\n        except Exception:\n            return None"
+      ],
+      "depth_max": 1
+    }
+  },
+  {
+    "name": "get_instagram_stories",
+    "description": "\n    Get the list of Instagram Stories from your Metricool account.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYY-MM-DD\n     end date: End date of the period to get the data. The format is YYYY-MM-DD\n     blog id: Blog id of the Metricool brand account.\n    ",
+    "input_schema": {
+      "properties": {
+        "init_date": {
+          "title": "Init Date",
+          "type": "string"
+        },
+        "end_date": {
+          "title": "End Date",
+          "type": "string"
+        },
+        "blog_id": {
+          "title": "Blog Id",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "init_date",
+        "end_date",
+        "blog_id"
+      ],
+      "title": "get_instagram_storiesArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/tools/tools.py\n# module: src.mcp_metricool.tools.tools\n# qname: src.mcp_metricool.tools.tools.get_instagram_stories\n# lines: 107-124\nasync def get_instagram_stories(init_date: str, end_date: str, blog_id: int) -> str | dict[str, Any]:\n    \"\"\"\n    Get the list of Instagram Stories from your Metricool account.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYY-MM-DD\n     end date: End date of the period to get the data. The format is YYYY-MM-DD\n     blog id: Blog id of the Metricool brand account.\n    \"\"\"\n\n    url = f\"{METRICOOL_BASE_URL}/v2/analytics/stories/instagram?from={init_date}T00%3A00%3A00&to={end_date}T23%3A59%3A59&blogId={blog_id}&userId={METRICOOL_USER_ID}&integrationSource=MCP\"\n\n    response = await make_get_request(url)\n\n    if not response:\n        return (\"Failed to get Instagram Stories\")\n\n    return response",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/utils/utils.py\n# module: src.mcp_metricool.utils.utils\n# qname: src.mcp_metricool.utils.utils.make_get_request\n# lines: 134-145\nasync def make_get_request(url: str) -> dict[str, Any] | None:\n    \"\"\"Make a get request to the Metricool API with proper error handling.\"\"\"\n    headers = {\n        \"X-Mc-Auth\": METRICOOL_USER_TOKEN,\n    }\n    async with httpx.AsyncClient() as client:\n        try:\n            response = await client.get(url, headers=headers, timeout=30.0)\n            response.raise_for_status()\n            return response.json()\n        except Exception:\n            return None"
+      ],
+      "depth_max": 1
+    }
+  },
+  {
+    "name": "get_tiktok_videos",
+    "description": "\n    Get the list of Tiktok Videos from your Metricool account.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYY-MM-DD\n     end date: End date of the period to get the data. The format is YYYY-MM-DD\n     blog id: Blog id of the Metricool brand account.\n    ",
+    "input_schema": {
+      "properties": {
+        "init_date": {
+          "title": "Init Date",
+          "type": "string"
+        },
+        "end_date": {
+          "title": "End Date",
+          "type": "string"
+        },
+        "blog_id": {
+          "title": "Blog Id",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "init_date",
+        "end_date",
+        "blog_id"
+      ],
+      "title": "get_tiktok_videosArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/tools/tools.py\n# module: src.mcp_metricool.tools.tools\n# qname: src.mcp_metricool.tools.tools.get_tiktok_videos\n# lines: 127-144\nasync def get_tiktok_videos(init_date: str, end_date: str, blog_id: int) -> str | dict[str, Any]:\n    \"\"\"\n    Get the list of Tiktok Videos from your Metricool account.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYY-MM-DD\n     end date: End date of the period to get the data. The format is YYYY-MM-DD\n     blog id: Blog id of the Metricool brand account.\n    \"\"\"\n\n    url = f\"{METRICOOL_BASE_URL}/v2/analytics/posts/tiktok?from={init_date}T00%3A00%3A00&to={end_date}T23%3A59%3A59&blogId={blog_id}&userId={METRICOOL_USER_ID}&integrationSource=MCP\"\n\n    response = await make_get_request(url)\n\n    if not response:\n        return (\"Failed to get Tiktok Videos\")\n\n    return response",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/utils/utils.py\n# module: src.mcp_metricool.utils.utils\n# qname: src.mcp_metricool.utils.utils.make_get_request\n# lines: 134-145\nasync def make_get_request(url: str) -> dict[str, Any] | None:\n    \"\"\"Make a get request to the Metricool API with proper error handling.\"\"\"\n    headers = {\n        \"X-Mc-Auth\": METRICOOL_USER_TOKEN,\n    }\n    async with httpx.AsyncClient() as client:\n        try:\n            response = await client.get(url, headers=headers, timeout=30.0)\n            response.raise_for_status()\n            return response.json()\n        except Exception:\n            return None"
+      ],
+      "depth_max": 1
+    }
+  },
+  {
+    "name": "get_facebook_reels",
+    "description": "\n    Get the list of Facebook Reels from your Metricool account.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYY-MM-DD\n     end date: End date of the period to get the data. The format is YYYY-MM-DD\n     blog id: Blog id of the Metricool brand account.\n    ",
+    "input_schema": {
+      "properties": {
+        "init_date": {
+          "title": "Init Date",
+          "type": "string"
+        },
+        "end_date": {
+          "title": "End Date",
+          "type": "string"
+        },
+        "blog_id": {
+          "title": "Blog Id",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "init_date",
+        "end_date",
+        "blog_id"
+      ],
+      "title": "get_facebook_reelsArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/tools/tools.py\n# module: src.mcp_metricool.tools.tools\n# qname: src.mcp_metricool.tools.tools.get_facebook_reels\n# lines: 147-164\nasync def get_facebook_reels(init_date: str, end_date: str, blog_id: int) -> str | dict[str, Any]:\n    \"\"\"\n    Get the list of Facebook Reels from your Metricool account.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYY-MM-DD\n     end date: End date of the period to get the data. The format is YYYY-MM-DD\n     blog id: Blog id of the Metricool brand account.\n    \"\"\"\n\n    url = f\"{METRICOOL_BASE_URL}/v2/analytics/reels/facebook?from={init_date}T00%3A00%3A00&to={end_date}T23%3A59%3A59&blogId={blog_id}&userId={METRICOOL_USER_ID}&integrationSource=MCP\"\n\n    response = await make_get_request(url)\n\n    if not response:\n        return (\"Failed to get Facebook Reels\")\n\n    return response",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/utils/utils.py\n# module: src.mcp_metricool.utils.utils\n# qname: src.mcp_metricool.utils.utils.make_get_request\n# lines: 134-145\nasync def make_get_request(url: str) -> dict[str, Any] | None:\n    \"\"\"Make a get request to the Metricool API with proper error handling.\"\"\"\n    headers = {\n        \"X-Mc-Auth\": METRICOOL_USER_TOKEN,\n    }\n    async with httpx.AsyncClient() as client:\n        try:\n            response = await client.get(url, headers=headers, timeout=30.0)\n            response.raise_for_status()\n            return response.json()\n        except Exception:\n            return None"
+      ],
+      "depth_max": 1
+    }
+  },
+  {
+    "name": "get_facebook_posts",
+    "description": "\n    Get the list of Facebook Posts from your Metricool brand account.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYY-MM-DD\n     end date: End date of the period to get the data. The format is YYYY-MM-DD\n     blog id: Blog id of the Metricool brand account.\n    ",
+    "input_schema": {
+      "properties": {
+        "init_date": {
+          "title": "Init Date",
+          "type": "string"
+        },
+        "end_date": {
+          "title": "End Date",
+          "type": "string"
+        },
+        "blog_id": {
+          "title": "Blog Id",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "init_date",
+        "end_date",
+        "blog_id"
+      ],
+      "title": "get_facebook_postsArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/tools/tools.py\n# module: src.mcp_metricool.tools.tools\n# qname: src.mcp_metricool.tools.tools.get_facebook_posts\n# lines: 167-184\nasync def get_facebook_posts(init_date: str, end_date: str, blog_id: int) -> str | dict[str, Any]:\n    \"\"\"\n    Get the list of Facebook Posts from your Metricool brand account.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYY-MM-DD\n     end date: End date of the period to get the data. The format is YYYY-MM-DD\n     blog id: Blog id of the Metricool brand account.\n    \"\"\"\n\n    url = f\"{METRICOOL_BASE_URL}/v2/analytics/posts/facebook?from={init_date}T00%3A00%3A00&to={end_date}T23%3A59%3A59&blogId={blog_id}&userId={METRICOOL_USER_ID}&integrationSource=MCP\"\n\n    response = await make_get_request(url)\n\n    if not response:\n        return (\"Failed to get Facebook Posts\")\n\n    return response",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/utils/utils.py\n# module: src.mcp_metricool.utils.utils\n# qname: src.mcp_metricool.utils.utils.make_get_request\n# lines: 134-145\nasync def make_get_request(url: str) -> dict[str, Any] | None:\n    \"\"\"Make a get request to the Metricool API with proper error handling.\"\"\"\n    headers = {\n        \"X-Mc-Auth\": METRICOOL_USER_TOKEN,\n    }\n    async with httpx.AsyncClient() as client:\n        try:\n            response = await client.get(url, headers=headers, timeout=30.0)\n            response.raise_for_status()\n            return response.json()\n        except Exception:\n            return None"
+      ],
+      "depth_max": 1
+    }
+  },
+  {
+    "name": "get_facebook_stories",
+    "description": "\n    Get the list of Facebook Stories from your Metricool brand account.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYY-MM-DD\n     end date: End date of the period to get the data. The format is YYYY-MM-DD\n     blog id: Blog id of the Metricool brand account.\n    ",
+    "input_schema": {
+      "properties": {
+        "init_date": {
+          "title": "Init Date",
+          "type": "string"
+        },
+        "end_date": {
+          "title": "End Date",
+          "type": "string"
+        },
+        "blog_id": {
+          "title": "Blog Id",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "init_date",
+        "end_date",
+        "blog_id"
+      ],
+      "title": "get_facebook_storiesArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/tools/tools.py\n# module: src.mcp_metricool.tools.tools\n# qname: src.mcp_metricool.tools.tools.get_facebook_stories\n# lines: 187-204\nasync def get_facebook_stories(init_date: str, end_date: str, blog_id: int) -> str | dict[str, Any]:\n    \"\"\"\n    Get the list of Facebook Stories from your Metricool brand account.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYY-MM-DD\n     end date: End date of the period to get the data. The format is YYYY-MM-DD\n     blog id: Blog id of the Metricool brand account.\n    \"\"\"\n\n    url = f\"{METRICOOL_BASE_URL}/v2/analytics/stories/facebook?from={init_date}T00%3A00%3A00&to={end_date}T23%3A59%3A59&blogId={blog_id}&userId={METRICOOL_USER_ID}&integrationSource=MCP\"\n\n    response = await make_get_request(url)\n\n    if not response:\n        return (\"Failed to get Facebook Stories\")\n\n    return response",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/utils/utils.py\n# module: src.mcp_metricool.utils.utils\n# qname: src.mcp_metricool.utils.utils.make_get_request\n# lines: 134-145\nasync def make_get_request(url: str) -> dict[str, Any] | None:\n    \"\"\"Make a get request to the Metricool API with proper error handling.\"\"\"\n    headers = {\n        \"X-Mc-Auth\": METRICOOL_USER_TOKEN,\n    }\n    async with httpx.AsyncClient() as client:\n        try:\n            response = await client.get(url, headers=headers, timeout=30.0)\n            response.raise_for_status()\n            return response.json()\n        except Exception:\n            return None"
+      ],
+      "depth_max": 1
+    }
+  },
+  {
+    "name": "get_thread_posts",
+    "description": "\n    Get the list of Threads Posts from your Metricool brand account.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYY-MM-DD\n     end date: End date of the period to get the data. The format is YYYY-MM-DD\n     blog id: Blog id of the Metricool brand account.\n    ",
+    "input_schema": {
+      "properties": {
+        "init_date": {
+          "title": "Init Date",
+          "type": "string"
+        },
+        "end_date": {
+          "title": "End Date",
+          "type": "string"
+        },
+        "blog_id": {
+          "title": "Blog Id",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "init_date",
+        "end_date",
+        "blog_id"
+      ],
+      "title": "get_thread_postsArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/tools/tools.py\n# module: src.mcp_metricool.tools.tools\n# qname: src.mcp_metricool.tools.tools.get_thread_posts\n# lines: 207-224\nasync def get_thread_posts(init_date: str, end_date: str, blog_id: int) -> str | dict[str, Any]:\n    \"\"\"\n    Get the list of Threads Posts from your Metricool brand account.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYY-MM-DD\n     end date: End date of the period to get the data. The format is YYYY-MM-DD\n     blog id: Blog id of the Metricool brand account.\n    \"\"\"\n\n    url = f\"{METRICOOL_BASE_URL}/v2/analytics/posts/threads?from={init_date}T00%3A00%3A00&to={end_date}T23%3A59%3A59&blogId={blog_id}&userId={METRICOOL_USER_ID}&integrationSource=MCP\"\n\n    response = await make_get_request(url)\n\n    if not response:\n        return (\"Failed to get Threads Posts\")\n\n    return response",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/utils/utils.py\n# module: src.mcp_metricool.utils.utils\n# qname: src.mcp_metricool.utils.utils.make_get_request\n# lines: 134-145\nasync def make_get_request(url: str) -> dict[str, Any] | None:\n    \"\"\"Make a get request to the Metricool API with proper error handling.\"\"\"\n    headers = {\n        \"X-Mc-Auth\": METRICOOL_USER_TOKEN,\n    }\n    async with httpx.AsyncClient() as client:\n        try:\n            response = await client.get(url, headers=headers, timeout=30.0)\n            response.raise_for_status()\n            return response.json()\n        except Exception:\n            return None"
+      ],
+      "depth_max": 1
+    }
+  },
+  {
+    "name": "get_x_posts",
+    "description": "\n    Get the list of X (Twitter) Posts from your Metricool account.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYYMMDD\n     end date: End date of the period to get the data. The format is YYYYMMDD\n     blog id: Blog id of the Metricool brand account.\n    ",
+    "input_schema": {
+      "properties": {
+        "init_date": {
+          "title": "Init Date",
+          "type": "string"
+        },
+        "end_date": {
+          "title": "End Date",
+          "type": "string"
+        },
+        "blog_id": {
+          "title": "Blog Id",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "init_date",
+        "end_date",
+        "blog_id"
+      ],
+      "title": "get_x_postsArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/tools/tools.py\n# module: src.mcp_metricool.tools.tools\n# qname: src.mcp_metricool.tools.tools.get_x_posts\n# lines: 227-244\nasync def get_x_posts(init_date: str, end_date: str, blog_id: int) -> str | dict[str, Any]:\n    \"\"\"\n    Get the list of X (Twitter) Posts from your Metricool account.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYYMMDD\n     end date: End date of the period to get the data. The format is YYYYMMDD\n     blog id: Blog id of the Metricool brand account.\n    \"\"\"\n\n    url = f\"{METRICOOL_BASE_URL}/stats/twitter/posts?start={init_date}&end={end_date}&blogId={blog_id}&userId={METRICOOL_USER_ID}&integrationSource=MCP\"\n\n    response = await make_get_request(url)\n\n    if not response:\n        return (\"Failed to get X Posts\")\n\n    return response",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/utils/utils.py\n# module: src.mcp_metricool.utils.utils\n# qname: src.mcp_metricool.utils.utils.make_get_request\n# lines: 134-145\nasync def make_get_request(url: str) -> dict[str, Any] | None:\n    \"\"\"Make a get request to the Metricool API with proper error handling.\"\"\"\n    headers = {\n        \"X-Mc-Auth\": METRICOOL_USER_TOKEN,\n    }\n    async with httpx.AsyncClient() as client:\n        try:\n            response = await client.get(url, headers=headers, timeout=30.0)\n            response.raise_for_status()\n            return response.json()\n        except Exception:\n            return None"
+      ],
+      "depth_max": 1
+    }
+  },
+  {
+    "name": "get_bluesky_posts",
+    "description": "\n    Get the list of Bluesky Posts from your Metricool brand account.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYY-MM-DD\n     end date: End date of the period to get the data. The format is YYYY-MM-DD\n     blog id: Blog id of the Metricool brand account.\n    ",
+    "input_schema": {
+      "properties": {
+        "init_date": {
+          "title": "Init Date",
+          "type": "string"
+        },
+        "end_date": {
+          "title": "End Date",
+          "type": "string"
+        },
+        "blog_id": {
+          "title": "Blog Id",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "init_date",
+        "end_date",
+        "blog_id"
+      ],
+      "title": "get_bluesky_postsArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/tools/tools.py\n# module: src.mcp_metricool.tools.tools\n# qname: src.mcp_metricool.tools.tools.get_bluesky_posts\n# lines: 247-264\nasync def get_bluesky_posts(init_date: str, end_date: str, blog_id: int) -> str | dict[str, Any]:\n    \"\"\"\n    Get the list of Bluesky Posts from your Metricool brand account.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYY-MM-DD\n     end date: End date of the period to get the data. The format is YYYY-MM-DD\n     blog id: Blog id of the Metricool brand account.\n    \"\"\"\n\n    url = f\"{METRICOOL_BASE_URL}/v2/analytics/posts/bluesky?from={init_date}T00%3A00%3A00&to={end_date}T23%3A59%3A59&blogId={blog_id}&userId={METRICOOL_USER_ID}&integrationSource=MCP\"\n\n    response = await make_get_request(url)\n\n    if not response:\n        return (\"Failed to get Bluesky Posts\")\n\n    return response",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/utils/utils.py\n# module: src.mcp_metricool.utils.utils\n# qname: src.mcp_metricool.utils.utils.make_get_request\n# lines: 134-145\nasync def make_get_request(url: str) -> dict[str, Any] | None:\n    \"\"\"Make a get request to the Metricool API with proper error handling.\"\"\"\n    headers = {\n        \"X-Mc-Auth\": METRICOOL_USER_TOKEN,\n    }\n    async with httpx.AsyncClient() as client:\n        try:\n            response = await client.get(url, headers=headers, timeout=30.0)\n            response.raise_for_status()\n            return response.json()\n        except Exception:\n            return None"
+      ],
+      "depth_max": 1
+    }
+  },
+  {
+    "name": "get_linkedin_posts",
+    "description": "\n    Get the list of Linkedin Posts from your Metricool brand account.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYY-MM-DD\n     end date: End date of the period to get the data. The format is YYYY-MM-DD\n     blog id: Blog id of the Metricool brand account.\n    ",
+    "input_schema": {
+      "properties": {
+        "init_date": {
+          "title": "Init Date",
+          "type": "string"
+        },
+        "end_date": {
+          "title": "End Date",
+          "type": "string"
+        },
+        "blog_id": {
+          "title": "Blog Id",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "init_date",
+        "end_date",
+        "blog_id"
+      ],
+      "title": "get_linkedin_postsArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/tools/tools.py\n# module: src.mcp_metricool.tools.tools\n# qname: src.mcp_metricool.tools.tools.get_linkedin_posts\n# lines: 267-284\nasync def get_linkedin_posts(init_date: str, end_date: str, blog_id: int) -> str | dict[str, Any]:\n    \"\"\"\n    Get the list of Linkedin Posts from your Metricool brand account.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYY-MM-DD\n     end date: End date of the period to get the data. The format is YYYY-MM-DD\n     blog id: Blog id of the Metricool brand account.\n    \"\"\"\n\n    url = f\"{METRICOOL_BASE_URL}/v2/analytics/posts/linkedin?from={init_date}T00%3A00%3A00&to={end_date}T23%3A59%3A59&blogId={blog_id}&userId={METRICOOL_USER_ID}&integrationSource=MCP\"\n\n    response = await make_get_request(url)\n\n    if not response:\n        return (\"Failed to get Linkedin Posts\")\n\n    return response",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/utils/utils.py\n# module: src.mcp_metricool.utils.utils\n# qname: src.mcp_metricool.utils.utils.make_get_request\n# lines: 134-145\nasync def make_get_request(url: str) -> dict[str, Any] | None:\n    \"\"\"Make a get request to the Metricool API with proper error handling.\"\"\"\n    headers = {\n        \"X-Mc-Auth\": METRICOOL_USER_TOKEN,\n    }\n    async with httpx.AsyncClient() as client:\n        try:\n            response = await client.get(url, headers=headers, timeout=30.0)\n            response.raise_for_status()\n            return response.json()\n        except Exception:\n            return None"
+      ],
+      "depth_max": 1
+    }
+  },
+  {
+    "name": "get_pinterest_pins",
+    "description": "\n    Get the list of Pinterest Pins from your Metricool brand account.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYY-MM-DD\n     end date: End date of the period to get the data. The format is YYYY-MM-DD\n     blog id: Blog id of the Metricool brand account.\n    ",
+    "input_schema": {
+      "properties": {
+        "init_date": {
+          "title": "Init Date",
+          "type": "string"
+        },
+        "end_date": {
+          "title": "End Date",
+          "type": "string"
+        },
+        "blog_id": {
+          "title": "Blog Id",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "init_date",
+        "end_date",
+        "blog_id"
+      ],
+      "title": "get_pinterest_pinsArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/tools/tools.py\n# module: src.mcp_metricool.tools.tools\n# qname: src.mcp_metricool.tools.tools.get_pinterest_pins\n# lines: 287-304\nasync def get_pinterest_pins(init_date: str, end_date: str, blog_id: int) -> str | dict[str, Any]:\n    \"\"\"\n    Get the list of Pinterest Pins from your Metricool brand account.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYY-MM-DD\n     end date: End date of the period to get the data. The format is YYYY-MM-DD\n     blog id: Blog id of the Metricool brand account.\n    \"\"\"\n\n    url = f\"{METRICOOL_BASE_URL}/v2/analytics/posts/pinterest?from={init_date}T00%3A00%3A00&to={end_date}T23%3A59%3A59&blogId={blog_id}&userId={METRICOOL_USER_ID}&integrationSource=MCP\"\n\n    response = await make_get_request(url)\n\n    if not response:\n        return (\"Failed to get Pinterest Pins\")\n\n    return response",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/utils/utils.py\n# module: src.mcp_metricool.utils.utils\n# qname: src.mcp_metricool.utils.utils.make_get_request\n# lines: 134-145\nasync def make_get_request(url: str) -> dict[str, Any] | None:\n    \"\"\"Make a get request to the Metricool API with proper error handling.\"\"\"\n    headers = {\n        \"X-Mc-Auth\": METRICOOL_USER_TOKEN,\n    }\n    async with httpx.AsyncClient() as client:\n        try:\n            response = await client.get(url, headers=headers, timeout=30.0)\n            response.raise_for_status()\n            return response.json()\n        except Exception:\n            return None"
+      ],
+      "depth_max": 1
+    }
+  },
+  {
+    "name": "get_youtube_videos",
+    "description": "\n    Get the list of Youtube Videos from your Metricool brand account.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYY-MM-DD\n     end date: End date of the period to get the data. The format is YYYY-MM-DD\n     blog id: Blog id of the Metricool brand account.\n    ",
+    "input_schema": {
+      "properties": {
+        "init_date": {
+          "title": "Init Date",
+          "type": "string"
+        },
+        "end_date": {
+          "title": "End Date",
+          "type": "string"
+        },
+        "blog_id": {
+          "title": "Blog Id",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "init_date",
+        "end_date",
+        "blog_id"
+      ],
+      "title": "get_youtube_videosArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/tools/tools.py\n# module: src.mcp_metricool.tools.tools\n# qname: src.mcp_metricool.tools.tools.get_youtube_videos\n# lines: 307-324\nasync def get_youtube_videos(init_date: str, end_date: str, blog_id: int) -> str | dict[str, Any]:\n    \"\"\"\n    Get the list of Youtube Videos from your Metricool brand account.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYY-MM-DD\n     end date: End date of the period to get the data. The format is YYYY-MM-DD\n     blog id: Blog id of the Metricool brand account.\n    \"\"\"\n\n    url = f\"{METRICOOL_BASE_URL}/v2/analytics/posts/youtube?from={init_date}T00%3A00%3A00&to={end_date}T23%3A59%3A59&blogId={blog_id}&userId={METRICOOL_USER_ID}&integrationSource=MCP\"\n\n    response = await make_get_request(url)\n\n    if not response:\n        return (\"Failed to get Youtube Videos\")\n\n    return response",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/utils/utils.py\n# module: src.mcp_metricool.utils.utils\n# qname: src.mcp_metricool.utils.utils.make_get_request\n# lines: 134-145\nasync def make_get_request(url: str) -> dict[str, Any] | None:\n    \"\"\"Make a get request to the Metricool API with proper error handling.\"\"\"\n    headers = {\n        \"X-Mc-Auth\": METRICOOL_USER_TOKEN,\n    }\n    async with httpx.AsyncClient() as client:\n        try:\n            response = await client.get(url, headers=headers, timeout=30.0)\n            response.raise_for_status()\n            return response.json()\n        except Exception:\n            return None"
+      ],
+      "depth_max": 1
+    }
+  },
+  {
+    "name": "get_twitch_videos",
+    "description": "\n    Get the list of Twitch Videos from your Metricool account.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYYMMDD\n     end date: End date of the period to get the data. The format is YYYYMMDD\n     blog id: Blog id of the Metricool brand account.\n    ",
+    "input_schema": {
+      "properties": {
+        "init_date": {
+          "title": "Init Date",
+          "type": "string"
+        },
+        "end_date": {
+          "title": "End Date",
+          "type": "string"
+        },
+        "blog_id": {
+          "title": "Blog Id",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "init_date",
+        "end_date",
+        "blog_id"
+      ],
+      "title": "get_twitch_videosArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/tools/tools.py\n# module: src.mcp_metricool.tools.tools\n# qname: src.mcp_metricool.tools.tools.get_twitch_videos\n# lines: 327-344\nasync def get_twitch_videos(init_date: str, end_date: str, blog_id: int) -> str | dict[str, Any]:\n    \"\"\"\n    Get the list of Twitch Videos from your Metricool account.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYYMMDD\n     end date: End date of the period to get the data. The format is YYYYMMDD\n     blog id: Blog id of the Metricool brand account.\n    \"\"\"\n\n    url = f\"{METRICOOL_BASE_URL}/stats/twitch/videos?start={init_date}&end={end_date}&blogId={blog_id}&userId={METRICOOL_USER_ID}&integrationSource=MCP\"\n\n    response = await make_get_request(url)\n\n    if not response:\n        return (\"Failed to get Twitch Videos\")\n\n    return response",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/utils/utils.py\n# module: src.mcp_metricool.utils.utils\n# qname: src.mcp_metricool.utils.utils.make_get_request\n# lines: 134-145\nasync def make_get_request(url: str) -> dict[str, Any] | None:\n    \"\"\"Make a get request to the Metricool API with proper error handling.\"\"\"\n    headers = {\n        \"X-Mc-Auth\": METRICOOL_USER_TOKEN,\n    }\n    async with httpx.AsyncClient() as client:\n        try:\n            response = await client.get(url, headers=headers, timeout=30.0)\n            response.raise_for_status()\n            return response.json()\n        except Exception:\n            return None"
+      ],
+      "depth_max": 1
+    }
+  },
+  {
+    "name": "get_facebookads_campaigns",
+    "description": "\n    Get the list of Facebook Ads Campaigns from your Metricool account.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYYMMDD\n     end date: End date of the period to get the data. The format is YYYYMMDD\n     blog id: Blog id of the Metricool brand account.\n    ",
+    "input_schema": {
+      "properties": {
+        "init_date": {
+          "title": "Init Date",
+          "type": "string"
+        },
+        "end_date": {
+          "title": "End Date",
+          "type": "string"
+        },
+        "blog_id": {
+          "title": "Blog Id",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "init_date",
+        "end_date",
+        "blog_id"
+      ],
+      "title": "get_facebookads_campaignsArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/tools/tools.py\n# module: src.mcp_metricool.tools.tools\n# qname: src.mcp_metricool.tools.tools.get_facebookads_campaigns\n# lines: 347-364\nasync def get_facebookads_campaigns(init_date: str, end_date: str, blog_id: int) -> str | list[dict[str, Any]]:\n    \"\"\"\n    Get the list of Facebook Ads Campaigns from your Metricool account.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYYMMDD\n     end date: End date of the period to get the data. The format is YYYYMMDD\n     blog id: Blog id of the Metricool brand account.\n    \"\"\"\n\n    url = f\"{METRICOOL_BASE_URL}/stats/facebookads/campaigns?start={init_date}&end={end_date}&blogId={blog_id}&userId={METRICOOL_USER_ID}&integrationSource=MCP\"\n\n    response = await make_get_request(url)\n\n    if not response:\n        return (\"Failed to get Facebook Ads Campaigns\")\n\n    return response",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/utils/utils.py\n# module: src.mcp_metricool.utils.utils\n# qname: src.mcp_metricool.utils.utils.make_get_request\n# lines: 134-145\nasync def make_get_request(url: str) -> dict[str, Any] | None:\n    \"\"\"Make a get request to the Metricool API with proper error handling.\"\"\"\n    headers = {\n        \"X-Mc-Auth\": METRICOOL_USER_TOKEN,\n    }\n    async with httpx.AsyncClient() as client:\n        try:\n            response = await client.get(url, headers=headers, timeout=30.0)\n            response.raise_for_status()\n            return response.json()\n        except Exception:\n            return None"
+      ],
+      "depth_max": 1
+    }
+  },
+  {
+    "name": "get_googleads_campaigns",
+    "description": "\n    Get the list of Google Ads Campaigns from your Metricool account.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYYMMDD\n     end date: End date of the period to get the data. The format is YYYYMMDD\n     blog id: Blog id of the Metricool brand account.\n    ",
+    "input_schema": {
+      "properties": {
+        "init_date": {
+          "title": "Init Date",
+          "type": "string"
+        },
+        "end_date": {
+          "title": "End Date",
+          "type": "string"
+        },
+        "blog_id": {
+          "title": "Blog Id",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "init_date",
+        "end_date",
+        "blog_id"
+      ],
+      "title": "get_googleads_campaignsArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/tools/tools.py\n# module: src.mcp_metricool.tools.tools\n# qname: src.mcp_metricool.tools.tools.get_googleads_campaigns\n# lines: 367-384\nasync def get_googleads_campaigns(init_date: str, end_date: str, blog_id: int) -> str | list[dict[str, Any]]:\n    \"\"\"\n    Get the list of Google Ads Campaigns from your Metricool account.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYYMMDD\n     end date: End date of the period to get the data. The format is YYYYMMDD\n     blog id: Blog id of the Metricool brand account.\n    \"\"\"\n\n    url = f\"{METRICOOL_BASE_URL}/stats/adwords/campaigns?start={init_date}&end={end_date}&blogId={blog_id}&userId={METRICOOL_USER_ID}&integrationSource=MCP\"\n\n    response = await make_get_request(url)\n\n    if not response:\n        return (\"Failed to get Google Ads Campaigns\")\n\n    return response",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/utils/utils.py\n# module: src.mcp_metricool.utils.utils\n# qname: src.mcp_metricool.utils.utils.make_get_request\n# lines: 134-145\nasync def make_get_request(url: str) -> dict[str, Any] | None:\n    \"\"\"Make a get request to the Metricool API with proper error handling.\"\"\"\n    headers = {\n        \"X-Mc-Auth\": METRICOOL_USER_TOKEN,\n    }\n    async with httpx.AsyncClient() as client:\n        try:\n            response = await client.get(url, headers=headers, timeout=30.0)\n            response.raise_for_status()\n            return response.json()\n        except Exception:\n            return None"
+      ],
+      "depth_max": 1
+    }
+  },
+  {
+    "name": "get_tiktokads_campaigns",
+    "description": "\n    Get the list of Tiktok Ads Campaigns from your Metricool brand account.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYY-MM-DD\n     end date: End date of the period to get the data. The format is YYYY-MM-DD\n     blog id: Blog id of the Metricool brand account.\n    ",
+    "input_schema": {
+      "properties": {
+        "init_date": {
+          "title": "Init Date",
+          "type": "string"
+        },
+        "end_date": {
+          "title": "End Date",
+          "type": "string"
+        },
+        "blog_id": {
+          "title": "Blog Id",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "init_date",
+        "end_date",
+        "blog_id"
+      ],
+      "title": "get_tiktokads_campaignsArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/tools/tools.py\n# module: src.mcp_metricool.tools.tools\n# qname: src.mcp_metricool.tools.tools.get_tiktokads_campaigns\n# lines: 387-404\nasync def get_tiktokads_campaigns(init_date: str, end_date: str, blog_id: int) -> str | dict[str, Any]:\n    \"\"\"\n    Get the list of Tiktok Ads Campaigns from your Metricool brand account.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYY-MM-DD\n     end date: End date of the period to get the data. The format is YYYY-MM-DD\n     blog id: Blog id of the Metricool brand account.\n    \"\"\"\n\n    url = f\"{METRICOOL_BASE_URL}/v2/analytics/campaigns/tiktokads?from={init_date}T00%3A00%3A00&to={end_date}T23%3A59%3A59&blogId={blog_id}&userId={METRICOOL_USER_ID}&integrationSource=MCP\"\n\n    response = await make_get_request(url)\n\n    if not response:\n        return (\"Failed to get Tiktok Ads Campaigns\")\n\n    return response",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/utils/utils.py\n# module: src.mcp_metricool.utils.utils\n# qname: src.mcp_metricool.utils.utils.make_get_request\n# lines: 134-145\nasync def make_get_request(url: str) -> dict[str, Any] | None:\n    \"\"\"Make a get request to the Metricool API with proper error handling.\"\"\"\n    headers = {\n        \"X-Mc-Auth\": METRICOOL_USER_TOKEN,\n    }\n    async with httpx.AsyncClient() as client:\n        try:\n            response = await client.get(url, headers=headers, timeout=30.0)\n            response.raise_for_status()\n            return response.json()\n        except Exception:\n            return None"
+      ],
+      "depth_max": 1
+    }
+  },
+  {
+    "name": "get_network_competitors",
+    "description": "\n    Get the list of your competitors from your Metricool brand account.\n    Add interesting conclusions for my brand about my competitors.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYY-MM-DD\n     end date: End date of the period to get the data. The format is YYYY-MM-DD\n     network: Network to retrieve the competitors. The format is \"twitter\", \"facebook\", \"instagram\", \"youtube\", \"twitch\" and \"bluesky\". Only these are accepted.\n     blog id: Blog id of the Metricool brand account.\n     limit: Limit of competitors. By default = 10\n     timezone: Timezone of the post. The format is \"Europe%2FMadrid\".  Use the timezone of the user extracted from the get_brands tool.\n    ",
+    "input_schema": {
+      "properties": {
+        "network": {
+          "title": "Network",
+          "type": "string"
+        },
+        "init_date": {
+          "title": "Init Date",
+          "type": "string"
+        },
+        "end_date": {
+          "title": "End Date",
+          "type": "string"
+        },
+        "blog_id": {
+          "title": "Blog Id",
+          "type": "integer"
+        },
+        "limit": {
+          "title": "Limit",
+          "type": "integer"
+        },
+        "timezone": {
+          "title": "Timezone",
+          "type": "string"
+        }
+      },
+      "required": [
+        "network",
+        "init_date",
+        "end_date",
+        "blog_id",
+        "limit",
+        "timezone"
+      ],
+      "title": "get_network_competitorsArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/tools/tools.py\n# module: src.mcp_metricool.tools.tools\n# qname: src.mcp_metricool.tools.tools.get_network_competitors\n# lines: 407-428\nasync def get_network_competitors(network: str, init_date: str, end_date: str, blog_id: int, limit: int, timezone: str) -> str | dict[str, Any]:\n    \"\"\"\n    Get the list of your competitors from your Metricool brand account.\n    Add interesting conclusions for my brand about my competitors.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYY-MM-DD\n     end date: End date of the period to get the data. The format is YYYY-MM-DD\n     network: Network to retrieve the competitors. The format is \"twitter\", \"facebook\", \"instagram\", \"youtube\", \"twitch\" and \"bluesky\". Only these are accepted.\n     blog id: Blog id of the Metricool brand account.\n     limit: Limit of competitors. By default = 10\n     timezone: Timezone of the post. The format is \"Europe%2FMadrid\".  Use the timezone of the user extracted from the get_brands tool.\n    \"\"\"\n\n    url = f\"{METRICOOL_BASE_URL}/v2/analytics/competitors/{network}?from={init_date}T00%3A00%3A00&to={end_date}T23%3A59%3A59&blogId={blog_id}&userId={METRICOOL_USER_ID}&limit={limit}&timezone={timezone}&integrationSource=MCP\"\n\n    response = await make_get_request(url)\n\n    if not response:\n        return (\"Failed to get competitors\")\n\n    return response",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/utils/utils.py\n# module: src.mcp_metricool.utils.utils\n# qname: src.mcp_metricool.utils.utils.make_get_request\n# lines: 134-145\nasync def make_get_request(url: str) -> dict[str, Any] | None:\n    \"\"\"Make a get request to the Metricool API with proper error handling.\"\"\"\n    headers = {\n        \"X-Mc-Auth\": METRICOOL_USER_TOKEN,\n    }\n    async with httpx.AsyncClient() as client:\n        try:\n            response = await client.get(url, headers=headers, timeout=30.0)\n            response.raise_for_status()\n            return response.json()\n        except Exception:\n            return None"
+      ],
+      "depth_max": 1
+    }
+  },
+  {
+    "name": "get_network_competitors_posts",
+    "description": "\n    Get the list of posts from your competitors from your Metricool brand account.\n    Add interesting conclusions for my brand about my competitors and analyze their posts.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYY-MM-DD\n     end date: End date of the period to get the data. The format is YYYY-MM-DD\n     network: Network to retrieve the posts. The format is \"twitter\", \"facebook\", \"instagram\", \"youtube\", \"twitch\" and \"bluesky\". Only these are accepted.\n     blog id: Blog id of the Metricool brand account.\n     limit: Limit of posts of competitors. By default = 50\n     timezone: Timezone of the post. The format is \"Europe%2FMadrid\".  Use the timezone of the user extracted from the get_brands tool.\n    ",
+    "input_schema": {
+      "properties": {
+        "network": {
+          "title": "Network",
+          "type": "string"
+        },
+        "init_date": {
+          "title": "Init Date",
+          "type": "string"
+        },
+        "end_date": {
+          "title": "End Date",
+          "type": "string"
+        },
+        "blog_id": {
+          "title": "Blog Id",
+          "type": "integer"
+        },
+        "limit": {
+          "title": "Limit",
+          "type": "integer"
+        },
+        "timezone": {
+          "title": "Timezone",
+          "type": "string"
+        }
+      },
+      "required": [
+        "network",
+        "init_date",
+        "end_date",
+        "blog_id",
+        "limit",
+        "timezone"
+      ],
+      "title": "get_network_competitors_postsArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/tools/tools.py\n# module: src.mcp_metricool.tools.tools\n# qname: src.mcp_metricool.tools.tools.get_network_competitors_posts\n# lines: 431-458\nasync def get_network_competitors_posts(network: str, init_date: str, end_date: str, blog_id: int, limit: int, timezone: str) -> str | dict[str, Any]:\n    \"\"\"\n    Get the list of posts from your competitors from your Metricool brand account.\n    Add interesting conclusions for my brand about my competitors and analyze their posts.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYY-MM-DD\n     end date: End date of the period to get the data. The format is YYYY-MM-DD\n     network: Network to retrieve the posts. The format is \"twitter\", \"facebook\", \"instagram\", \"youtube\", \"twitch\" and \"bluesky\". Only these are accepted.\n     blog id: Blog id of the Metricool brand account.\n     limit: Limit of posts of competitors. By default = 50\n     timezone: Timezone of the post. The format is \"Europe%2FMadrid\".  Use the timezone of the user extracted from the get_brands tool.\n    \"\"\"\n    if(network==\"instagram\"):\n        url = f\"{METRICOOL_BASE_URL}/v2/analytics/competitors/{network}/publications?from={init_date}T00%3A00%3A00&to={end_date}T23%3A59%3A59&blogId={blog_id}&userId={METRICOOL_USER_ID}&limit={limit}&timezone={timezone}&integrationSource=MCP\"\n        response_pub = await make_get_request(url)\n        url = f\"{METRICOOL_BASE_URL}/v2/analytics/competitors/{network}/publications?from={init_date}T00%3A00%3A00&to={end_date}T23%3A59%3A59&blogId={blog_id}&userId={METRICOOL_USER_ID}&limit={limit}&timezone={timezone}&integrationSource=MCP\"\n        response_reels = await make_get_request(url)\n        response={\"publications\":response_pub, \"reels\":response_reels}\n    else:\n        url = f\"{METRICOOL_BASE_URL}/v2/analytics/competitors/{network}/posts?from={init_date}T00%3A00%3A00&to={end_date}T23%3A59%3A59&blogId={blog_id}&userId={METRICOOL_USER_ID}&limit={limit}&timezone={timezone}&integrationSource=MCP\"\n\n        response = await make_get_request(url)\n\n    if not response:\n        return (\"Failed to get competitors\")\n\n    return response",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/utils/utils.py\n# module: src.mcp_metricool.utils.utils\n# qname: src.mcp_metricool.utils.utils.make_get_request\n# lines: 134-145\nasync def make_get_request(url: str) -> dict[str, Any] | None:\n    \"\"\"Make a get request to the Metricool API with proper error handling.\"\"\"\n    headers = {\n        \"X-Mc-Auth\": METRICOOL_USER_TOKEN,\n    }\n    async with httpx.AsyncClient() as client:\n        try:\n            response = await client.get(url, headers=headers, timeout=30.0)\n            response.raise_for_status()\n            return response.json()\n        except Exception:\n            return None"
+      ],
+      "depth_max": 1
+    }
+  },
+  {
+    "name": "get_pinterest_boards",
+    "description": "\n    Get the list of Pinterest boards for a specific Metricool brand (blog_id).\n    If the user doesn't provide a blog_id, ask for it.\n\n    Args:\n     blog_id: Blog id of the Metricool brand account.\n    ",
+    "input_schema": {
+      "properties": {
+        "blog_id": {
+          "title": "Blog Id",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "blog_id"
+      ],
+      "title": "get_pinterest_boardsArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/tools/tools.py\n# module: src.mcp_metricool.tools.tools\n# qname: src.mcp_metricool.tools.tools.get_pinterest_boards\n# lines: 461-476\nasync def get_pinterest_boards(blog_id: int) -> str | dict[str, Any]:\n    \"\"\"\n    Get the list of Pinterest boards for a specific Metricool brand (blog_id).\n    If the user doesn't provide a blog_id, ask for it.\n\n    Args:\n     blog_id: Blog id of the Metricool brand account.\n    \"\"\"\n    url = f\"{METRICOOL_BASE_URL}/v2/scheduler/boards/pinterest?blogId={blog_id}&userId={METRICOOL_USER_ID}&integrationSource=MCP\"\n\n    response = await make_get_request(url)\n\n    if not response:\n        return \"Failed to get pinterest boards\"\n\n    return response",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/utils/utils.py\n# module: src.mcp_metricool.utils.utils\n# qname: src.mcp_metricool.utils.utils.make_get_request\n# lines: 134-145\nasync def make_get_request(url: str) -> dict[str, Any] | None:\n    \"\"\"Make a get request to the Metricool API with proper error handling.\"\"\"\n    headers = {\n        \"X-Mc-Auth\": METRICOOL_USER_TOKEN,\n    }\n    async with httpx.AsyncClient() as client:\n        try:\n            response = await client.get(url, headers=headers, timeout=30.0)\n            response.raise_for_status()\n            return response.json()\n        except Exception:\n            return None"
+      ],
+      "depth_max": 1
+    }
+  },
+  {
+    "name": "post_schedule_post",
+    "description": "\n    Schedule a post to Metricool at a specific date and time.\n    To be able to schedule the post, you need to maintain the structure.\n    You can use the tool get_best_time_to_post to get the best time to post for a specific provider if the user doesn't specify the time to post.\n    If the post include Instagram, is a must to have at least one image or video. Posts must include an image or a carousel, Reels must include a video, and Stories can include either an image or a video. If you don't have more information, you can ask the user about it and wait until you have the information.\n    If the post include Pinterest, is a must to have a image and the board where to publish the pin. If you don't have more information, you can ask the user about it and wait until you have the information.\n    If the post include Youtube, is a must to have a video, select the audience (if it's video made for kids or not) and the title of the video. If you don't have more information, you can ask the user about it and wait until you have the information.\n    If the post include Tiktok, is a must to have at least one image or video. If you don't have more information, you can ask the user about it and wait until you have the information.\n    If the post is Facebook Reel, is a must to have a video. If is Facebook Story, image or video is needed. If you don't have more information, you can ask the user about it and wait until you have the information.\n    If the post is Bluesky, make sure the text does not exceed 300 characters. If the content exceeds that limit, do not retry and return an error informing the user: \"Error: The text exceeds the 300-character limit allowed on Bluesky. Please edit it.\"\n    If the post is for X (formerly Twitter), make sure before posting that the text does not exceed 280 characters. You must NOT split the message into multiple tweets or threads, the message must be evaluated strictly against a 280-character limit. If the text exceeds 280 characters, do not retry and return only the following error message and stop processing:\n    \"Error: The text exceeds the 280-character limit allowed on X. Please edit it.\"\n    The date can't be in the past.\n    DO NOT modify the text if there's any error, just notify the user.\n\n    Args:\n     date: Date and time to publish the post. The format is YYYY-MM-DDT00:00:00\n     blog id: Blog id of the Metricool brand account.\n     info: Data of the post to be scheduled. Should be a json object with the following fields:\n        autoPublish: True or False, default is True.\n        descendants: list with the args of the other posts if it is a thread with the format [args of the second post, args of the third post,...  ], default is empty list if there is no thread.\n        draft: True or False, default is False.\n        firstCommentText: Text of the first comment of the post. Default \"\"\n        hasNotReadNotes: True or False, default is False.\n        media: default is empty list.\n        mediaAltText: default is empty list.\n        providers: always need at least one provider with the format [{\"network\":\"<string>\"}]. Use \"twitter\" for X posts.\n        publicationDate: Date and timezone of the post. The format is {dateTime:\"YYYY-MM-DDT00:00:00\", timezone:\"Europe/Madrid\"}. Use the timezone of the user extracted from the get_brands tool.\n        shortener: True or False, default is False.\n        smartLinkData: default is {ids:[]}\n        text: Text of the post.\n        Always you need to add the networkData for the posts, as empty if you don't have more information. Only include the networkData for the networks you have in the providers list.\n            The format is \"twitterData\": {\"tags\":[]}, Tags is used for tagging people on the images of the post, not hashtags.\n                            \"facebookData\": {\"type\":\"<string>\", \"title\":\"<string>\", \"boost\":<double>, \"boostPayer\":\"<string>\", \"boostBeneficiary\":\"<string>\"},\n                                Facebook type can be \"POST\", \"REEL\" or \"STORY\"\n                                Facebook title is only available for Facebook videos (This is separate from the main text of the post).\n                                Facebook boost, boostPayer, and boostBeneficiary are only included if they are promoted posts.\n                            \"instagramData\": {\"type\": \"<string>\" (default = POST), \"collaborators\":[{username: \"string\", deleted: false}]], \"carouselTags\":{\"<number>\":[{\"username\":\"<string>\",\"x\":<double>,\"y\":<double>}]} (number is the index of the image within the carousel), \"showReelOnFeed\": \"<boolean>\" (default = true), \"boost\":<double>, \"boostPayer\":\"<string>\", \"boostBeneficiary\":\"<string>\"},\n                                Instagram type can be \"POST\", \"REEL\" or \"STORY\".\n                                There could be more than one collaborator, following the same structure.\n                                The carouselTags is a dictionary with the number of the image in the carousel as key and a list of tags for that image.\n                            \"linkedinData\": {\"documentTitle\": \"<string>\", \"publishImagesAsPDF\": \"<boolean>\" (default = false), \"previewIncluded\": \"<boolean>\" (default = true), \"type\": \"<string>\" (default = post), \"poll\": {\"question\": \"<string>\", \"options\": [{\"text\": \"<string>\"}, {\"text\": \"<string>\"}], \"settings\": {\"duration\": \"<string>\"}}},\n                                Linkedin type can be \"post\" or \"poll\".\n                                If there is a documentTitle in Linkedin, publishImagesAsPDF must be true.\n                                Linkedin poll duration can be \"ONE_DAY\", \"THREE_DAYS\", \"SEVEN_DAYS \" or \"FOURTEEN_DAYS \".\n                            \"pinterestData\": {\"boardId\":\"<string>\", \"pinTitle\":\"<string>\",\"pinLink\":\"<string>\", \"pinNewFormat\":\"<boolean>\"},\n                            \"youtubeData\": {\"title\": \"<string>\", \"type\": \"<string>\" (default = video), \"privacy\": \"<string>\" (default = public), \"tags\": [ \"<string>\", \"<string>\" ], \"category\": \"<string>\" (optional field), \"madeForKids\": \"<boolean>\"},\n                                Youtube type can be \"video\" or \"short\" and privacy can be \"public\", \"unlisted\" or \"private\".\n                                Youtube category can be FILM_ANIMATION, AUTOS_VEHICLES, MUSIC, PETS_ANIMALS, SPORTS, TRAVEL_EVENTS, GAMING, PEOPLE_BLOGS, COMEDY, ENTERTAINMENT, NEWS_POLITICS, HOWTO_STYLE, EDUCATION, SCIENCE_TECHNOLOGY, NONPROFITS_ACTIVISM.\n                            \"twitchData\": {\"autoPublish\":\"<boolean>\", \"tags\":[]},\n                            \"tiktokData\": {\"disableComment\": \"<boolean>\" (default = false), \"disableDuet\": \"<boolean>\" (default = false), \"disableStitch\": \"<boolean>\" (default = false), \"privacyOption\": \"<string>\" (default = \"PUBLIC_TO_EVERYONE\"), \"commercialContentThirdParty\": \"<boolean>\" (default = false), \"commercialContentOwnBrand\": \"<boolean>\" (default = false), \"title\": \"<string>\", \"autoAddMusic\": \"<boolean>\" (default = false), \"photoCoverIndex\": \"<integer>\" (default = 0)},\n                                Tiktok privacyOption can be \"PUBLIC_TO_EVERYONE\", \"MUTUAL_FOLLOW_FRIENDS\", \"FOLLOWER_OF_CREATOR\" or \"SELF_ONLY\".\n                            \"blueskyData\": {\"postLanguages\":[\"\",\"\"]},\n                            \"threadsData\":{\"allowedCountryCodes:[\"\",\"\"]}\n        The other fields are optional, but you need to add the ones you have. If you don't have more information, you can ask the user about it and wait until you have the information.\n\n    ",
+    "input_schema": {
+      "properties": {
+        "date": {
+          "title": "Date",
+          "type": "string"
+        },
+        "blog_id": {
+          "title": "Blog Id",
+          "type": "integer"
+        },
+        "info": {
+          "title": "Info"
+        }
+      },
+      "required": [
+        "date",
+        "blog_id",
+        "info"
+      ],
+      "title": "post_schedule_postArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/tools/tools.py\n# module: src.mcp_metricool.tools.tools\n# qname: src.mcp_metricool.tools.tools.post_schedule_post\n# lines: 479-553\nasync def post_schedule_post(date:str, blog_id: int, info: json) -> str | dict[str, Any]:\n    \"\"\"\n    Schedule a post to Metricool at a specific date and time.\n    To be able to schedule the post, you need to maintain the structure.\n    You can use the tool get_best_time_to_post to get the best time to post for a specific provider if the user doesn't specify the time to post.\n    If the post include Instagram, is a must to have at least one image or video. Posts must include an image or a carousel, Reels must include a video, and Stories can include either an image or a video. If you don't have more information, you can ask the user about it and wait until you have the information.\n    If the post include Pinterest, is a must to have a image and the board where to publish the pin. If you don't have more information, you can ask the user about it and wait until you have the information.\n    If the post include Youtube, is a must to have a video, select the audience (if it's video made for kids or not) and the title of the video. If you don't have more information, you can ask the user about it and wait until you have the information.\n    If the post include Tiktok, is a must to have at least one image or video. If you don't have more information, you can ask the user about it and wait until you have the information.\n    If the post is Facebook Reel, is a must to have a video. If is Facebook Story, image or video is needed. If you don't have more information, you can ask the user about it and wait until you have the information.\n    If the post is Bluesky, make sure the text does not exceed 300 characters. If the content exceeds that limit, do not retry and return an error informing the user: \"Error: The text exceeds the 300-character limit allowed on Bluesky. Please edit it.\"\n    If the post is for X (formerly Twitter), make sure before posting that the text does not exceed 280 characters. You must NOT split the message into multiple tweets or threads, the message must be evaluated strictly against a 280-character limit. If the text exceeds 280 characters, do not retry and return only the following error message and stop processing:\n    \"Error: The text exceeds the 280-character limit allowed on X. Please edit it.\"\n    The date can't be in the past.\n    DO NOT modify the text if there's any error, just notify the user.\n\n    Args:\n     date: Date and time to publish the post. The format is YYYY-MM-DDT00:00:00\n     blog id: Blog id of the Metricool brand account.\n     info: Data of the post to be scheduled. Should be a json object with the following fields:\n        autoPublish: True or False, default is True.\n        descendants: list with the args of the other posts if it is a thread with the format [args of the second post, args of the third post,...  ], default is empty list if there is no thread.\n        draft: True or False, default is False.\n        firstCommentText: Text of the first comment of the post. Default \"\"\n        hasNotReadNotes: True or False, default is False.\n        media: default is empty list.\n        mediaAltText: default is empty list.\n        providers: always need at least one provider with the format [{\"network\":\"<string>\"}]. Use \"twitter\" for X posts.\n        publicationDate: Date and timezone of the post. The format is {dateTime:\"YYYY-MM-DDT00:00:00\", timezone:\"Europe/Madrid\"}. Use the timezone of the user extracted from the get_brands tool.\n        shortener: True or False, default is False.\n        smartLinkData: default is {ids:[]}\n        text: Text of the post.\n        Always you need to add the networkData for the posts, as empty if you don't have more information. Only include the networkData for the networks you have in the providers list.\n            The format is \"twitterData\": {\"tags\":[]}, Tags is used for tagging people on the images of the post, not hashtags.\n                            \"facebookData\": {\"type\":\"<string>\", \"title\":\"<string>\", \"boost\":<double>, \"boostPayer\":\"<string>\", \"boostBeneficiary\":\"<string>\"},\n                                Facebook type can be \"POST\", \"REEL\" or \"STORY\"\n                                Facebook title is only available for Facebook videos (This is separate from the main text of the post).\n                                Facebook boost, boostPayer, and boostBeneficiary are only included if they are promoted posts.\n                            \"instagramData\": {\"type\": \"<string>\" (default = POST), \"collaborators\":[{username: \"string\", deleted: false}]], \"carouselTags\":{\"<number>\":[{\"username\":\"<string>\",\"x\":<double>,\"y\":<double>}]} (number is the index of the image within the carousel), \"showReelOnFeed\": \"<boolean>\" (default = true), \"boost\":<double>, \"boostPayer\":\"<string>\", \"boostBeneficiary\":\"<string>\"},\n                                Instagram type can be \"POST\", \"REEL\" or \"STORY\".\n                                There could be more than one collaborator, following the same structure.\n                                The carouselTags is a dictionary with the number of the image in the carousel as key and a list of tags for that image.\n                            \"linkedinData\": {\"documentTitle\": \"<string>\", \"publishImagesAsPDF\": \"<boolean>\" (default = false), \"previewIncluded\": \"<boolean>\" (default = true), \"type\": \"<string>\" (default = post), \"poll\": {\"question\": \"<string>\", \"options\": [{\"text\": \"<string>\"}, {\"text\": \"<string>\"}], \"settings\": {\"duration\": \"<string>\"}}},\n                                Linkedin type can be \"post\" or \"poll\".\n                                If there is a documentTitle in Linkedin, publishImagesAsPDF must be true.\n                                Linkedin poll duration can be \"ONE_DAY\", \"THREE_DAYS\", \"SEVEN_DAYS \" or \"FOURTEEN_DAYS \".\n                            \"pinterestData\": {\"boardId\":\"<string>\", \"pinTitle\":\"<string>\",\"pinLink\":\"<string>\", \"pinNewFormat\":\"<boolean>\"},\n                            \"youtubeData\": {\"title\": \"<string>\", \"type\": \"<string>\" (default = video), \"privacy\": \"<string>\" (default = public), \"tags\": [ \"<string>\", \"<string>\" ], \"category\": \"<string>\" (optional field), \"madeForKids\": \"<boolean>\"},\n                                Youtube type can be \"video\" or \"short\" and privacy can be \"public\", \"unlisted\" or \"private\".\n                                Youtube category can be FILM_ANIMATION, AUTOS_VEHICLES, MUSIC, PETS_ANIMALS, SPORTS, TRAVEL_EVENTS, GAMING, PEOPLE_BLOGS, COMEDY, ENTERTAINMENT, NEWS_POLITICS, HOWTO_STYLE, EDUCATION, SCIENCE_TECHNOLOGY, NONPROFITS_ACTIVISM.\n                            \"twitchData\": {\"autoPublish\":\"<boolean>\", \"tags\":[]},\n                            \"tiktokData\": {\"disableComment\": \"<boolean>\" (default = false), \"disableDuet\": \"<boolean>\" (default = false), \"disableStitch\": \"<boolean>\" (default = false), \"privacyOption\": \"<string>\" (default = \"PUBLIC_TO_EVERYONE\"), \"commercialContentThirdParty\": \"<boolean>\" (default = false), \"commercialContentOwnBrand\": \"<boolean>\" (default = false), \"title\": \"<string>\", \"autoAddMusic\": \"<boolean>\" (default = false), \"photoCoverIndex\": \"<integer>\" (default = 0)},\n                                Tiktok privacyOption can be \"PUBLIC_TO_EVERYONE\", \"MUTUAL_FOLLOW_FRIENDS\", \"FOLLOWER_OF_CREATOR\" or \"SELF_ONLY\".\n                            \"blueskyData\": {\"postLanguages\":[\"\",\"\"]},\n                            \"threadsData\":{\"allowedCountryCodes:[\"\",\"\"]}\n        The other fields are optional, but you need to add the ones you have. If you don't have more information, you can ask the user about it and wait until you have the information.\n\n    \"\"\"\n\n    for provider in info.get(\"providers\", []):\n        network = provider.get(\"network\")\n        text = info.get(\"text\", \"\")\n\n        if network == \"twitter\" and len(text) > 280:\n            return \"Error: The text exceeds the 280-character limit allowed on X. Please edit it and try again.\"\n        if network == \"bluesky\" and len(text) > 300:\n            return \"Error: The text exceeds the 300-character limit allowed on Bluesky. Please edit it and try again.\"\n    url = f\"{METRICOOL_BASE_URL}/v2/scheduler/posts?blogId={blog_id}&userId={METRICOOL_USER_ID}&integrationSource=MCP\"\n\n    response = await make_post_request(url, data=json.dumps(info))\n\n    if not response:\n        return (\"Failed to schedule the post\")\n\n    return response",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/utils/utils.py\n# module: src.mcp_metricool.utils.utils\n# qname: src.mcp_metricool.utils.utils.make_post_request\n# lines: 147-160\nasync def make_post_request(url: str, data: json) -> dict[str, Any] | None:\n    \"\"\"Make a post request to the Metricool API with proper error handling.\"\"\"\n    headers = {\n        \"X-Mc-Auth\": METRICOOL_USER_TOKEN,\n        \"content-type\": \"application/json\",\n        \"accept\": \"application/json\"\n    }\n    async with httpx.AsyncClient() as client:\n        try:\n            response = await client.post(url, headers=headers, data=data, timeout=30.0)\n            response.raise_for_status()\n            return response.json()\n        except Exception:\n            return None"
+      ],
+      "depth_max": 1
+    }
+  },
+  {
+    "name": "get_scheduled_posts",
+    "description": "\n    Get the list of scheduled posts for a specific Metricool brand (blog_id).\n    Only retrieves posts that are scheduled (not yet published).\n    If the user doesn't provide a blog_id, ask for it.\n\n    Args:\n     blog_id: Blog id of the Metricool brand account.\n     start: Start date of the period to get the data. The format is YYYY-MM-DD\n     end: End date of the period to get the data. The format is YYYY-MM-DD\n     timezone: Timezone of the post. The format is \"Europe%2FMadrid\".  Use the timezone of the user extracted from the get_brands tool.\n     extendedRange: When it's true, search date range is expanded one day after and one day before. Default value is false.\n    ",
+    "input_schema": {
+      "properties": {
+        "blog_id": {
+          "title": "Blog Id",
+          "type": "integer"
+        },
+        "start": {
+          "title": "Start",
+          "type": "string"
+        },
+        "end": {
+          "title": "End",
+          "type": "string"
+        },
+        "timezone": {
+          "title": "Timezone",
+          "type": "string"
+        },
+        "extendedRange": {
+          "title": "Extendedrange",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "blog_id",
+        "start",
+        "end",
+        "timezone",
+        "extendedRange"
+      ],
+      "title": "get_scheduled_postsArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/tools/tools.py\n# module: src.mcp_metricool.tools.tools\n# qname: src.mcp_metricool.tools.tools.get_scheduled_posts\n# lines: 557-577\nasync def get_scheduled_posts(blog_id: int, start: str, end: str, timezone: str, extendedRange: bool) -> str | dict[str, Any]:\n    \"\"\"\n    Get the list of scheduled posts for a specific Metricool brand (blog_id).\n    Only retrieves posts that are scheduled (not yet published).\n    If the user doesn't provide a blog_id, ask for it.\n\n    Args:\n     blog_id: Blog id of the Metricool brand account.\n     start: Start date of the period to get the data. The format is YYYY-MM-DD\n     end: End date of the period to get the data. The format is YYYY-MM-DD\n     timezone: Timezone of the post. The format is \"Europe%2FMadrid\".  Use the timezone of the user extracted from the get_brands tool.\n     extendedRange: When it's true, search date range is expanded one day after and one day before. Default value is false.\n    \"\"\"\n    url = f\"{METRICOOL_BASE_URL}/v2/scheduler/posts?blogId={blog_id}&userId={METRICOOL_USER_ID}&integrationSource=MCP&start={start}T00%3A00%3A00&end={end}T23%3A59%3A59&timezone={timezone}&extendedRange={extendedRange}\"\n\n    response = await make_get_request(url)\n\n    if not response:\n        return \"Failed to get scheduled posts\"\n\n    return response",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/utils/utils.py\n# module: src.mcp_metricool.utils.utils\n# qname: src.mcp_metricool.utils.utils.make_get_request\n# lines: 134-145\nasync def make_get_request(url: str) -> dict[str, Any] | None:\n    \"\"\"Make a get request to the Metricool API with proper error handling.\"\"\"\n    headers = {\n        \"X-Mc-Auth\": METRICOOL_USER_TOKEN,\n    }\n    async with httpx.AsyncClient() as client:\n        try:\n            response = await client.get(url, headers=headers, timeout=30.0)\n            response.raise_for_status()\n            return response.json()\n        except Exception:\n            return None"
+      ],
+      "depth_max": 1
+    }
+  },
+  {
+    "name": "get_best_time_to_post",
+    "description": "\n    Get the best time to post for a specific provider. The return is a list of hours and days with a value. The higher the value, the best time to post.\n    Try to get the best for as maximum of 1 week. If you have day to publish but not hours, choose the start and end of this day.\n    Args:\n     start: Start date of the period to get the data. The format is YYYY-MM-DD\n     end: End date of the period to get the data. The format is YYYY-MM-DD\n     blog id: Blog id of the Metricool brand account.\n     provider: Provider of the post. The format is \"twitter\", \"facebook\", \"instagram\", \"linkedin\", \"youtube\", \"tiktok\". Only these are accepted.\n     timezone: Timezone of the post. The format is \"Europe%2FMadrid\".  Use the timezone of the user extracted from the get_brands tool.\n    ",
+    "input_schema": {
+      "properties": {
+        "start": {
+          "title": "Start",
+          "type": "string"
+        },
+        "end": {
+          "title": "End",
+          "type": "string"
+        },
+        "blog_id": {
+          "title": "Blog Id",
+          "type": "integer"
+        },
+        "provider": {
+          "title": "Provider",
+          "type": "string"
+        },
+        "timezone": {
+          "title": "Timezone",
+          "type": "string"
+        }
+      },
+      "required": [
+        "start",
+        "end",
+        "blog_id",
+        "provider",
+        "timezone"
+      ],
+      "title": "get_best_time_to_postArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/tools/tools.py\n# module: src.mcp_metricool.tools.tools\n# qname: src.mcp_metricool.tools.tools.get_best_time_to_post\n# lines: 580-615\nasync def get_best_time_to_post(start: str, end: str, blog_id: int, provider: str, timezone: str) -> str | dict[\n    str, Any]:\n    \"\"\"\n    Get the best time to post for a specific provider. The return is a list of hours and days with a value. The higher the value, the best time to post.\n    Try to get the best for as maximum of 1 week. If you have day to publish but not hours, choose the start and end of this day.\n    Args:\n     start: Start date of the period to get the data. The format is YYYY-MM-DD\n     end: End date of the period to get the data. The format is YYYY-MM-DD\n     blog id: Blog id of the Metricool brand account.\n     provider: Provider of the post. The format is \"twitter\", \"facebook\", \"instagram\", \"linkedin\", \"youtube\", \"tiktok\". Only these are accepted.\n     timezone: Timezone of the post. The format is \"Europe%2FMadrid\".  Use the timezone of the user extracted from the get_brands tool.\n    \"\"\"\n\n    days_of_week = {\n        1: \"Sunday\",\n        2: \"Monday\",\n        3: \"Tuesday\",\n        4: \"Wednesday\",\n        5: \"Thursday\",\n        6: \"Friday\",\n        7: \"Saturday\"\n    }\n\n    url = f\"{METRICOOL_BASE_URL}/v2/scheduler/besttimes/{provider}?start={start}T00%3A00%3A00&end={end}T23%3A59%3A59&timezone={timezone}&blogId={blog_id}&userId={METRICOOL_USER_ID}&integrationSource=MCP\"\n\n    response = await make_get_request(url)\n\n    if not response:\n        return (\"Failed to get the best time to post\")\n\n    #Introducir día de la semana\n    for entry in response[\"data\"]:\n        day_number = entry.get(\"dayOfWeek\")\n        entry[\"dayOfWeekName\"] = days_of_week.get(day_number, \"Unknown\")\n\n    return response",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/utils/utils.py\n# module: src.mcp_metricool.utils.utils\n# qname: src.mcp_metricool.utils.utils.make_get_request\n# lines: 134-145\nasync def make_get_request(url: str) -> dict[str, Any] | None:\n    \"\"\"Make a get request to the Metricool API with proper error handling.\"\"\"\n    headers = {\n        \"X-Mc-Auth\": METRICOOL_USER_TOKEN,\n    }\n    async with httpx.AsyncClient() as client:\n        try:\n            response = await client.get(url, headers=headers, timeout=30.0)\n            response.raise_for_status()\n            return response.json()\n        except Exception:\n            return None"
+      ],
+      "depth_max": 1
+    }
+  },
+  {
+    "name": "update_schedule_post",
+    "description": "\n    Update a scheduled post in Metricool. You need the id of the post to update. Get it from the get_scheduled_posts tool previous on the conversation.\n    Ask the user if they're sure they want to modify the post, including what will be changed, and require them to confirm.\n    Do not retry if there is a problem.\n    To update the post, ensure the full original content is included in the request, modifying only the new information while keeping the rest unchanged and maintaining the original structure.\n    If the post include Instagram, is a must to have at least one image or video. Posts must include an image or a carousel, Reels must include a video, and Stories can include either an image or a video. If you don't have more information, you can ask the user about it and wait until you have the information.\n    If the post include Pinterest, is a must to have a image and the board where to publish the pin. If you don't have more information, you can ask the user about it and wait until you have the information.\n    If the post include Youtube, is a must to have a video, select the audience (if it's video made for kids or not) and the title of the video. If you don't have more information, you can ask the user about it and wait until you have the information.\n    If the post include Tiktok, is a must to have at least one image or video. If you don't have more information, you can ask the user about it and wait until you have the information.\n    If the post is Facebook Reel, is a must to have a video. If is Facebook Story, image or video is needed. If you don't have more information, you can ask the user about it and wait until you have the information.\n    If the post is Bluesky, make sure the text does not exceed 300 characters. If the content exceeds that limit, do not retry and return an error informing the user: \"Error: The text exceeds the 300-character limit allowed on Bluesky. Please edit it.\"\n    If the post is for X (formerly Twitter), make sure before posting that the text does not exceed 280 characters. You must NOT split the message into multiple tweets or threads, the message must be evaluated strictly against a 280-character limit. If the text exceeds 280 characters, do not retry and return only the following error message and stop processing:\n\n    The date can't be in the past.\n\n    Args:\n     date: Date and time to publish the post. The format is YYYY-MM-DDT00:00:00\n     id: id of the post to update. Get it from the get_scheduled_posts tool previous on the conversation.\n     blog id: Blog id of the Metricool brand account.\n     info: Data of the post to be scheduled. Should be a json object with the following fields:\n        id: id of the post to update. Get it from the get_scheduled_posts tool previous on the conversation. The format is \"id\":<integer>\n        uuid: uuid of the post to update. Get it from the get_scheduled_posts tool previous on the conversation. The format is \"uuid\":\"<string>\"\n        autoPublish: True or False, default is True.\n        descendants: list with the args of the other posts if it is a thread with the format [args of the second post, args of the third post,...  ], default is empty list if there is no thread.\n        draft: True or False, default is False.\n        firstCommentText: Text of the first comment of the post. Default \"\"\n        hasNotReadNotes: True or False, default is False.\n        media: default is empty list.\n        mediaAltText: default is empty list.\n        providers: always need at least one provider with the format [{\"network\":\"<string>\"}]. Use \"twitter\" for X posts.\n        publicationDate: Date and timezone of the post. The format is {dateTime:\"2025-01-01T00:00:00\", timezone:\"Europe/Madrid\"}\n        shortener: True or False, default is False.\n        smartLinkData: default is {ids:[]}\n        text: Text of the post.\n        Always you need to add the networkData for the posts, as empty if you don't have more information. Only include the networkData for the networks you have in the providers list.\n            The format is \"twitterData\": {\"tags\":[]}, Tags is used for tagging people on the images of the post, not hashtags.\n                            \"facebookData\": {\"type\":\"<string>\", \"title\":\"<string>\", \"boost\":<double>, \"boostPayer\":\"<string>\", \"boostBeneficiary\":\"<string>\"},\n                                Facebook type can be \"POST\", \"REEL\" or \"STORY\"\n                                Facebook title is only available for Facebook videos (This is separate from the main text of the post).\n                                Facebook boost, boostPayer, and boostBeneficiary are only included if they are promoted posts.\n                            \"instagramData\": {\"type\": \"<string>\" (default = POST), \"collaborators\":[{username: \"string\", deleted: false}]], \"carouselTags\":{\"<number>\":[{\"username\":\"<string>\",\"x\":<double>,\"y\":<double>}]} (number is the index of the image within the carousel), \"showReelOnFeed\": \"<boolean>\" (default = true), \"boost\":<double>, \"boostPayer\":\"<string>\", \"boostBeneficiary\":\"<string>\"},\n                                Instagram type can be \"POST\", \"REEL\" or \"STORY\".\n                                There could be more than one collaborator, following the same structure.\n                                The carouselTags is a dictionary with the number of the image in the carousel as key and a list of tags for that image.\n                            \"linkedinData\": {\"documentTitle\": \"<string>\", \"publishImagesAsPDF\": \"<boolean>\" (default = false), \"previewIncluded\": \"<boolean>\" (default = true), \"type\": \"<string>\" (default = post), \"poll\": {\"question\": \"<string>\", \"options\": [{\"text\": \"<string>\"}, {\"text\": \"<string>\"}], \"settings\": {\"duration\": \"<string>\"}}},\n                                Linkedin type can be \"post\" or \"poll\".\n                                If there is a documentTitle in Linkedin, publishImagesAsPDF must be true.\n                                Linkedin poll duration can be \"ONE_DAY\", \"THREE_DAYS\", \"SEVEN_DAYS \" or \"FOURTEEN_DAYS \".\n                            \"pinterestData\": {\"boardId\":\"<string>\", \"pinTitle\":\"<string>\",\"pinLink\":\"<string>\", \"pinNewFormat\":\"<boolean>\"},\n                            \"youtubeData\": {\"title\": \"<string>\", \"type\": \"<string>\" (default = video), \"privacy\": \"<string>\" (default = public), \"tags\": [ \"<string>\", \"<string>\" ], \"category\": \"<string>\" (optional field), \"madeForKids\": \"<boolean>\"},\n                                Youtube type can be \"video\" or \"short\" and privacy can be \"public\", \"unlisted\" or \"private\".\n                                Youtube category can be FILM_ANIMATION, AUTOS_VEHICLES, MUSIC, PETS_ANIMALS, SPORTS, TRAVEL_EVENTS, GAMING, PEOPLE_BLOGS, COMEDY, ENTERTAINMENT, NEWS_POLITICS, HOWTO_STYLE, EDUCATION, SCIENCE_TECHNOLOGY, NONPROFITS_ACTIVISM.\n                            \"twitchData\": {\"autoPublish\":\"<boolean>\", \"tags\":[]},\n                            \"tiktokData\": {\"disableComment\": \"<boolean>\" (default = false), \"disableDuet\": \"<boolean>\" (default = false), \"disableStitch\": \"<boolean>\" (default = false), \"privacyOption\": \"<string>\" (default = \"PUBLIC_TO_EVERYONE\"), \"commercialContentThirdParty\": \"<boolean>\" (default = false), \"commercialContentOwnBrand\": \"<boolean>\" (default = false), \"title\": \"<string>\", \"autoAddMusic\": \"<boolean>\" (default = false), \"photoCoverIndex\": \"<integer>\" (default = 0)},\n                                Tiktok privacyOption can be \"PUBLIC_TO_EVERYONE\", \"MUTUAL_FOLLOW_FRIENDS\", \"FOLLOWER_OF_CREATOR\" or \"SELF_ONLY\".\n                            \"blueskyData\": {\"postLanguages\":[\"\",\"\"]},\n                            \"threadsData\":{\"allowedCountryCodes:[\"\",\"\"]}\n    ",
+    "input_schema": {
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "date": {
+          "title": "Date",
+          "type": "string"
+        },
+        "blog_id": {
+          "title": "Blog Id",
+          "type": "integer"
+        },
+        "info": {
+          "title": "Info"
+        }
+      },
+      "required": [
+        "id",
+        "date",
+        "blog_id",
+        "info"
+      ],
+      "title": "update_schedule_postArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/tools/tools.py\n# module: src.mcp_metricool.tools.tools\n# qname: src.mcp_metricool.tools.tools.update_schedule_post\n# lines: 618-685\nasync def update_schedule_post(id: str, date:str, blog_id: int, info: json) -> str | dict[str, Any]:\n    \"\"\"\n    Update a scheduled post in Metricool. You need the id of the post to update. Get it from the get_scheduled_posts tool previous on the conversation.\n    Ask the user if they're sure they want to modify the post, including what will be changed, and require them to confirm.\n    Do not retry if there is a problem.\n    To update the post, ensure the full original content is included in the request, modifying only the new information while keeping the rest unchanged and maintaining the original structure.\n    If the post include Instagram, is a must to have at least one image or video. Posts must include an image or a carousel, Reels must include a video, and Stories can include either an image or a video. If you don't have more information, you can ask the user about it and wait until you have the information.\n    If the post include Pinterest, is a must to have a image and the board where to publish the pin. If you don't have more information, you can ask the user about it and wait until you have the information.\n    If the post include Youtube, is a must to have a video, select the audience (if it's video made for kids or not) and the title of the video. If you don't have more information, you can ask the user about it and wait until you have the information.\n    If the post include Tiktok, is a must to have at least one image or video. If you don't have more information, you can ask the user about it and wait until you have the information.\n    If the post is Facebook Reel, is a must to have a video. If is Facebook Story, image or video is needed. If you don't have more information, you can ask the user about it and wait until you have the information.\n    If the post is Bluesky, make sure the text does not exceed 300 characters. If the content exceeds that limit, do not retry and return an error informing the user: \"Error: The text exceeds the 300-character limit allowed on Bluesky. Please edit it.\"\n    If the post is for X (formerly Twitter), make sure before posting that the text does not exceed 280 characters. You must NOT split the message into multiple tweets or threads, the message must be evaluated strictly against a 280-character limit. If the text exceeds 280 characters, do not retry and return only the following error message and stop processing:\n\n    The date can't be in the past.\n\n    Args:\n     date: Date and time to publish the post. The format is YYYY-MM-DDT00:00:00\n     id: id of the post to update. Get it from the get_scheduled_posts tool previous on the conversation.\n     blog id: Blog id of the Metricool brand account.\n     info: Data of the post to be scheduled. Should be a json object with the following fields:\n        id: id of the post to update. Get it from the get_scheduled_posts tool previous on the conversation. The format is \"id\":<integer>\n        uuid: uuid of the post to update. Get it from the get_scheduled_posts tool previous on the conversation. The format is \"uuid\":\"<string>\"\n        autoPublish: True or False, default is True.\n        descendants: list with the args of the other posts if it is a thread with the format [args of the second post, args of the third post,...  ], default is empty list if there is no thread.\n        draft: True or False, default is False.\n        firstCommentText: Text of the first comment of the post. Default \"\"\n        hasNotReadNotes: True or False, default is False.\n        media: default is empty list.\n        mediaAltText: default is empty list.\n        providers: always need at least one provider with the format [{\"network\":\"<string>\"}]. Use \"twitter\" for X posts.\n        publicationDate: Date and timezone of the post. The format is {dateTime:\"2025-01-01T00:00:00\", timezone:\"Europe/Madrid\"}\n        shortener: True or False, default is False.\n        smartLinkData: default is {ids:[]}\n        text: Text of the post.\n        Always you need to add the networkData for the posts, as empty if you don't have more information. Only include the networkData for the networks you have in the providers list.\n            The format is \"twitterData\": {\"tags\":[]}, Tags is used for tagging people on the images of the post, not hashtags.\n                            \"facebookData\": {\"type\":\"<string>\", \"title\":\"<string>\", \"boost\":<double>, \"boostPayer\":\"<string>\", \"boostBeneficiary\":\"<string>\"},\n                                Facebook type can be \"POST\", \"REEL\" or \"STORY\"\n                                Facebook title is only available for Facebook videos (This is separate from the main text of the post).\n                                Facebook boost, boostPayer, and boostBeneficiary are only included if they are promoted posts.\n                            \"instagramData\": {\"type\": \"<string>\" (default = POST), \"collaborators\":[{username: \"string\", deleted: false}]], \"carouselTags\":{\"<number>\":[{\"username\":\"<string>\",\"x\":<double>,\"y\":<double>}]} (number is the index of the image within the carousel), \"showReelOnFeed\": \"<boolean>\" (default = true), \"boost\":<double>, \"boostPayer\":\"<string>\", \"boostBeneficiary\":\"<string>\"},\n                                Instagram type can be \"POST\", \"REEL\" or \"STORY\".\n                                There could be more than one collaborator, following the same structure.\n                                The carouselTags is a dictionary with the number of the image in the carousel as key and a list of tags for that image.\n                            \"linkedinData\": {\"documentTitle\": \"<string>\", \"publishImagesAsPDF\": \"<boolean>\" (default = false), \"previewIncluded\": \"<boolean>\" (default = true), \"type\": \"<string>\" (default = post), \"poll\": {\"question\": \"<string>\", \"options\": [{\"text\": \"<string>\"}, {\"text\": \"<string>\"}], \"settings\": {\"duration\": \"<string>\"}}},\n                                Linkedin type can be \"post\" or \"poll\".\n                                If there is a documentTitle in Linkedin, publishImagesAsPDF must be true.\n                                Linkedin poll duration can be \"ONE_DAY\", \"THREE_DAYS\", \"SEVEN_DAYS \" or \"FOURTEEN_DAYS \".\n                            \"pinterestData\": {\"boardId\":\"<string>\", \"pinTitle\":\"<string>\",\"pinLink\":\"<string>\", \"pinNewFormat\":\"<boolean>\"},\n                            \"youtubeData\": {\"title\": \"<string>\", \"type\": \"<string>\" (default = video), \"privacy\": \"<string>\" (default = public), \"tags\": [ \"<string>\", \"<string>\" ], \"category\": \"<string>\" (optional field), \"madeForKids\": \"<boolean>\"},\n                                Youtube type can be \"video\" or \"short\" and privacy can be \"public\", \"unlisted\" or \"private\".\n                                Youtube category can be FILM_ANIMATION, AUTOS_VEHICLES, MUSIC, PETS_ANIMALS, SPORTS, TRAVEL_EVENTS, GAMING, PEOPLE_BLOGS, COMEDY, ENTERTAINMENT, NEWS_POLITICS, HOWTO_STYLE, EDUCATION, SCIENCE_TECHNOLOGY, NONPROFITS_ACTIVISM.\n                            \"twitchData\": {\"autoPublish\":\"<boolean>\", \"tags\":[]},\n                            \"tiktokData\": {\"disableComment\": \"<boolean>\" (default = false), \"disableDuet\": \"<boolean>\" (default = false), \"disableStitch\": \"<boolean>\" (default = false), \"privacyOption\": \"<string>\" (default = \"PUBLIC_TO_EVERYONE\"), \"commercialContentThirdParty\": \"<boolean>\" (default = false), \"commercialContentOwnBrand\": \"<boolean>\" (default = false), \"title\": \"<string>\", \"autoAddMusic\": \"<boolean>\" (default = false), \"photoCoverIndex\": \"<integer>\" (default = 0)},\n                                Tiktok privacyOption can be \"PUBLIC_TO_EVERYONE\", \"MUTUAL_FOLLOW_FRIENDS\", \"FOLLOWER_OF_CREATOR\" or \"SELF_ONLY\".\n                            \"blueskyData\": {\"postLanguages\":[\"\",\"\"]},\n                            \"threadsData\":{\"allowedCountryCodes:[\"\",\"\"]}\n    \"\"\"\n\n    url = f\"{METRICOOL_BASE_URL}/v2/scheduler/posts/{id}?blogId={blog_id}&userId={METRICOOL_USER_ID}&integrationSource=MCP\"\n\n    response = await make_put_request(url, data=json.dumps(info))\n\n    if not response:\n        return (\"Failed to update the post\")\n\n    return response",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/utils/utils.py\n# module: src.mcp_metricool.utils.utils\n# qname: src.mcp_metricool.utils.utils.make_put_request\n# lines: 162-175\nasync def make_put_request(url: str, data: json) -> dict[str, Any] | None:\n    \"\"\"Make a put request to the Metricool API with proper error handling.\"\"\"\n    headers = {\n        \"X-Mc-Auth\": METRICOOL_USER_TOKEN,\n        \"content-type\": \"application/json\",\n        \"accept\": \"application/json\"\n    }\n    async with httpx.AsyncClient() as client:\n        try:\n            response = await client.put(url, headers=headers, data=data, timeout=30.0)\n            response.raise_for_status()\n            return response.json()\n        except Exception:\n            return None"
+      ],
+      "depth_max": 1
+    }
+  },
+  {
+    "name": "get_metrics",
+    "description": "\n    Retrieve the available metrics for a specific network.\n    Args:\n        network: Specific network to get the available metrics.\n    ",
+    "input_schema": {
+      "properties": {
+        "network": {
+          "title": "Network",
+          "type": "string"
+        }
+      },
+      "required": [
+        "network"
+      ],
+      "title": "get_metricsArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/tools/tools.py\n# module: src.mcp_metricool.tools.tools\n# qname: src.mcp_metricool.tools.tools.get_metrics\n# lines: 690-704\nasync def get_metrics(network: str) -> str | dict[str, Any]:\n    \"\"\"\n    Retrieve the available metrics for a specific network.\n    Args:\n        network: Specific network to get the available metrics.\n    \"\"\"\n    if network not in network_subject_metrics:\n        return f\"Incorrect network '{network}'. The available networks are: {', '.join(network_subject_metrics.keys())}\"\n    else:\n        metrics = {}\n        subjects = list(network_subject_metrics[network].keys())\n        for subj in subjects:\n            metrics[subj] = network_subject_metrics[network][subj]\n        return {\"metrics\": metrics,\n                \"instructions\": \"Stop the chat, show the metrics and let the user choose the metrics they want to analyze before going again to get_analytics, the user must choose before you continue.\"}",
+      "depth_max": 0
+    }
+  },
+  {
+    "name": "get_analytics",
+    "description": "\n    Retrieve analytics data for a specific Metricool brand. If the user does not specify any metric you can use the\n    get_metrics tool and let the user decide them.\n\n    Args:\n        - blog_id (int): ID of the Metricool brand account. Required.\n        - start (str): Start date of the data period (format: YYYY-MM-DD). Required.\n        - end (str): End date of the data period (format: YYYY-MM-DD). Required.\n        - timezone (str): Timezone from the brand(e.g., Europe%2FMadrid). Required. If you don't have the timezone you can obtain it from the get_brands tool\n        - network (str): Social network to analyze (e.g., facebook, instagram, linkedin, youtube, tiktok, etc.), it must be connected to the brand. Required.\n        - metric ([str]): List of metrics, default is empty.\n        If blog_id is missing, ask the user to provide it.\n        If network is missing, ask the user to specify one.\n        If network is not connected to the brand, ask the user to specify one of the connected ones.\n",
+    "input_schema": {
+      "properties": {
+        "blog_id": {
+          "title": "Blog Id",
+          "type": "integer"
+        },
+        "start": {
+          "title": "Start",
+          "type": "string"
+        },
+        "end": {
+          "title": "End",
+          "type": "string"
+        },
+        "timezone": {
+          "title": "Timezone",
+          "type": "string"
+        },
+        "network": {
+          "title": "Network",
+          "type": "string"
+        },
+        "metric": {
+          "title": "Metric"
+        }
+      },
+      "required": [
+        "blog_id",
+        "start",
+        "end",
+        "timezone",
+        "network",
+        "metric"
+      ],
+      "title": "get_analyticsArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/tools/tools.py\n# module: src.mcp_metricool.tools.tools\n# qname: src.mcp_metricool.tools.tools.get_analytics\n# lines: 708-814\nasync def get_analytics(blog_id: int, start: str, end: str, timezone: str, network: str, metric: [str]) -> str | dict[str, Any]:\n\n    \"\"\"\n    Retrieve analytics data for a specific Metricool brand. If the user does not specify any metric you can use the\n    get_metrics tool and let the user decide them.\n\n    Args:\n        - blog_id (int): ID of the Metricool brand account. Required.\n        - start (str): Start date of the data period (format: YYYY-MM-DD). Required.\n        - end (str): End date of the data period (format: YYYY-MM-DD). Required.\n        - timezone (str): Timezone from the brand(e.g., Europe%2FMadrid). Required. If you don't have the timezone you can obtain it from the get_brands tool\n        - network (str): Social network to analyze (e.g., facebook, instagram, linkedin, youtube, tiktok, etc.), it must be connected to the brand. Required.\n        - metric ([str]): List of metrics, default is empty.\n        If blog_id is missing, ask the user to provide it.\n        If network is missing, ask the user to specify one.\n        If network is not connected to the brand, ask the user to specify one of the connected ones.\n\"\"\"\n\n    if network not in network_subject_metrics:\n        return f\"Incorrect network '{network}'. The available networks are: {', '.join(network_subject_metrics.keys())}\"\n    if not metric:\n        return \"Please provide a list of metrics. You can use the 'get_metrics' tool to explore available metrics.\"\n\n    results = {}\n\n\n    subjects = list(network_subject_metrics[network].keys())\n    start_formatted = format_datetime_with_timezone(start, \"00:00:00\", timezone)\n    end_formatted = format_datetime_with_timezone(end, \"23:59:59\", timezone)\n    start_aux = start.replace(\"-\", \"\")\n    end_aux = end.replace(\"-\", \"\")\n    for subj in subjects:\n        metrics = metric if metric else network_subject_metrics[network][subj]\n        for met in metrics:\n            if met not in network_subject_metrics[network][subj]:\n                continue\n            if network == 'tiktok' and subj == 'videos':\n                url = (\n                f\"{METRICOOL_BASE_URL}/v2/analytics/timelines\"\n                f\"?blogId={blog_id}&userId={METRICOOL_USER_ID}&integrationSource=MCP\"\n                f\"&from={start_formatted}&to={end_formatted}\"\n                f\"&timezone={timezone}&metric={met}&network={network}\"\n                )\n            elif network == 'youtube' and subj == 'videos':\n                url = (\n                    f\"{METRICOOL_BASE_URL}/v2/analytics/timelines\"\n                    f\"?blogId={blog_id}&userId={METRICOOL_USER_ID}&integrationSource=MCP\"\n                    f\"&from={start_formatted}&to={end_formatted}\"\n                    f\"&timezone={timezone}&metric={met}&network={network}&postsType=publishedInRange\"\n                )\n            elif network == 'youtube' and subj == \"account\":\n                url = (\n                    f\"https://app.metricool.com/api/stats/timeline/{met}?start={start_aux}&end={end_aux}&timezone={timezone}\"\n                    f\"&userId={METRICOOL_USER_ID}&blogId={blog_id}&integrationSource=MCP\"\n                )\n            elif network == \"linkedin\" and subj != \"stories\":\n                url = (\n                    f\"{METRICOOL_BASE_URL}/v2/analytics/timelines\"\n                    f\"?blogId={blog_id}&userId={METRICOOL_USER_ID}&integrationSource=MCP\"\n                    f\"&from={start_formatted}&to={end_formatted}\"\n                    f\"&timezone={timezone}&metric={met}&metricType={subj}&network={network}\"\n                )\n            elif network == \"linkedin\" and subj == \"stories\":\n                url = (\n                    f\"https://app.metricool.com/api/stats/timeline/{met}\"\n                    f\"?start={start_aux}&end={end_aux}&userId={METRICOOL_USER_ID}&blogId={blog_id}&integrationSource=MCP\"\n                )\n            elif network == \"webpage\":\n                url = (\n                    f\"https://app.metricool.com/api/stats/timeline/{met}\"\n                    f\"?start={start_aux}&end={end_aux}&userId={METRICOOL_USER_ID}&blogId={blog_id}&timezone={timezone}&integrationSource=MCP\"\n                )\n            elif network == \"twitter\":\n                url = (\n                    f\"https://app.metricool.com/api/stats/timeline/{met}\"\n                    f\"?start={start_aux}&end={end_aux}&userId={METRICOOL_USER_ID}&blogId={blog_id}&timezone={timezone}&integrationSource=MCP\"\n                )\n            elif network == \"twitch\":\n                url = (\n                    f\"https://app.metricool.com/api/stats/timeline/twitch{met}\"\n                    f\"?start={start_aux}&end={end_aux}&userId={METRICOOL_USER_ID}&blogId={blog_id}&timezone={timezone}&integrationSource=MCP\"\n                )\n            else:\n                url = (\n                f\"{METRICOOL_BASE_URL}/v2/analytics/timelines\"\n                f\"?blogId={blog_id}&userId={METRICOOL_USER_ID}&integrationSource=MCP\"\n                f\"&from={start_formatted}&to={end_formatted}\"\n                f\"&timezone={timezone}&metric={met}&subject={subj}&network={network}\"\n                )\n            try:\n                result = await make_get_request(url)\n                if result:\n                    results[f\"{subj}:{met}\"] = result\n                else:\n                    results[f\"{subj}:{met}\"] = \"No data\"\n            except Exception as e:\n                results[f\"{subj}:{met}\"] = f\"Error: {str(e)}\"\n\n            for key, value in results.items():\n                if isinstance(value, dict) and \"data\" in value:\n                    for item in value[\"data\"]:\n                        if isinstance(item, dict) and \"values\" in item:\n                            for v in item[\"values\"]:\n                                if \"dateTime\" in v:\n                                    v[\"dateTime\"] = convert_datetime_to_timezone(v[\"dateTime\"], unquote(timezone))\n\n    return results if results else \"No valid data.\"",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/tools/tools.py\n# module: src.mcp_metricool.tools.tools\n# qname: src.mcp_metricool.tools.tools.convert_datetime_to_timezone\n# lines: 823-830\ndef convert_datetime_to_timezone(dt_str: str, target_tz_str: str) -> str:\n    try:\n        dt = datetime.strptime(dt_str, \"%Y-%m-%dT%H:%M:%S%z\")\n        target_tz = timezone(target_tz_str)\n        dt_converted = dt.astimezone(target_tz)\n        return dt_converted.isoformat()\n    except Exception as e:\n        return dt_str",
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/tools/tools.py\n# module: src.mcp_metricool.tools.tools\n# qname: src.mcp_metricool.tools.tools.format_datetime_with_timezone\n# lines: 816-821\ndef format_datetime_with_timezone(date_str: str, hour: str, timezone_str: str) -> str:\n    tz_clean = unquote(timezone_str)\n    tz = timezone(tz_clean)\n    dt = datetime.strptime(f\"{date_str}T{hour}\", \"%Y-%m-%dT%H:%M:%S\")\n    final_dt = tz.localize(dt)\n    return quote(final_dt.isoformat())",
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-metricool/src/mcp_metricool/utils/utils.py\n# module: src.mcp_metricool.utils.utils\n# qname: src.mcp_metricool.utils.utils.make_get_request\n# lines: 134-145\nasync def make_get_request(url: str) -> dict[str, Any] | None:\n    \"\"\"Make a get request to the Metricool API with proper error handling.\"\"\"\n    headers = {\n        \"X-Mc-Auth\": METRICOOL_USER_TOKEN,\n    }\n    async with httpx.AsyncClient() as client:\n        try:\n            response = await client.get(url, headers=headers, timeout=30.0)\n            response.raise_for_status()\n            return response.json()\n        except Exception:\n            return None"
+      ],
+      "depth_max": 1
+    }
+  }
+]

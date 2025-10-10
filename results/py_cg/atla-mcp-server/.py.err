@@ -1,0 +1,12 @@
+Code2Flow: Found 3 files from sources argument.
+Code2Flow: Processing 3 source file(s).
+Code2Flow:   /Users/xue/workspace/mcp_project/mcp_server_pyrepos/atla-mcp-server/atla_mcp_server/__main__.py
+Code2Flow:   /Users/xue/workspace/mcp_project/mcp_server_pyrepos/atla-mcp-server/atla_mcp_server/debug.py
+Code2Flow:   /Users/xue/workspace/mcp_project/mcp_server_pyrepos/atla-mcp-server/atla_mcp_server/server.py
+Code2Flow: Found groups ['File: __main__', 'File: debug', 'File: server', 'Class: MCPState'].
+Code2Flow: Found nodes ['(global)', '(global)', '(global)', 'app_factory', 'evaluate_llm_response', 'evaluate_llm_response_on_multiple_criteria', 'main'].
+Code2Flow: Found calls ['AsyncAtla()', 'FastMCP()', 'MCPState()', 'WithJsonSchema()', 'app.run()', 'app_factory()', 'argparse.ArgumentParser()', 'asyncio.gather()', 'cast()', 'dedent()', 'evaluate_llm_response()', 'main()', 'mcp.tool()', 'os.getenv()', 'parser.add_argument()', 'parser.error()', 'parser.parse_args()', 'print()', 'state.create()'].
+Code2Flow: Found variables ['Annotated->UNKNOWN_MODULE', 'AsyncAtla->UNKNOWN_MODULE', 'AsyncIterator->UNKNOWN_MODULE', 'Context->UNKNOWN_MODULE', 'FastMCP->UNKNOWN_MODULE', 'Literal->UNKNOWN_MODULE', 'Optional->UNKNOWN_MODULE', 'WithJsonSchema->UNKNOWN_MODULE', 'app-><Call owner_token=None token=app_factory>', 'app_factory->UNKNOWN_MODULE', 'argparse->UNKNOWN_MODULE', 'args-><Call owner_token=parser token=parse_args>', 'asynccontextmanager->UNKNOWN_MODULE', 'asyncio->UNKNOWN_MODULE', 'atla_api_key-><Call owner_token=os token=getenv>', 'cast->UNKNOWN_MODULE', 'dataclass->UNKNOWN_MODULE', 'dedent->UNKNOWN_MODULE', 'mcp-><Call owner_token=None token=FastMCP>', 'os->UNKNOWN_MODULE', 'parser-><Call owner_token=argparse token=ArgumentParser>', 'state-><Call owner_token=None token=cast>'].
+Code2Flow: Generating output file...
+Code2Flow: Wrote output file '/Users/xue/workspace/mcp_project/NPL4MCP/results/py_cg/atla-mcp-server/cg_py.json' with 6 nodes and 4 edges.
+Code2Flow: Code2flow finished processing in 0.00 seconds.

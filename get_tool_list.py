@@ -19,19 +19,55 @@ def serialize_tool(tool):
 
 config = {
     "mcpServers": {
-        "web-eval-agent": {
-            "command": "uvx",
-            "args": [
-                "--refresh-package",
-                "webEvalAgent",
-                "--from",
-                "git+https://github.com/Operative-Sh/web-eval-agent.git",
-                "webEvalAgent"
-            ],
-            "env": {
-                "OPERATIVE_API_KEY": "op-vm057UM7hvCx8zTHGpKc3dPn1oo1lNznju0fJLdx_90"
-            }
-        },
+        # "mcp-metricool": {
+        #     "command": "uvx",
+        #     "args": [
+        #         "--upgrade",
+        #         "mcp-metricool"
+        #     ],
+        #     "env": {
+        #         "METRICOOL_USER_TOKEN": "<METRICOOL_USER_TOKEN>",
+        #         "METRICOOL_USER_ID": "<METRICOOL_USER_ID>"
+        #     }
+        # },
+        # "atla-mcp-server": {
+        #     "command": "uvx",
+        #     "args": ["atla-mcp-server"],
+        #     "env": {
+        #         "ATLA_API_KEY": "<your-atla-api-key>"
+        #     }
+        # },
+        # "dappier-mcp": {
+        #     "command": "uvx",
+        #     "args": ["dappier-mcp"],
+        #     "env": {
+        #         "DAPPIER_API_KEY": "YOUR_API_KEY_HERE"
+        #     }
+        # },
+        # "geekbot-mcp": {
+        #   "command": "uv",
+        #   "args": [
+        #     "tool",
+        #     "run",
+        #     "geekbot-mcp"
+        #   ],
+        #   "env": {
+        #     "GB_API_KEY": "YOUR-API-KEY"
+        #   }
+        # },
+        # "web-eval-agent": {
+        #     "command": "uvx",
+        #     "args": [
+        #         "--refresh-package",
+        #         "webEvalAgent",
+        #         "--from",
+        #         "git+https://github.com/Operative-Sh/web-eval-agent.git",
+        #         "webEvalAgent"
+        #     ],
+        #     "env": {
+        #         "OPERATIVE_API_KEY": "op-vm057UM7hvCx8zTHGpKc3dPn1oo1lNznju0fJLdx_90"
+        #     }
+        # },
         # "ProxmoxMCP": {
         #     "command": "python",
         #     "args": ["-m", "proxmox_mcp.server"],
