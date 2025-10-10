@@ -16,19 +16,23 @@ for PROJ in "${REPOS_DIR}"/*; do
   ########################
   # Python -> cg_py.json
   ########################
+  if [ -f "${OUT}/cg_py.json" ]; then
+    echo "[skip exist] ${NAME} 已存在 cg_py.json，跳过"
+    continue
+  fi
+
   PY_TMP=$(mktemp)
   find "${PROJ}" -type f -name '*.py' \
-  -not -name '__init__.py' \
-  -not -path '*/.git/*' \
-  -not -path '*/__pycache__/*' \
-  -not -path '*/.mypy_cache/*' \
-  -not -path '*/.pytest_cache/*' \
-  -not -path '*/site-packages/*' \
-  -not -path '*/venv/*' \
-  -not -path '*/.venv/*' \
-  -not -path '*/env/*' \
-  -print > "${PY_TMP}"
-
+    -not -name '__init__.py' \
+    -not -path '*/.git/*' \
+    -not -path '*/__pycache__/*' \
+    -not -path '*/.mypy_cache/*' \
+    -not -path '*/.pytest_cache/*' \
+    -not -path '*/site-packages/*' \
+    -not -path '*/venv/*' \
+    -not -path '*/.venv/*' \
+    -not -path '*/env/*' \
+    -print > "${PY_TMP}"
 
   if [ -s "${PY_TMP}" ]; then
     echo "[py ] ${NAME} -> ${OUT}/cg_py.json"
@@ -38,6 +42,7 @@ for PROJ in "${REPOS_DIR}"/*; do
   else
     echo "[skip py ] ${NAME} 无 .py 文件"
   fi
+
   rm -f "${PY_TMP}"
 done
 

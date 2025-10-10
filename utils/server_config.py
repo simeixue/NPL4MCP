@@ -108,24 +108,43 @@ config = {
         #         f"{REPO_BASE}/python-notebook-mcp/server.py"
         #         ],
         #     "autoApprove": ["initialize_workspace"]
-        # }
+        # },
+        "mcp-clickhouse": {
+            "command": "uv",
+            "args": [
+                "run",
+                "--with",
+                "mcp-clickhouse",
+                "mcp-clickhouse"
+            ],
+            "env": {
+                "CLICKHOUSE_HOST": "sql-clickhouse.clickhouse.com",
+                "CLICKHOUSE_PORT": "8443",
+                "CLICKHOUSE_USER": "demo",
+                "CLICKHOUSE_PASSWORD": "",
+                "CLICKHOUSE_SECURE": "true",
+                "CLICKHOUSE_VERIFY": "true",
+                "CLICKHOUSE_CONNECT_TIMEOUT": "30",
+                "CLICKHOUSE_SEND_RECEIVE_TIMEOUT": "30"
+            }
+        },
         
 
 # ---------------- 需要配置的server ----------------        
 
-        "web-eval-agent": {
-            "command": "uvx",
-            "args": [
-                "--refresh-package",
-                "webEvalAgent",
-                "--from",
-                "git+https://github.com/Operative-Sh/web-eval-agent.git",
-                "webEvalAgent"
-            ],
-            "env": {
-                "OPERATIVE_API_KEY": "op-vm057UM7hvCx8zTHGpKc3dPn1oo1lNznju0fJLdx_90"
-            }
-        },
+        # "web-eval-agent": {
+        #     "command": "uvx",
+        #     "args": [
+        #         "--refresh-package",
+        #         "webEvalAgent",
+        #         "--from",
+        #         "git+https://github.com/Operative-Sh/web-eval-agent.git",
+        #         "webEvalAgent"
+        #     ],
+        #     "env": {
+        #         "OPERATIVE_API_KEY": "op-vm057UM7hvCx8zTHGpKc3dPn1oo1lNznju0fJLdx_90"
+        #     }
+        # },
         # "MiniMax-MCP": {
         #     "command": "uvx",
         #     "args": [

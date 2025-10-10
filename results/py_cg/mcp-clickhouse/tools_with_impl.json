@@ -1,0 +1,95 @@
+[
+  {
+    "name": "list_databases",
+    "description": "List available ClickHouse databases",
+    "input_schema": {
+      "properties": {},
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/mcp_clickhouse/mcp_server.py\n# module: mcp_clickhouse.mcp_server\n# qname: mcp_clickhouse.mcp_server.list_databases\n# lines: 131-144\ndef list_databases():\n    \"\"\"List available ClickHouse databases\"\"\"\n    logger.info(\"Listing all databases\")\n    client = create_clickhouse_client()\n    result = client.command(\"SHOW DATABASES\")\n\n    # Convert newline-separated string to list and trim whitespace\n    if isinstance(result, str):\n        databases = [db.strip() for db in result.strip().split(\"\\n\")]\n    else:\n        databases = [result]\n\n    logger.info(f\"Found {len(databases)} databases\")\n    return json.dumps(databases)",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/mcp_clickhouse/mcp_server.py\n# module: mcp_clickhouse.mcp_server\n# qname: mcp_clickhouse.mcp_server.create_clickhouse_client\n# lines: 219-237\ndef create_clickhouse_client():\n    client_config = get_config().get_client_config()\n    logger.info(\n        f\"Creating ClickHouse client connection to {client_config['host']}:{client_config['port']} \"\n        f\"as {client_config['username']} \"\n        f\"(secure={client_config['secure']}, verify={client_config['verify']}, \"\n        f\"connect_timeout={client_config['connect_timeout']}s, \"\n        f\"send_receive_timeout={client_config['send_receive_timeout']}s)\"\n    )\n\n    try:\n        client = clickhouse_connect.get_client(**client_config)\n        # Test the connection\n        version = client.server_version\n        logger.info(f\"Successfully connected to ClickHouse server version {version}\")\n        return client\n    except Exception as e:\n        logger.error(f\"Failed to connect to ClickHouse: {str(e)}\")\n        raise"
+      ],
+      "depth_2": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/mcp_clickhouse/mcp_env.py\n# module: mcp_clickhouse.mcp_env\n# qname: mcp_clickhouse.mcp_env.get_config\n# lines: 260-269\ndef get_config():\n    \"\"\"\n    Gets the singleton instance of ClickHouseConfig.\n    Instantiates it on the first call.\n    \"\"\"\n    global _CONFIG_INSTANCE\n    if _CONFIG_INSTANCE is None:\n        # Instantiate the config object here, ensuring load_dotenv() has likely run\n        _CONFIG_INSTANCE = ClickHouseConfig()\n    return _CONFIG_INSTANCE"
+      ],
+      "depth_max": 2
+    }
+  },
+  {
+    "name": "list_tables",
+    "description": "List available ClickHouse tables in a database, including schema, comment,\nrow count, and column count.",
+    "input_schema": {
+      "properties": {
+        "database": {
+          "title": "Database",
+          "type": "string"
+        },
+        "like": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Like"
+        },
+        "not_like": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Not Like"
+        }
+      },
+      "required": [
+        "database"
+      ],
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/mcp_clickhouse/mcp_server.py\n# module: mcp_clickhouse.mcp_server\n# qname: mcp_clickhouse.mcp_server.list_tables\n# lines: 147-176\ndef list_tables(database: str, like: Optional[str] = None, not_like: Optional[str] = None):\n    \"\"\"List available ClickHouse tables in a database, including schema, comment,\n    row count, and column count.\"\"\"\n    logger.info(f\"Listing tables in database '{database}'\")\n    client = create_clickhouse_client()\n    query = f\"SELECT database, name, engine, create_table_query, dependencies_database, dependencies_table, engine_full, sorting_key, primary_key, total_rows, total_bytes, total_bytes_uncompressed, parts, active_parts, total_marks, comment FROM system.tables WHERE database = {format_query_value(database)}\"\n    if like:\n        query += f\" AND name LIKE {format_query_value(like)}\"\n\n    if not_like:\n        query += f\" AND name NOT LIKE {format_query_value(not_like)}\"\n\n    result = client.query(query)\n\n    # Deserialize result as Table dataclass instances\n    tables = result_to_table(result.column_names, result.result_rows)\n\n    for table in tables:\n        column_data_query = f\"SELECT database, table, name, type AS column_type, default_kind, default_expression, comment FROM system.columns WHERE database = {format_query_value(database)} AND table = {format_query_value(table.name)}\"\n        column_data_query_result = client.query(column_data_query)\n        table.columns = [\n            c\n            for c in result_to_column(\n                column_data_query_result.column_names,\n                column_data_query_result.result_rows,\n            )\n        ]\n\n    logger.info(f\"Found {len(tables)} tables\")\n    return [asdict(table) for table in tables]",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/mcp_clickhouse/mcp_server.py\n# module: mcp_clickhouse.mcp_server\n# qname: mcp_clickhouse.mcp_server.create_clickhouse_client\n# lines: 219-237\ndef create_clickhouse_client():\n    client_config = get_config().get_client_config()\n    logger.info(\n        f\"Creating ClickHouse client connection to {client_config['host']}:{client_config['port']} \"\n        f\"as {client_config['username']} \"\n        f\"(secure={client_config['secure']}, verify={client_config['verify']}, \"\n        f\"connect_timeout={client_config['connect_timeout']}s, \"\n        f\"send_receive_timeout={client_config['send_receive_timeout']}s)\"\n    )\n\n    try:\n        client = clickhouse_connect.get_client(**client_config)\n        # Test the connection\n        version = client.server_version\n        logger.info(f\"Successfully connected to ClickHouse server version {version}\")\n        return client\n    except Exception as e:\n        logger.error(f\"Failed to connect to ClickHouse: {str(e)}\")\n        raise",
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/mcp_clickhouse/mcp_server.py\n# module: mcp_clickhouse.mcp_server\n# qname: mcp_clickhouse.mcp_server.result_to_column\n# lines: 117-118\ndef result_to_column(query_columns, result) -> List[Column]:\n    return [Column(**dict(zip(query_columns, row))) for row in result]",
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/mcp_clickhouse/mcp_server.py\n# module: mcp_clickhouse.mcp_server\n# qname: mcp_clickhouse.mcp_server.result_to_table\n# lines: 113-114\ndef result_to_table(query_columns, result) -> List[Table]:\n    return [Table(**dict(zip(query_columns, row))) for row in result]"
+      ],
+      "depth_2": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/mcp_clickhouse/mcp_env.py\n# module: mcp_clickhouse.mcp_env\n# qname: mcp_clickhouse.mcp_env.get_config\n# lines: 260-269\ndef get_config():\n    \"\"\"\n    Gets the singleton instance of ClickHouseConfig.\n    Instantiates it on the first call.\n    \"\"\"\n    global _CONFIG_INSTANCE\n    if _CONFIG_INSTANCE is None:\n        # Instantiate the config object here, ensuring load_dotenv() has likely run\n        _CONFIG_INSTANCE = ClickHouseConfig()\n    return _CONFIG_INSTANCE"
+      ],
+      "depth_max": 2
+    }
+  },
+  {
+    "name": "run_select_query",
+    "description": "Run a SELECT query in a ClickHouse database",
+    "input_schema": {
+      "properties": {
+        "query": {
+          "title": "Query",
+          "type": "string"
+        }
+      },
+      "required": [
+        "query"
+      ],
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/mcp_clickhouse/mcp_server.py\n# module: mcp_clickhouse.mcp_server\n# qname: mcp_clickhouse.mcp_server.run_select_query\n# lines: 191-216\ndef run_select_query(query: str):\n    \"\"\"Run a SELECT query in a ClickHouse database\"\"\"\n    logger.info(f\"Executing SELECT query: {query}\")\n    try:\n        future = QUERY_EXECUTOR.submit(execute_query, query)\n        try:\n            result = future.result(timeout=SELECT_QUERY_TIMEOUT_SECS)\n            # Check if we received an error structure from execute_query\n            if isinstance(result, dict) and \"error\" in result:\n                logger.warning(f\"Query failed: {result['error']}\")\n                # MCP requires structured responses; string error messages can cause\n                # serialization issues leading to BrokenResourceError\n                return {\n                    \"status\": \"error\",\n                    \"message\": f\"Query failed: {result['error']}\",\n                }\n            return result\n        except concurrent.futures.TimeoutError:\n            logger.warning(f\"Query timed out after {SELECT_QUERY_TIMEOUT_SECS} seconds: {query}\")\n            future.cancel()\n            raise ToolError(f\"Query timed out after {SELECT_QUERY_TIMEOUT_SECS} seconds\")\n    except ToolError:\n        raise\n    except Exception as e:\n        logger.error(f\"Unexpected error in run_select_query: {str(e)}\")\n        raise RuntimeError(f\"Unexpected error during query execution: {str(e)}\")",
+      "depth_max": 0
+    }
+  }
+]
