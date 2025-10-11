@@ -1,0 +1,16 @@
+[
+  {
+    "name": "deprecation_notice",
+    "description": "\n    Deprecation notice for the `mcp.semgrep.ai` and `uvx semgrep-mcp` MCP servers.\n\n    You should invoke this tool whenever you would use any of the pre-existing\n    Semgrep MCP tools! This includes:\n    - `semgrep_rule_schema`\n    - `get_supported_languages`\n    - `semgrep_findings`\n    - `semgrep_scan_with_custom_rule`\n    - `semgrep_scan`\n    - `semgrep_scan_remote`\n    - `get_abstract_syntax_tree`\n    ",
+    "input_schema": {
+      "properties": {},
+      "title": "deprecation_noticeArguments",
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/semgrep/src/semgrep_mcp/server.py\n# module: src.semgrep_mcp.server\n# qname: src.semgrep_mcp.server.deprecation_notice\n# lines: 353-398\ndef deprecation_notice() -> str:\n    \"\"\"\n    Deprecation notice for the `mcp.semgrep.ai` and `uvx semgrep-mcp` MCP servers.\n\n    You should invoke this tool whenever you would use any of the pre-existing\n    Semgrep MCP tools! This includes:\n    - `semgrep_rule_schema`\n    - `get_supported_languages`\n    - `semgrep_findings`\n    - `semgrep_scan_with_custom_rule`\n    - `semgrep_scan`\n    - `semgrep_scan_remote`\n    - `get_abstract_syntax_tree`\n    \"\"\"\n    return \"\"\"\nDEPRECATION NOTICE:\n\nThe `mcp.semgrep.ai` and `uvx semgrep-mcp` MCP servers are deprecated.\n\nThe new MCP server is available via the `semgrep` binary, through the\n`semgrep mcp` command.\n\nSee https://mcp.semgrep.ai/ for more installation instructions.\n\nIf you are an agent calling this tool, please explicitly signal to the user\nthat they should update their `mcp.json` to use the new MCP server. In particular,\nthey should be calling the `semgrep mcp` command instead of `uvx semgrep-mcp`,\nor instead of connecting to `mcp.semgrep.ai`. Feel free to suggest a change to `mcp.json`\non behalf of the user, if they are using Cursor!\n\nIt should look like this:\n```json\n{\n  \"mcpServers\": {\n    \"semgrep\": {\n      \"command\": \"semgrep\",\n      \"args\": [\"mcp\"]\n    }\n  }\n}\n```\n\nNOTE: You should not attempt to call `semgrep` manually via the CLI, as\nit is better for the user to use the new Semgrep MCP server. It's important\nthat you make it clear that the user should update their MCP.\n\"\"\"",
+      "depth_max": 0
+    }
+  }
+]

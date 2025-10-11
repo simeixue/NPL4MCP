@@ -19,6 +19,58 @@ def serialize_tool(tool):
 
 config = {
     "mcpServers": {
+        # "fibery-mcp-server": {
+        #     "command": "uv",
+        #     "args": [
+        #          "tool",
+        #          "run",
+        #          "fibery-mcp-server",
+        #          "--fibery-host",
+        #          "your-domain.fibery.io",
+        #          "--fibery-api-token",
+        #          "your-api-token"
+        #     ]
+        # },
+        # "semgrep": {
+        #     "command": "uvx",
+        #     "args": ["semgrep-mcp"],
+        #     "env": {
+        #         "SEMGREP_APP_TOKEN": "<token>"
+        #     }
+        # },
+        # "mcp-hydrolix": {
+        #     "command": "uv",
+        #     "args": [
+        #         "run",
+        #         "--with",
+        #         "mcp-hydrolix",
+        #         "--python",
+        #         "3.13",
+        #         "mcp-hydrolix"
+        #     ],
+        #     "env": {
+        #         "HYDROLIX_HOST": "<hydrolix-host>",
+        #         "HYDROLIX_USER": "<hydrolix-user>",
+        #         "HYDROLIX_PASSWORD": "<hydrolix-password>"
+        #     }
+        # },
+        # "codelogic-mcp-server": {
+        #     "type": "stdio",
+        #     "command": "uv",
+        #     "args": [
+        #         "--directory",
+        #         f"{REPO_BASE}/codelogic-mcp-server",
+        #         "run",
+        #         "codelogic-mcp-server"
+        #     ],
+        #     "env": {
+        #         "CODELOGIC_SERVER_HOST": "<url to the server e.g. https://myco.app.codelogic.com>",
+        #         "CODELOGIC_USERNAME": "<my username>",
+        #         "CODELOGIC_PASSWORD": "<my password>",
+        #         "CODELOGIC_WORKSPACE_NAME": "<my workspace>",
+        #         "CODELOGIC_DEBUG_MODE": "true"
+        #     }
+        # },
         # "mcp-metricool": {
         #     "command": "uvx",
         #     "args": [

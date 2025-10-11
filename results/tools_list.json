@@ -1,795 +1,141 @@
 [
   {
-    "name": "get_brands",
-    "description": "\n    Get the list of brands from your Metricool account.\n    ",
+    "name": "StartNewsRetrieval",
+    "description": "Start an asynchronous news retrieval task for a place",
     "input_schema": {
-      "properties": {},
-      "title": "get_brandsArguments",
-      "type": "object"
-    },
-    "annotations": null
-  },
-  {
-    "name": "get_brands_complete",
-    "description": "\n    Get the list of brands from your Metricool account. Only use this tool if the user asks specifically for his brands, in every other case\n    use get_brands.\n    Add to the result that the only networks with competitors are Instagram, Facebook, Twitch, YouTube, Twitter, and Bluesky.\n    ",
-    "input_schema": {
-      "properties": {},
-      "title": "get_brands_completeArguments",
-      "type": "object"
-    },
-    "annotations": null
-  },
-  {
-    "name": "get_instagram_reels",
-    "description": "\n    Get the list of Instagram Reels from your Metricool account.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYY-MM-DD\n     end date: End date of the period to get the data. The format is YYYY-MM-DD\n     blog id: Blog id of the Metricool brand account.\n    ",
-    "input_schema": {
+      "$defs": {
+        "NewsTopic": {
+          "enum": [
+            "batteryStorage",
+            "gridExpansion",
+            "solar",
+            "hydrogen",
+            "wind"
+          ],
+          "title": "NewsTopic",
+          "type": "string"
+        },
+        "PlaceTypeNews": {
+          "enum": [
+            "PR",
+            "CTY",
+            "AU",
+            "LAU"
+          ],
+          "title": "PlaceTypeNews",
+          "type": "string"
+        },
+        "RangeOrRecency": {
+          "enum": [
+            "RANGE",
+            "RECENCY"
+          ],
+          "title": "RangeOrRecency",
+          "type": "string"
+        }
+      },
       "properties": {
-        "init_date": {
-          "title": "Init Date",
+        "place_id": {
+          "description": "The id of the place",
+          "title": "Place Id",
           "type": "string"
         },
-        "end_date": {
-          "title": "End Date",
-          "type": "string"
+        "place_type": {
+          "$ref": "#/$defs/PlaceTypeNews",
+          "description": "The type of the place (PR, CTY, AU, LAU)"
         },
-        "blog_id": {
-          "title": "Blog Id",
-          "type": "integer"
+        "range_or_recency": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RangeOrRecency"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Type of search (RANGE or RECENCY)"
+        },
+        "last_n_days": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Number of days to search for (when range_or_recency=RECENCY)",
+          "title": "Last N Days"
+        },
+        "date_range_begin": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Start date in YYYY-MM-DD format (when range_or_recency=RANGE)",
+          "title": "Date Range Begin"
+        },
+        "date_range_end": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "End date in YYYY-MM-DD format (when range_or_recency=RANGE)",
+          "title": "Date Range End"
+        },
+        "news_topics": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/NewsTopic"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "List of topics to filter by",
+          "title": "News Topics"
         }
       },
       "required": [
-        "init_date",
-        "end_date",
-        "blog_id"
+        "place_id",
+        "place_type"
       ],
-      "title": "get_instagram_reelsArguments",
+      "title": "start_news_retrievalArguments",
       "type": "object"
     },
     "annotations": null
   },
   {
-    "name": "get_instagram_posts",
-    "description": "\n    Get the list of Instagram Posts from your Metricool account.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYY-MM-DD\n     end date: End date of the period to get the data. The format is YYYY-MM-DD\n     blog id: Blog id of the Metricool brand account.\n    ",
+    "name": "GetNewsResults",
+    "description": "Get the results of a previously started news retrieval task",
     "input_schema": {
       "properties": {
-        "init_date": {
-          "title": "Init Date",
-          "type": "string"
-        },
-        "end_date": {
-          "title": "End Date",
-          "type": "string"
-        },
-        "blog_id": {
-          "title": "Blog Id",
-          "type": "integer"
-        }
-      },
-      "required": [
-        "init_date",
-        "end_date",
-        "blog_id"
-      ],
-      "title": "get_instagram_postsArguments",
-      "type": "object"
-    },
-    "annotations": null
-  },
-  {
-    "name": "get_instagram_stories",
-    "description": "\n    Get the list of Instagram Stories from your Metricool account.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYY-MM-DD\n     end date: End date of the period to get the data. The format is YYYY-MM-DD\n     blog id: Blog id of the Metricool brand account.\n    ",
-    "input_schema": {
-      "properties": {
-        "init_date": {
-          "title": "Init Date",
-          "type": "string"
-        },
-        "end_date": {
-          "title": "End Date",
-          "type": "string"
-        },
-        "blog_id": {
-          "title": "Blog Id",
-          "type": "integer"
-        }
-      },
-      "required": [
-        "init_date",
-        "end_date",
-        "blog_id"
-      ],
-      "title": "get_instagram_storiesArguments",
-      "type": "object"
-    },
-    "annotations": null
-  },
-  {
-    "name": "get_tiktok_videos",
-    "description": "\n    Get the list of Tiktok Videos from your Metricool account.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYY-MM-DD\n     end date: End date of the period to get the data. The format is YYYY-MM-DD\n     blog id: Blog id of the Metricool brand account.\n    ",
-    "input_schema": {
-      "properties": {
-        "init_date": {
-          "title": "Init Date",
-          "type": "string"
-        },
-        "end_date": {
-          "title": "End Date",
-          "type": "string"
-        },
-        "blog_id": {
-          "title": "Blog Id",
-          "type": "integer"
-        }
-      },
-      "required": [
-        "init_date",
-        "end_date",
-        "blog_id"
-      ],
-      "title": "get_tiktok_videosArguments",
-      "type": "object"
-    },
-    "annotations": null
-  },
-  {
-    "name": "get_facebook_reels",
-    "description": "\n    Get the list of Facebook Reels from your Metricool account.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYY-MM-DD\n     end date: End date of the period to get the data. The format is YYYY-MM-DD\n     blog id: Blog id of the Metricool brand account.\n    ",
-    "input_schema": {
-      "properties": {
-        "init_date": {
-          "title": "Init Date",
-          "type": "string"
-        },
-        "end_date": {
-          "title": "End Date",
-          "type": "string"
-        },
-        "blog_id": {
-          "title": "Blog Id",
-          "type": "integer"
-        }
-      },
-      "required": [
-        "init_date",
-        "end_date",
-        "blog_id"
-      ],
-      "title": "get_facebook_reelsArguments",
-      "type": "object"
-    },
-    "annotations": null
-  },
-  {
-    "name": "get_facebook_posts",
-    "description": "\n    Get the list of Facebook Posts from your Metricool brand account.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYY-MM-DD\n     end date: End date of the period to get the data. The format is YYYY-MM-DD\n     blog id: Blog id of the Metricool brand account.\n    ",
-    "input_schema": {
-      "properties": {
-        "init_date": {
-          "title": "Init Date",
-          "type": "string"
-        },
-        "end_date": {
-          "title": "End Date",
-          "type": "string"
-        },
-        "blog_id": {
-          "title": "Blog Id",
-          "type": "integer"
-        }
-      },
-      "required": [
-        "init_date",
-        "end_date",
-        "blog_id"
-      ],
-      "title": "get_facebook_postsArguments",
-      "type": "object"
-    },
-    "annotations": null
-  },
-  {
-    "name": "get_facebook_stories",
-    "description": "\n    Get the list of Facebook Stories from your Metricool brand account.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYY-MM-DD\n     end date: End date of the period to get the data. The format is YYYY-MM-DD\n     blog id: Blog id of the Metricool brand account.\n    ",
-    "input_schema": {
-      "properties": {
-        "init_date": {
-          "title": "Init Date",
-          "type": "string"
-        },
-        "end_date": {
-          "title": "End Date",
-          "type": "string"
-        },
-        "blog_id": {
-          "title": "Blog Id",
-          "type": "integer"
-        }
-      },
-      "required": [
-        "init_date",
-        "end_date",
-        "blog_id"
-      ],
-      "title": "get_facebook_storiesArguments",
-      "type": "object"
-    },
-    "annotations": null
-  },
-  {
-    "name": "get_thread_posts",
-    "description": "\n    Get the list of Threads Posts from your Metricool brand account.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYY-MM-DD\n     end date: End date of the period to get the data. The format is YYYY-MM-DD\n     blog id: Blog id of the Metricool brand account.\n    ",
-    "input_schema": {
-      "properties": {
-        "init_date": {
-          "title": "Init Date",
-          "type": "string"
-        },
-        "end_date": {
-          "title": "End Date",
-          "type": "string"
-        },
-        "blog_id": {
-          "title": "Blog Id",
-          "type": "integer"
-        }
-      },
-      "required": [
-        "init_date",
-        "end_date",
-        "blog_id"
-      ],
-      "title": "get_thread_postsArguments",
-      "type": "object"
-    },
-    "annotations": null
-  },
-  {
-    "name": "get_x_posts",
-    "description": "\n    Get the list of X (Twitter) Posts from your Metricool account.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYYMMDD\n     end date: End date of the period to get the data. The format is YYYYMMDD\n     blog id: Blog id of the Metricool brand account.\n    ",
-    "input_schema": {
-      "properties": {
-        "init_date": {
-          "title": "Init Date",
-          "type": "string"
-        },
-        "end_date": {
-          "title": "End Date",
-          "type": "string"
-        },
-        "blog_id": {
-          "title": "Blog Id",
-          "type": "integer"
-        }
-      },
-      "required": [
-        "init_date",
-        "end_date",
-        "blog_id"
-      ],
-      "title": "get_x_postsArguments",
-      "type": "object"
-    },
-    "annotations": null
-  },
-  {
-    "name": "get_bluesky_posts",
-    "description": "\n    Get the list of Bluesky Posts from your Metricool brand account.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYY-MM-DD\n     end date: End date of the period to get the data. The format is YYYY-MM-DD\n     blog id: Blog id of the Metricool brand account.\n    ",
-    "input_schema": {
-      "properties": {
-        "init_date": {
-          "title": "Init Date",
-          "type": "string"
-        },
-        "end_date": {
-          "title": "End Date",
-          "type": "string"
-        },
-        "blog_id": {
-          "title": "Blog Id",
-          "type": "integer"
-        }
-      },
-      "required": [
-        "init_date",
-        "end_date",
-        "blog_id"
-      ],
-      "title": "get_bluesky_postsArguments",
-      "type": "object"
-    },
-    "annotations": null
-  },
-  {
-    "name": "get_linkedin_posts",
-    "description": "\n    Get the list of Linkedin Posts from your Metricool brand account.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYY-MM-DD\n     end date: End date of the period to get the data. The format is YYYY-MM-DD\n     blog id: Blog id of the Metricool brand account.\n    ",
-    "input_schema": {
-      "properties": {
-        "init_date": {
-          "title": "Init Date",
-          "type": "string"
-        },
-        "end_date": {
-          "title": "End Date",
-          "type": "string"
-        },
-        "blog_id": {
-          "title": "Blog Id",
-          "type": "integer"
-        }
-      },
-      "required": [
-        "init_date",
-        "end_date",
-        "blog_id"
-      ],
-      "title": "get_linkedin_postsArguments",
-      "type": "object"
-    },
-    "annotations": null
-  },
-  {
-    "name": "get_pinterest_pins",
-    "description": "\n    Get the list of Pinterest Pins from your Metricool brand account.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYY-MM-DD\n     end date: End date of the period to get the data. The format is YYYY-MM-DD\n     blog id: Blog id of the Metricool brand account.\n    ",
-    "input_schema": {
-      "properties": {
-        "init_date": {
-          "title": "Init Date",
-          "type": "string"
-        },
-        "end_date": {
-          "title": "End Date",
-          "type": "string"
-        },
-        "blog_id": {
-          "title": "Blog Id",
-          "type": "integer"
-        }
-      },
-      "required": [
-        "init_date",
-        "end_date",
-        "blog_id"
-      ],
-      "title": "get_pinterest_pinsArguments",
-      "type": "object"
-    },
-    "annotations": null
-  },
-  {
-    "name": "get_youtube_videos",
-    "description": "\n    Get the list of Youtube Videos from your Metricool brand account.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYY-MM-DD\n     end date: End date of the period to get the data. The format is YYYY-MM-DD\n     blog id: Blog id of the Metricool brand account.\n    ",
-    "input_schema": {
-      "properties": {
-        "init_date": {
-          "title": "Init Date",
-          "type": "string"
-        },
-        "end_date": {
-          "title": "End Date",
-          "type": "string"
-        },
-        "blog_id": {
-          "title": "Blog Id",
-          "type": "integer"
-        }
-      },
-      "required": [
-        "init_date",
-        "end_date",
-        "blog_id"
-      ],
-      "title": "get_youtube_videosArguments",
-      "type": "object"
-    },
-    "annotations": null
-  },
-  {
-    "name": "get_twitch_videos",
-    "description": "\n    Get the list of Twitch Videos from your Metricool account.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYYMMDD\n     end date: End date of the period to get the data. The format is YYYYMMDD\n     blog id: Blog id of the Metricool brand account.\n    ",
-    "input_schema": {
-      "properties": {
-        "init_date": {
-          "title": "Init Date",
-          "type": "string"
-        },
-        "end_date": {
-          "title": "End Date",
-          "type": "string"
-        },
-        "blog_id": {
-          "title": "Blog Id",
-          "type": "integer"
-        }
-      },
-      "required": [
-        "init_date",
-        "end_date",
-        "blog_id"
-      ],
-      "title": "get_twitch_videosArguments",
-      "type": "object"
-    },
-    "annotations": null
-  },
-  {
-    "name": "get_facebookads_campaigns",
-    "description": "\n    Get the list of Facebook Ads Campaigns from your Metricool account.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYYMMDD\n     end date: End date of the period to get the data. The format is YYYYMMDD\n     blog id: Blog id of the Metricool brand account.\n    ",
-    "input_schema": {
-      "properties": {
-        "init_date": {
-          "title": "Init Date",
-          "type": "string"
-        },
-        "end_date": {
-          "title": "End Date",
-          "type": "string"
-        },
-        "blog_id": {
-          "title": "Blog Id",
-          "type": "integer"
-        }
-      },
-      "required": [
-        "init_date",
-        "end_date",
-        "blog_id"
-      ],
-      "title": "get_facebookads_campaignsArguments",
-      "type": "object"
-    },
-    "annotations": null
-  },
-  {
-    "name": "get_googleads_campaigns",
-    "description": "\n    Get the list of Google Ads Campaigns from your Metricool account.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYYMMDD\n     end date: End date of the period to get the data. The format is YYYYMMDD\n     blog id: Blog id of the Metricool brand account.\n    ",
-    "input_schema": {
-      "properties": {
-        "init_date": {
-          "title": "Init Date",
-          "type": "string"
-        },
-        "end_date": {
-          "title": "End Date",
-          "type": "string"
-        },
-        "blog_id": {
-          "title": "Blog Id",
-          "type": "integer"
-        }
-      },
-      "required": [
-        "init_date",
-        "end_date",
-        "blog_id"
-      ],
-      "title": "get_googleads_campaignsArguments",
-      "type": "object"
-    },
-    "annotations": null
-  },
-  {
-    "name": "get_tiktokads_campaigns",
-    "description": "\n    Get the list of Tiktok Ads Campaigns from your Metricool brand account.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYY-MM-DD\n     end date: End date of the period to get the data. The format is YYYY-MM-DD\n     blog id: Blog id of the Metricool brand account.\n    ",
-    "input_schema": {
-      "properties": {
-        "init_date": {
-          "title": "Init Date",
-          "type": "string"
-        },
-        "end_date": {
-          "title": "End Date",
-          "type": "string"
-        },
-        "blog_id": {
-          "title": "Blog Id",
-          "type": "integer"
-        }
-      },
-      "required": [
-        "init_date",
-        "end_date",
-        "blog_id"
-      ],
-      "title": "get_tiktokads_campaignsArguments",
-      "type": "object"
-    },
-    "annotations": null
-  },
-  {
-    "name": "get_network_competitors",
-    "description": "\n    Get the list of your competitors from your Metricool brand account.\n    Add interesting conclusions for my brand about my competitors.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYY-MM-DD\n     end date: End date of the period to get the data. The format is YYYY-MM-DD\n     network: Network to retrieve the competitors. The format is \"twitter\", \"facebook\", \"instagram\", \"youtube\", \"twitch\" and \"bluesky\". Only these are accepted.\n     blog id: Blog id of the Metricool brand account.\n     limit: Limit of competitors. By default = 10\n     timezone: Timezone of the post. The format is \"Europe%2FMadrid\".  Use the timezone of the user extracted from the get_brands tool.\n    ",
-    "input_schema": {
-      "properties": {
-        "network": {
-          "title": "Network",
-          "type": "string"
-        },
-        "init_date": {
-          "title": "Init Date",
-          "type": "string"
-        },
-        "end_date": {
-          "title": "End Date",
-          "type": "string"
-        },
-        "blog_id": {
-          "title": "Blog Id",
-          "type": "integer"
-        },
-        "limit": {
-          "title": "Limit",
-          "type": "integer"
-        },
-        "timezone": {
-          "title": "Timezone",
+        "task_id": {
+          "description": "The task ID returned by StartNewsRetrieval",
+          "title": "Task Id",
           "type": "string"
         }
       },
       "required": [
-        "network",
-        "init_date",
-        "end_date",
-        "blog_id",
-        "limit",
-        "timezone"
+        "task_id"
       ],
-      "title": "get_network_competitorsArguments",
-      "type": "object"
-    },
-    "annotations": null
-  },
-  {
-    "name": "get_network_competitors_posts",
-    "description": "\n    Get the list of posts from your competitors from your Metricool brand account.\n    Add interesting conclusions for my brand about my competitors and analyze their posts.\n\n    Args:\n     init date: Init date of the period to get the data. The format is YYYY-MM-DD\n     end date: End date of the period to get the data. The format is YYYY-MM-DD\n     network: Network to retrieve the posts. The format is \"twitter\", \"facebook\", \"instagram\", \"youtube\", \"twitch\" and \"bluesky\". Only these are accepted.\n     blog id: Blog id of the Metricool brand account.\n     limit: Limit of posts of competitors. By default = 50\n     timezone: Timezone of the post. The format is \"Europe%2FMadrid\".  Use the timezone of the user extracted from the get_brands tool.\n    ",
-    "input_schema": {
-      "properties": {
-        "network": {
-          "title": "Network",
-          "type": "string"
-        },
-        "init_date": {
-          "title": "Init Date",
-          "type": "string"
-        },
-        "end_date": {
-          "title": "End Date",
-          "type": "string"
-        },
-        "blog_id": {
-          "title": "Blog Id",
-          "type": "integer"
-        },
-        "limit": {
-          "title": "Limit",
-          "type": "integer"
-        },
-        "timezone": {
-          "title": "Timezone",
-          "type": "string"
-        }
-      },
-      "required": [
-        "network",
-        "init_date",
-        "end_date",
-        "blog_id",
-        "limit",
-        "timezone"
-      ],
-      "title": "get_network_competitors_postsArguments",
-      "type": "object"
-    },
-    "annotations": null
-  },
-  {
-    "name": "get_pinterest_boards",
-    "description": "\n    Get the list of Pinterest boards for a specific Metricool brand (blog_id).\n    If the user doesn't provide a blog_id, ask for it.\n\n    Args:\n     blog_id: Blog id of the Metricool brand account.\n    ",
-    "input_schema": {
-      "properties": {
-        "blog_id": {
-          "title": "Blog Id",
-          "type": "integer"
-        }
-      },
-      "required": [
-        "blog_id"
-      ],
-      "title": "get_pinterest_boardsArguments",
-      "type": "object"
-    },
-    "annotations": null
-  },
-  {
-    "name": "post_schedule_post",
-    "description": "\n    Schedule a post to Metricool at a specific date and time.\n    To be able to schedule the post, you need to maintain the structure.\n    You can use the tool get_best_time_to_post to get the best time to post for a specific provider if the user doesn't specify the time to post.\n    If the post include Instagram, is a must to have at least one image or video. Posts must include an image or a carousel, Reels must include a video, and Stories can include either an image or a video. If you don't have more information, you can ask the user about it and wait until you have the information.\n    If the post include Pinterest, is a must to have a image and the board where to publish the pin. If you don't have more information, you can ask the user about it and wait until you have the information.\n    If the post include Youtube, is a must to have a video, select the audience (if it's video made for kids or not) and the title of the video. If you don't have more information, you can ask the user about it and wait until you have the information.\n    If the post include Tiktok, is a must to have at least one image or video. If you don't have more information, you can ask the user about it and wait until you have the information.\n    If the post is Facebook Reel, is a must to have a video. If is Facebook Story, image or video is needed. If you don't have more information, you can ask the user about it and wait until you have the information.\n    If the post is Bluesky, make sure the text does not exceed 300 characters. If the content exceeds that limit, do not retry and return an error informing the user: \"Error: The text exceeds the 300-character limit allowed on Bluesky. Please edit it.\"\n    If the post is for X (formerly Twitter), make sure before posting that the text does not exceed 280 characters. You must NOT split the message into multiple tweets or threads, the message must be evaluated strictly against a 280-character limit. If the text exceeds 280 characters, do not retry and return only the following error message and stop processing:\n    \"Error: The text exceeds the 280-character limit allowed on X. Please edit it.\"\n    The date can't be in the past.\n    DO NOT modify the text if there's any error, just notify the user.\n\n    Args:\n     date: Date and time to publish the post. The format is YYYY-MM-DDT00:00:00\n     blog id: Blog id of the Metricool brand account.\n     info: Data of the post to be scheduled. Should be a json object with the following fields:\n        autoPublish: True or False, default is True.\n        descendants: list with the args of the other posts if it is a thread with the format [args of the second post, args of the third post,...  ], default is empty list if there is no thread.\n        draft: True or False, default is False.\n        firstCommentText: Text of the first comment of the post. Default \"\"\n        hasNotReadNotes: True or False, default is False.\n        media: default is empty list.\n        mediaAltText: default is empty list.\n        providers: always need at least one provider with the format [{\"network\":\"<string>\"}]. Use \"twitter\" for X posts.\n        publicationDate: Date and timezone of the post. The format is {dateTime:\"YYYY-MM-DDT00:00:00\", timezone:\"Europe/Madrid\"}. Use the timezone of the user extracted from the get_brands tool.\n        shortener: True or False, default is False.\n        smartLinkData: default is {ids:[]}\n        text: Text of the post.\n        Always you need to add the networkData for the posts, as empty if you don't have more information. Only include the networkData for the networks you have in the providers list.\n            The format is \"twitterData\": {\"tags\":[]}, Tags is used for tagging people on the images of the post, not hashtags.\n                            \"facebookData\": {\"type\":\"<string>\", \"title\":\"<string>\", \"boost\":<double>, \"boostPayer\":\"<string>\", \"boostBeneficiary\":\"<string>\"},\n                                Facebook type can be \"POST\", \"REEL\" or \"STORY\"\n                                Facebook title is only available for Facebook videos (This is separate from the main text of the post).\n                                Facebook boost, boostPayer, and boostBeneficiary are only included if they are promoted posts.\n                            \"instagramData\": {\"type\": \"<string>\" (default = POST), \"collaborators\":[{username: \"string\", deleted: false}]], \"carouselTags\":{\"<number>\":[{\"username\":\"<string>\",\"x\":<double>,\"y\":<double>}]} (number is the index of the image within the carousel), \"showReelOnFeed\": \"<boolean>\" (default = true), \"boost\":<double>, \"boostPayer\":\"<string>\", \"boostBeneficiary\":\"<string>\"},\n                                Instagram type can be \"POST\", \"REEL\" or \"STORY\".\n                                There could be more than one collaborator, following the same structure.\n                                The carouselTags is a dictionary with the number of the image in the carousel as key and a list of tags for that image.\n                            \"linkedinData\": {\"documentTitle\": \"<string>\", \"publishImagesAsPDF\": \"<boolean>\" (default = false), \"previewIncluded\": \"<boolean>\" (default = true), \"type\": \"<string>\" (default = post), \"poll\": {\"question\": \"<string>\", \"options\": [{\"text\": \"<string>\"}, {\"text\": \"<string>\"}], \"settings\": {\"duration\": \"<string>\"}}},\n                                Linkedin type can be \"post\" or \"poll\".\n                                If there is a documentTitle in Linkedin, publishImagesAsPDF must be true.\n                                Linkedin poll duration can be \"ONE_DAY\", \"THREE_DAYS\", \"SEVEN_DAYS \" or \"FOURTEEN_DAYS \".\n                            \"pinterestData\": {\"boardId\":\"<string>\", \"pinTitle\":\"<string>\",\"pinLink\":\"<string>\", \"pinNewFormat\":\"<boolean>\"},\n                            \"youtubeData\": {\"title\": \"<string>\", \"type\": \"<string>\" (default = video), \"privacy\": \"<string>\" (default = public), \"tags\": [ \"<string>\", \"<string>\" ], \"category\": \"<string>\" (optional field), \"madeForKids\": \"<boolean>\"},\n                                Youtube type can be \"video\" or \"short\" and privacy can be \"public\", \"unlisted\" or \"private\".\n                                Youtube category can be FILM_ANIMATION, AUTOS_VEHICLES, MUSIC, PETS_ANIMALS, SPORTS, TRAVEL_EVENTS, GAMING, PEOPLE_BLOGS, COMEDY, ENTERTAINMENT, NEWS_POLITICS, HOWTO_STYLE, EDUCATION, SCIENCE_TECHNOLOGY, NONPROFITS_ACTIVISM.\n                            \"twitchData\": {\"autoPublish\":\"<boolean>\", \"tags\":[]},\n                            \"tiktokData\": {\"disableComment\": \"<boolean>\" (default = false), \"disableDuet\": \"<boolean>\" (default = false), \"disableStitch\": \"<boolean>\" (default = false), \"privacyOption\": \"<string>\" (default = \"PUBLIC_TO_EVERYONE\"), \"commercialContentThirdParty\": \"<boolean>\" (default = false), \"commercialContentOwnBrand\": \"<boolean>\" (default = false), \"title\": \"<string>\", \"autoAddMusic\": \"<boolean>\" (default = false), \"photoCoverIndex\": \"<integer>\" (default = 0)},\n                                Tiktok privacyOption can be \"PUBLIC_TO_EVERYONE\", \"MUTUAL_FOLLOW_FRIENDS\", \"FOLLOWER_OF_CREATOR\" or \"SELF_ONLY\".\n                            \"blueskyData\": {\"postLanguages\":[\"\",\"\"]},\n                            \"threadsData\":{\"allowedCountryCodes:[\"\",\"\"]}\n        The other fields are optional, but you need to add the ones you have. If you don't have more information, you can ask the user about it and wait until you have the information.\n\n    ",
-    "input_schema": {
-      "properties": {
-        "date": {
-          "title": "Date",
-          "type": "string"
-        },
-        "blog_id": {
-          "title": "Blog Id",
-          "type": "integer"
-        },
-        "info": {
-          "title": "Info"
-        }
-      },
-      "required": [
-        "date",
-        "blog_id",
-        "info"
-      ],
-      "title": "post_schedule_postArguments",
-      "type": "object"
-    },
-    "annotations": null
-  },
-  {
-    "name": "get_scheduled_posts",
-    "description": "\n    Get the list of scheduled posts for a specific Metricool brand (blog_id).\n    Only retrieves posts that are scheduled (not yet published).\n    If the user doesn't provide a blog_id, ask for it.\n\n    Args:\n     blog_id: Blog id of the Metricool brand account.\n     start: Start date of the period to get the data. The format is YYYY-MM-DD\n     end: End date of the period to get the data. The format is YYYY-MM-DD\n     timezone: Timezone of the post. The format is \"Europe%2FMadrid\".  Use the timezone of the user extracted from the get_brands tool.\n     extendedRange: When it's true, search date range is expanded one day after and one day before. Default value is false.\n    ",
-    "input_schema": {
-      "properties": {
-        "blog_id": {
-          "title": "Blog Id",
-          "type": "integer"
-        },
-        "start": {
-          "title": "Start",
-          "type": "string"
-        },
-        "end": {
-          "title": "End",
-          "type": "string"
-        },
-        "timezone": {
-          "title": "Timezone",
-          "type": "string"
-        },
-        "extendedRange": {
-          "title": "Extendedrange",
-          "type": "boolean"
-        }
-      },
-      "required": [
-        "blog_id",
-        "start",
-        "end",
-        "timezone",
-        "extendedRange"
-      ],
-      "title": "get_scheduled_postsArguments",
-      "type": "object"
-    },
-    "annotations": null
-  },
-  {
-    "name": "get_best_time_to_post",
-    "description": "\n    Get the best time to post for a specific provider. The return is a list of hours and days with a value. The higher the value, the best time to post.\n    Try to get the best for as maximum of 1 week. If you have day to publish but not hours, choose the start and end of this day.\n    Args:\n     start: Start date of the period to get the data. The format is YYYY-MM-DD\n     end: End date of the period to get the data. The format is YYYY-MM-DD\n     blog id: Blog id of the Metricool brand account.\n     provider: Provider of the post. The format is \"twitter\", \"facebook\", \"instagram\", \"linkedin\", \"youtube\", \"tiktok\". Only these are accepted.\n     timezone: Timezone of the post. The format is \"Europe%2FMadrid\".  Use the timezone of the user extracted from the get_brands tool.\n    ",
-    "input_schema": {
-      "properties": {
-        "start": {
-          "title": "Start",
-          "type": "string"
-        },
-        "end": {
-          "title": "End",
-          "type": "string"
-        },
-        "blog_id": {
-          "title": "Blog Id",
-          "type": "integer"
-        },
-        "provider": {
-          "title": "Provider",
-          "type": "string"
-        },
-        "timezone": {
-          "title": "Timezone",
-          "type": "string"
-        }
-      },
-      "required": [
-        "start",
-        "end",
-        "blog_id",
-        "provider",
-        "timezone"
-      ],
-      "title": "get_best_time_to_postArguments",
-      "type": "object"
-    },
-    "annotations": null
-  },
-  {
-    "name": "update_schedule_post",
-    "description": "\n    Update a scheduled post in Metricool. You need the id of the post to update. Get it from the get_scheduled_posts tool previous on the conversation.\n    Ask the user if they're sure they want to modify the post, including what will be changed, and require them to confirm.\n    Do not retry if there is a problem.\n    To update the post, ensure the full original content is included in the request, modifying only the new information while keeping the rest unchanged and maintaining the original structure.\n    If the post include Instagram, is a must to have at least one image or video. Posts must include an image or a carousel, Reels must include a video, and Stories can include either an image or a video. If you don't have more information, you can ask the user about it and wait until you have the information.\n    If the post include Pinterest, is a must to have a image and the board where to publish the pin. If you don't have more information, you can ask the user about it and wait until you have the information.\n    If the post include Youtube, is a must to have a video, select the audience (if it's video made for kids or not) and the title of the video. If you don't have more information, you can ask the user about it and wait until you have the information.\n    If the post include Tiktok, is a must to have at least one image or video. If you don't have more information, you can ask the user about it and wait until you have the information.\n    If the post is Facebook Reel, is a must to have a video. If is Facebook Story, image or video is needed. If you don't have more information, you can ask the user about it and wait until you have the information.\n    If the post is Bluesky, make sure the text does not exceed 300 characters. If the content exceeds that limit, do not retry and return an error informing the user: \"Error: The text exceeds the 300-character limit allowed on Bluesky. Please edit it.\"\n    If the post is for X (formerly Twitter), make sure before posting that the text does not exceed 280 characters. You must NOT split the message into multiple tweets or threads, the message must be evaluated strictly against a 280-character limit. If the text exceeds 280 characters, do not retry and return only the following error message and stop processing:\n\n    The date can't be in the past.\n\n    Args:\n     date: Date and time to publish the post. The format is YYYY-MM-DDT00:00:00\n     id: id of the post to update. Get it from the get_scheduled_posts tool previous on the conversation.\n     blog id: Blog id of the Metricool brand account.\n     info: Data of the post to be scheduled. Should be a json object with the following fields:\n        id: id of the post to update. Get it from the get_scheduled_posts tool previous on the conversation. The format is \"id\":<integer>\n        uuid: uuid of the post to update. Get it from the get_scheduled_posts tool previous on the conversation. The format is \"uuid\":\"<string>\"\n        autoPublish: True or False, default is True.\n        descendants: list with the args of the other posts if it is a thread with the format [args of the second post, args of the third post,...  ], default is empty list if there is no thread.\n        draft: True or False, default is False.\n        firstCommentText: Text of the first comment of the post. Default \"\"\n        hasNotReadNotes: True or False, default is False.\n        media: default is empty list.\n        mediaAltText: default is empty list.\n        providers: always need at least one provider with the format [{\"network\":\"<string>\"}]. Use \"twitter\" for X posts.\n        publicationDate: Date and timezone of the post. The format is {dateTime:\"2025-01-01T00:00:00\", timezone:\"Europe/Madrid\"}\n        shortener: True or False, default is False.\n        smartLinkData: default is {ids:[]}\n        text: Text of the post.\n        Always you need to add the networkData for the posts, as empty if you don't have more information. Only include the networkData for the networks you have in the providers list.\n            The format is \"twitterData\": {\"tags\":[]}, Tags is used for tagging people on the images of the post, not hashtags.\n                            \"facebookData\": {\"type\":\"<string>\", \"title\":\"<string>\", \"boost\":<double>, \"boostPayer\":\"<string>\", \"boostBeneficiary\":\"<string>\"},\n                                Facebook type can be \"POST\", \"REEL\" or \"STORY\"\n                                Facebook title is only available for Facebook videos (This is separate from the main text of the post).\n                                Facebook boost, boostPayer, and boostBeneficiary are only included if they are promoted posts.\n                            \"instagramData\": {\"type\": \"<string>\" (default = POST), \"collaborators\":[{username: \"string\", deleted: false}]], \"carouselTags\":{\"<number>\":[{\"username\":\"<string>\",\"x\":<double>,\"y\":<double>}]} (number is the index of the image within the carousel), \"showReelOnFeed\": \"<boolean>\" (default = true), \"boost\":<double>, \"boostPayer\":\"<string>\", \"boostBeneficiary\":\"<string>\"},\n                                Instagram type can be \"POST\", \"REEL\" or \"STORY\".\n                                There could be more than one collaborator, following the same structure.\n                                The carouselTags is a dictionary with the number of the image in the carousel as key and a list of tags for that image.\n                            \"linkedinData\": {\"documentTitle\": \"<string>\", \"publishImagesAsPDF\": \"<boolean>\" (default = false), \"previewIncluded\": \"<boolean>\" (default = true), \"type\": \"<string>\" (default = post), \"poll\": {\"question\": \"<string>\", \"options\": [{\"text\": \"<string>\"}, {\"text\": \"<string>\"}], \"settings\": {\"duration\": \"<string>\"}}},\n                                Linkedin type can be \"post\" or \"poll\".\n                                If there is a documentTitle in Linkedin, publishImagesAsPDF must be true.\n                                Linkedin poll duration can be \"ONE_DAY\", \"THREE_DAYS\", \"SEVEN_DAYS \" or \"FOURTEEN_DAYS \".\n                            \"pinterestData\": {\"boardId\":\"<string>\", \"pinTitle\":\"<string>\",\"pinLink\":\"<string>\", \"pinNewFormat\":\"<boolean>\"},\n                            \"youtubeData\": {\"title\": \"<string>\", \"type\": \"<string>\" (default = video), \"privacy\": \"<string>\" (default = public), \"tags\": [ \"<string>\", \"<string>\" ], \"category\": \"<string>\" (optional field), \"madeForKids\": \"<boolean>\"},\n                                Youtube type can be \"video\" or \"short\" and privacy can be \"public\", \"unlisted\" or \"private\".\n                                Youtube category can be FILM_ANIMATION, AUTOS_VEHICLES, MUSIC, PETS_ANIMALS, SPORTS, TRAVEL_EVENTS, GAMING, PEOPLE_BLOGS, COMEDY, ENTERTAINMENT, NEWS_POLITICS, HOWTO_STYLE, EDUCATION, SCIENCE_TECHNOLOGY, NONPROFITS_ACTIVISM.\n                            \"twitchData\": {\"autoPublish\":\"<boolean>\", \"tags\":[]},\n                            \"tiktokData\": {\"disableComment\": \"<boolean>\" (default = false), \"disableDuet\": \"<boolean>\" (default = false), \"disableStitch\": \"<boolean>\" (default = false), \"privacyOption\": \"<string>\" (default = \"PUBLIC_TO_EVERYONE\"), \"commercialContentThirdParty\": \"<boolean>\" (default = false), \"commercialContentOwnBrand\": \"<boolean>\" (default = false), \"title\": \"<string>\", \"autoAddMusic\": \"<boolean>\" (default = false), \"photoCoverIndex\": \"<integer>\" (default = 0)},\n                                Tiktok privacyOption can be \"PUBLIC_TO_EVERYONE\", \"MUTUAL_FOLLOW_FRIENDS\", \"FOLLOWER_OF_CREATOR\" or \"SELF_ONLY\".\n                            \"blueskyData\": {\"postLanguages\":[\"\",\"\"]},\n                            \"threadsData\":{\"allowedCountryCodes:[\"\",\"\"]}\n    ",
-    "input_schema": {
-      "properties": {
-        "id": {
-          "title": "Id",
-          "type": "string"
-        },
-        "date": {
-          "title": "Date",
-          "type": "string"
-        },
-        "blog_id": {
-          "title": "Blog Id",
-          "type": "integer"
-        },
-        "info": {
-          "title": "Info"
-        }
-      },
-      "required": [
-        "id",
-        "date",
-        "blog_id",
-        "info"
-      ],
-      "title": "update_schedule_postArguments",
-      "type": "object"
-    },
-    "annotations": null
-  },
-  {
-    "name": "get_metrics",
-    "description": "\n    Retrieve the available metrics for a specific network.\n    Args:\n        network: Specific network to get the available metrics.\n    ",
-    "input_schema": {
-      "properties": {
-        "network": {
-          "title": "Network",
-          "type": "string"
-        }
-      },
-      "required": [
-        "network"
-      ],
-      "title": "get_metricsArguments",
-      "type": "object"
-    },
-    "annotations": null
-  },
-  {
-    "name": "get_analytics",
-    "description": "\n    Retrieve analytics data for a specific Metricool brand. If the user does not specify any metric you can use the\n    get_metrics tool and let the user decide them.\n\n    Args:\n        - blog_id (int): ID of the Metricool brand account. Required.\n        - start (str): Start date of the data period (format: YYYY-MM-DD). Required.\n        - end (str): End date of the data period (format: YYYY-MM-DD). Required.\n        - timezone (str): Timezone from the brand(e.g., Europe%2FMadrid). Required. If you don't have the timezone you can obtain it from the get_brands tool\n        - network (str): Social network to analyze (e.g., facebook, instagram, linkedin, youtube, tiktok, etc.), it must be connected to the brand. Required.\n        - metric ([str]): List of metrics, default is empty.\n        If blog_id is missing, ask the user to provide it.\n        If network is missing, ask the user to specify one.\n        If network is not connected to the brand, ask the user to specify one of the connected ones.\n",
-    "input_schema": {
-      "properties": {
-        "blog_id": {
-          "title": "Blog Id",
-          "type": "integer"
-        },
-        "start": {
-          "title": "Start",
-          "type": "string"
-        },
-        "end": {
-          "title": "End",
-          "type": "string"
-        },
-        "timezone": {
-          "title": "Timezone",
-          "type": "string"
-        },
-        "network": {
-          "title": "Network",
-          "type": "string"
-        },
-        "metric": {
-          "title": "Metric"
-        }
-      },
-      "required": [
-        "blog_id",
-        "start",
-        "end",
-        "timezone",
-        "network",
-        "metric"
-      ],
-      "title": "get_analyticsArguments",
+      "title": "get_news_resultsArguments",
       "type": "object"
     },
     "annotations": null

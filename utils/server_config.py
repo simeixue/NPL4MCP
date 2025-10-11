@@ -142,21 +142,54 @@ config = {
         #         "ATLA_API_KEY": "<your-atla-api-key>"
         #     }
         # },
-        "mcp-metricool": {
-            "command": "uvx",
-            "args": [
-                "--upgrade",
-                "mcp-metricool"
-            ],
-            "env": {
-                "METRICOOL_USER_TOKEN": "<METRICOOL_USER_TOKEN>",
-                "METRICOOL_USER_ID": "<METRICOOL_USER_ID>"
-            }
-        },
-        
+        # "mcp-metricool": {
+        #     "command": "uvx",
+        #     "args": [
+        #         "--upgrade",
+        #         "mcp-metricool"
+        #     ],
+        #     "env": {
+        #         "METRICOOL_USER_TOKEN": "<METRICOOL_USER_TOKEN>",
+        #         "METRICOOL_USER_ID": "<METRICOOL_USER_ID>"
+        #     }
+        # },
+        # "mcp-hydrolix": {
+        #     "command": "uv",
+        #     "args": [
+        #         "run",
+        #         "--with",
+        #         "mcp-hydrolix",
+        #         "--python",
+        #         "3.13",
+        #         "mcp-hydrolix"
+        #     ],
+        #     "env": {
+        #         "HYDROLIX_HOST": "<hydrolix-host>",
+        #         "HYDROLIX_USER": "<hydrolix-user>",
+        #         "HYDROLIX_PASSWORD": "<hydrolix-password>"
+        #     }
+        # },
+        # "semgrep": {
+        #     "command": "uvx",
+        #     "args": ["semgrep-mcp"],
+        #     "env": {
+        #         "SEMGREP_APP_TOKEN": "<token>"
+        #     }
+        # },
+        # "fibery-mcp-server": {
+        #     "command": "uv",
+        #     "args": [
+        #          "tool",
+        #          "run",
+        #          "fibery-mcp-server",
+        #          "--fibery-host",
+        #          "your-domain.fibery.io",
+        #          "--fibery-api-token",
+        #          "your-api-token"
+        #     ]
+        # },
 
-# ---------------- 需要配置的server ----------------        
-
+# ---------------- 需要配置的server ----------------
         # "web-eval-agent": {
         #     "command": "uvx",
         #     "args": [

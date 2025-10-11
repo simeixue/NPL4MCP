@@ -1,0 +1,95 @@
+[
+  {
+    "name": "list_databases",
+    "description": "List available Hydrolix databases",
+    "input_schema": {
+      "properties": {},
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-hydrolix/mcp_hydrolix/mcp_server.py\n# module: mcp_hydrolix.mcp_server\n# qname: mcp_hydrolix.mcp_server.list_databases\n# lines: 110-123\ndef list_databases():\n    \"\"\"List available Hydrolix databases\"\"\"\n    logger.info(\"Listing all databases\")\n    client = create_hydrolix_client()\n    result = client.command(\"SHOW DATABASES\")\n\n    # Convert newline-separated string to list and trim whitespace\n    if isinstance(result, str):\n        databases = [db.strip() for db in result.strip().split(\"\\n\")]\n    else:\n        databases = [result]\n\n    logger.info(f\"Found {len(databases)} databases\")\n    return json.dumps(databases)",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-hydrolix/mcp_hydrolix/mcp_server.py\n# module: mcp_hydrolix.mcp_server\n# qname: mcp_hydrolix.mcp_server.create_hydrolix_client\n# lines: 245-268\ndef create_hydrolix_client():\n    client_config = get_config().get_client_config()\n    auth_info = (\n        f\"as {client_config['username']}\"\n        if \"username\" in client_config\n        else \"using service account token\"\n    )\n    logger.info(\n        f\"Creating Hydrolix client connection to {client_config['host']}:{client_config['port']} \"\n        f\"{auth_info} \"\n        f\"(secure={client_config['secure']}, verify={client_config['verify']}, \"\n        f\"connect_timeout={client_config['connect_timeout']}s, \"\n        f\"send_receive_timeout={client_config['send_receive_timeout']}s)\"\n    )\n\n    try:\n        client = clickhouse_connect.get_client(**client_config)\n        # Test the connection\n        version = client.server_version\n        logger.info(f\"Successfully connected to Hydrolix compatible with ClickHouse {version}\")\n        return client\n    except Exception as e:\n        logger.error(f\"Failed to connect to Hydrolix: {str(e)}\")\n        raise"
+      ],
+      "depth_2": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-hydrolix/mcp_hydrolix/mcp_env.py\n# module: mcp_hydrolix.mcp_env\n# qname: mcp_hydrolix.mcp_env.get_config\n# lines: 225-234\ndef get_config():\n    \"\"\"\n    Gets the singleton instance of HydrolixConfig.\n    Instantiates it on the first call.\n    \"\"\"\n    global _CONFIG_INSTANCE\n    if _CONFIG_INSTANCE is None:\n        # Instantiate the config object here, ensuring load_dotenv() has likely run\n        _CONFIG_INSTANCE = HydrolixConfig()\n    return _CONFIG_INSTANCE"
+      ],
+      "depth_max": 2
+    }
+  },
+  {
+    "name": "list_tables",
+    "description": "List available Hydrolix tables in a database, including schema, comment,\nrow count, and column count.",
+    "input_schema": {
+      "properties": {
+        "database": {
+          "title": "Database",
+          "type": "string"
+        },
+        "like": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Like"
+        },
+        "not_like": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Not Like"
+        }
+      },
+      "required": [
+        "database"
+      ],
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-hydrolix/mcp_hydrolix/mcp_server.py\n# module: mcp_hydrolix.mcp_server\n# qname: mcp_hydrolix.mcp_server.list_tables\n# lines: 127-156\ndef list_tables(database: str, like: Optional[str] = None, not_like: Optional[str] = None):\n    \"\"\"List available Hydrolix tables in a database, including schema, comment,\n    row count, and column count.\"\"\"\n    logger.info(f\"Listing tables in database '{database}'\")\n    client = create_hydrolix_client()\n    query = f\"SELECT database, name, engine, create_table_query, dependencies_database, dependencies_table, engine_full, sorting_key, primary_key, total_rows, total_bytes, total_bytes_uncompressed, parts, active_parts, total_marks, comment FROM system.tables WHERE database = {format_query_value(database)}\"\n    if like:\n        query += f\" AND name LIKE {format_query_value(like)}\"\n\n    if not_like:\n        query += f\" AND name NOT LIKE {format_query_value(not_like)}\"\n\n    result = client.query(query)\n\n    # Deserialize result as Table dataclass instances\n    tables = result_to_table(result.column_names, result.result_rows)\n\n    for table in tables:\n        column_data_query = f\"SELECT database, table, name, type AS column_type, default_kind, default_expression, comment FROM system.columns WHERE database = {format_query_value(database)} AND table = {format_query_value(table.name)}\"\n        column_data_query_result = client.query(column_data_query)\n        table.columns = [\n            c\n            for c in result_to_column(\n                column_data_query_result.column_names,\n                column_data_query_result.result_rows,\n            )\n        ]\n\n    logger.info(f\"Found {len(tables)} tables\")\n    return [asdict(table) for table in tables]",
+      "depth_1": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-hydrolix/mcp_hydrolix/mcp_server.py\n# module: mcp_hydrolix.mcp_server\n# qname: mcp_hydrolix.mcp_server.create_hydrolix_client\n# lines: 245-268\ndef create_hydrolix_client():\n    client_config = get_config().get_client_config()\n    auth_info = (\n        f\"as {client_config['username']}\"\n        if \"username\" in client_config\n        else \"using service account token\"\n    )\n    logger.info(\n        f\"Creating Hydrolix client connection to {client_config['host']}:{client_config['port']} \"\n        f\"{auth_info} \"\n        f\"(secure={client_config['secure']}, verify={client_config['verify']}, \"\n        f\"connect_timeout={client_config['connect_timeout']}s, \"\n        f\"send_receive_timeout={client_config['send_receive_timeout']}s)\"\n    )\n\n    try:\n        client = clickhouse_connect.get_client(**client_config)\n        # Test the connection\n        version = client.server_version\n        logger.info(f\"Successfully connected to Hydrolix compatible with ClickHouse {version}\")\n        return client\n    except Exception as e:\n        logger.error(f\"Failed to connect to Hydrolix: {str(e)}\")\n        raise",
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-hydrolix/mcp_hydrolix/mcp_server.py\n# module: mcp_hydrolix.mcp_server\n# qname: mcp_hydrolix.mcp_server.result_to_column\n# lines: 95-96\ndef result_to_column(query_columns, result) -> List[Column]:\n    return [Column(**dict(zip(query_columns, row))) for row in result]",
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-hydrolix/mcp_hydrolix/mcp_server.py\n# module: mcp_hydrolix.mcp_server\n# qname: mcp_hydrolix.mcp_server.result_to_table\n# lines: 91-92\ndef result_to_table(query_columns, result) -> List[Table]:\n    return [Table(**dict(zip(query_columns, row))) for row in result]"
+      ],
+      "depth_2": [
+        "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-hydrolix/mcp_hydrolix/mcp_env.py\n# module: mcp_hydrolix.mcp_env\n# qname: mcp_hydrolix.mcp_env.get_config\n# lines: 225-234\ndef get_config():\n    \"\"\"\n    Gets the singleton instance of HydrolixConfig.\n    Instantiates it on the first call.\n    \"\"\"\n    global _CONFIG_INSTANCE\n    if _CONFIG_INSTANCE is None:\n        # Instantiate the config object here, ensuring load_dotenv() has likely run\n        _CONFIG_INSTANCE = HydrolixConfig()\n    return _CONFIG_INSTANCE"
+      ],
+      "depth_max": 2
+    }
+  },
+  {
+    "name": "run_select_query",
+    "description": "Run a SELECT query in a Hydrolix time-series database using the Clickhouse SQL dialect.\nQueries run using this tool will timeout after 30 seconds.\n\nThe primary key on tables queried this way is always a timestamp. Queries should include either\na LIMIT clause or a filter based on the primary key as a performance guard to ensure they return\nin a reasonable amount of time. Queries should select specific fields and avoid the use of\nSELECT * to avoid performance issues. The performance guard used for the query should be clearly\ncommunicated with the user, and the user should be informed that the query may take a long time\nto run if the performance guard is not used. When choosing a performance guard, the user's\npreference should be requested and used if available. When using aggregations, the performance\nguard should take form of a primary key filter, or else the LIMIT should be applied in a\nsubquery before applying the aggregations.\n\nWhen matching columns based on substrings, prefix or suffix matches should be used instead of\nfull-text search whenever possible. When searching for substrings, the syntax `column LIKE\n'%suffix'` or `column LIKE 'prefix%'` should be used.\n\nExample query. Purpose: get logs from the `application.logs` table. Primary key: `timestamp`.\nPerformance guard: 10 minute recency filter.\n\n`SELECT message, timestamp FROM application.logs WHERE timestamp > now() - INTERVAL 10 MINUTES`\n\nExample query. Purpose: get the median humidity from the `weather.measurements` table. Primary\nkey: `date`. Performance guard: 1000 row limit, applied before aggregation.\n\n `SELECT median(humidity) FROM (SELECT humidity FROM weather.measurements LIMIT 1000)`\n\nExample query. Purpose: get the lowest temperature from the `weather.measurements` table over\nthe last 10 years. Primary key: `date`. Performance guard: date range filter.\n\n`SELECT min(temperature) FROM weather.measurements WHERE date > now() - INTERVAL 10 YEARS`\n\nExample query. Purpose: get the app name with the most log messages from the `application.logs`\ntable in the window between new year and valentine's day of 2024. Primary key: `timestamp`.\nPerformance guard: date range filter.\n `SELECT app, count(*) FROM application.logs WHERE timestamp > '2024-01-01' AND timestamp < '2024-02-14' GROUP BY app ORDER BY count(*) DESC LIMIT 1`\n",
+    "input_schema": {
+      "properties": {
+        "query": {
+          "title": "Query",
+          "type": "string"
+        }
+      },
+      "required": [
+        "query"
+      ],
+      "type": "object"
+    },
+    "annotations": {},
+    "implementation": {
+      "depth_0": "# file: /Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-hydrolix/mcp_hydrolix/mcp_server.py\n# module: mcp_hydrolix.mcp_server\n# qname: mcp_hydrolix.mcp_server.run_select_query\n# lines: 181-242\ndef run_select_query(query: str):\n    \"\"\"Run a SELECT query in a Hydrolix time-series database using the Clickhouse SQL dialect.\n    Queries run using this tool will timeout after 30 seconds.\n\n    The primary key on tables queried this way is always a timestamp. Queries should include either\n    a LIMIT clause or a filter based on the primary key as a performance guard to ensure they return\n    in a reasonable amount of time. Queries should select specific fields and avoid the use of\n    SELECT * to avoid performance issues. The performance guard used for the query should be clearly\n    communicated with the user, and the user should be informed that the query may take a long time\n    to run if the performance guard is not used. When choosing a performance guard, the user's\n    preference should be requested and used if available. When using aggregations, the performance\n    guard should take form of a primary key filter, or else the LIMIT should be applied in a\n    subquery before applying the aggregations.\n\n    When matching columns based on substrings, prefix or suffix matches should be used instead of\n    full-text search whenever possible. When searching for substrings, the syntax `column LIKE\n    '%suffix'` or `column LIKE 'prefix%'` should be used.\n\n    Example query. Purpose: get logs from the `application.logs` table. Primary key: `timestamp`.\n    Performance guard: 10 minute recency filter.\n\n    `SELECT message, timestamp FROM application.logs WHERE timestamp > now() - INTERVAL 10 MINUTES`\n\n    Example query. Purpose: get the median humidity from the `weather.measurements` table. Primary\n    key: `date`. Performance guard: 1000 row limit, applied before aggregation.\n\n     `SELECT median(humidity) FROM (SELECT humidity FROM weather.measurements LIMIT 1000)`\n\n    Example query. Purpose: get the lowest temperature from the `weather.measurements` table over\n    the last 10 years. Primary key: `date`. Performance guard: date range filter.\n\n    `SELECT min(temperature) FROM weather.measurements WHERE date > now() - INTERVAL 10 YEARS`\n\n    Example query. Purpose: get the app name with the most log messages from the `application.logs`\n    table in the window between new year and valentine's day of 2024. Primary key: `timestamp`.\n    Performance guard: date range filter.\n     `SELECT app, count(*) FROM application.logs WHERE timestamp > '2024-01-01' AND timestamp < '2024-02-14' GROUP BY app ORDER BY count(*) DESC LIMIT 1`\n    \"\"\"\n    logger.info(f\"Executing SELECT query: {query}\")\n    try:\n        future = QUERY_EXECUTOR.submit(execute_query, query)\n        try:\n            result = future.result(timeout=SELECT_QUERY_TIMEOUT_SECS)\n            # Check if we received an error structure from execute_query\n            if isinstance(result, dict) and \"error\" in result:\n                logger.warning(f\"Query failed: {result['error']}\")\n                # MCP requires structured responses; string error messages can cause\n                # serialization issues leading to BrokenResourceError\n                return {\n                    \"status\": \"error\",\n                    \"message\": f\"Query failed: {result['error']}\",\n                }\n            return result\n        except concurrent.futures.TimeoutError:\n            logger.warning(f\"Query timed out after {SELECT_QUERY_TIMEOUT_SECS} seconds: {query}\")\n            future.cancel()\n            raise ToolError(f\"Query timed out after {SELECT_QUERY_TIMEOUT_SECS} seconds\")\n    except ToolError:\n        raise\n    except Exception as e:\n        logger.error(f\"Unexpected error in run_select_query: {str(e)}\")\n        raise RuntimeError(f\"Unexpected error during query execution: {str(e)}\")",
+      "depth_max": 0
+    }
+  }
+]
