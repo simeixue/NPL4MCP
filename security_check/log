@@ -1,0 +1,435 @@
+(mcp_venv) xue@MacBookPro-8 NPL4MCP % ./security_check/mcp_security_scan.sh repo /Users/xue/workspace/mcp_project/mcp_server_pyrepos
+[repo] AbletonMCP
+Found 4 known vulnerabilities in 2 packages
+[main]  INFO    profile include tests: None
+[main]  INFO    profile exclude tests: None
+[main]  INFO    cli include tests: None
+[main]  INFO    cli exclude tests: None
+[json]  INFO    JSON output written to file: ./security_check/security_reports/repo-AbletonMCP-20251012-085712/bandit.json
+
+┌──── ○○○ ────┐
+│ Semgrep CLI │
+└─────────────┘
+
+/Users/xue/venvs/mcp_venv/lib/python3.13/site-packages/opentelemetry/instrumentation/dependencies.py:4: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import (
+summary: pip-audit=0, bandit=3, semgrep=0
+[saved] ./security_check/security_reports/repo-AbletonMCP-20251012-085712
+[repo] alibaba-cloud-ops-mcp-server
+Found 4 known vulnerabilities in 2 packages
+[main]  INFO    profile include tests: None
+[main]  INFO    profile exclude tests: None
+[main]  INFO    cli include tests: None
+[main]  INFO    cli exclude tests: None
+[json]  INFO    JSON output written to file: ./security_check/security_reports/repo-alibaba-cloud-ops-mcp-server-20251012-085712/bandit.json
+
+┌──── ○○○ ────┐
+│ Semgrep CLI │
+└─────────────┘
+
+/Users/xue/venvs/mcp_venv/lib/python3.13/site-packages/opentelemetry/instrumentation/dependencies.py:4: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import (
+summary: pip-audit=0, bandit=183, semgrep=0
+[saved] ./security_check/security_reports/repo-alibaba-cloud-ops-mcp-server-20251012-085712
+[repo] atla-mcp-server
+Found 4 known vulnerabilities in 2 packages
+[main]  INFO    profile include tests: None
+[main]  INFO    profile exclude tests: None
+[main]  INFO    cli include tests: None
+[main]  INFO    cli exclude tests: None
+[json]  INFO    JSON output written to file: ./security_check/security_reports/repo-atla-mcp-server-20251012-085712/bandit.json
+
+┌──── ○○○ ────┐
+│ Semgrep CLI │
+└─────────────┘
+
+/Users/xue/venvs/mcp_venv/lib/python3.13/site-packages/opentelemetry/instrumentation/dependencies.py:4: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import (
+summary: pip-audit=0, bandit=0, semgrep=0
+[saved] ./security_check/security_reports/repo-atla-mcp-server-20251012-085712
+[repo] blender
+Found 4 known vulnerabilities in 2 packages
+[main]  INFO    profile include tests: None
+[main]  INFO    profile exclude tests: None
+[main]  INFO    cli include tests: None
+[main]  INFO    cli exclude tests: None
+[json]  INFO    JSON output written to file: ./security_check/security_reports/repo-blender-20251012-085712/bandit.json
+
+┌──── ○○○ ────┐
+│ Semgrep CLI │
+└─────────────┘
+
+/Users/xue/venvs/mcp_venv/lib/python3.13/site-packages/opentelemetry/instrumentation/dependencies.py:4: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import (
+summary: pip-audit=0, bandit=32, semgrep=0
+[saved] ./security_check/security_reports/repo-blender-20251012-085712
+[repo] chronulus-mcp
+Found 2 known vulnerabilities in 1 package
+[main]  INFO    profile include tests: None
+[main]  INFO    profile exclude tests: None
+[main]  INFO    cli include tests: None
+[main]  INFO    cli exclude tests: None
+[json]  INFO    JSON output written to file: ./security_check/security_reports/repo-chronulus-mcp-20251012-085712/bandit.json
+
+┌──── ○○○ ────┐
+│ Semgrep CLI │
+└─────────────┘
+
+/Users/xue/venvs/mcp_venv/lib/python3.13/site-packages/opentelemetry/instrumentation/dependencies.py:4: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import (
+summary: pip-audit=0, bandit=0, semgrep=0
+[saved] ./security_check/security_reports/repo-chronulus-mcp-20251012-085712
+[repo] dappier-mcp
+Found 4 known vulnerabilities in 2 packages
+[main]  INFO    profile include tests: None
+[main]  INFO    profile exclude tests: None
+[main]  INFO    cli include tests: None
+[main]  INFO    cli exclude tests: None
+[json]  INFO    JSON output written to file: ./security_check/security_reports/repo-dappier-mcp-20251012-085712/bandit.json
+
+┌──── ○○○ ────┐
+│ Semgrep CLI │
+└─────────────┘
+
+/Users/xue/venvs/mcp_venv/lib/python3.13/site-packages/opentelemetry/instrumentation/dependencies.py:4: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import (
+summary: pip-audit=0, bandit=0, semgrep=0
+[saved] ./security_check/security_reports/repo-dappier-mcp-20251012-085712
+[repo] elevenlabs
+Found 4 known vulnerabilities in 2 packages
+[main]  INFO    profile include tests: None
+[main]  INFO    profile exclude tests: None
+[main]  INFO    cli include tests: None
+[main]  INFO    cli exclude tests: None
+[json]  INFO    JSON output written to file: ./security_check/security_reports/repo-elevenlabs-20251012-085712/bandit.json
+
+┌──── ○○○ ────┐
+│ Semgrep CLI │
+└─────────────┘
+
+/Users/xue/venvs/mcp_venv/lib/python3.13/site-packages/opentelemetry/instrumentation/dependencies.py:4: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import (
+summary: pip-audit=0, bandit=14, semgrep=0
+[saved] ./security_check/security_reports/repo-elevenlabs-20251012-085712
+[repo] fetch
+Found 4 known vulnerabilities in 2 packages
+[main]  INFO    profile include tests: None
+[main]  INFO    profile exclude tests: None
+[main]  INFO    cli include tests: None
+[main]  INFO    cli exclude tests: None
+[json]  INFO    JSON output written to file: ./security_check/security_reports/repo-fetch-20251012-085712/bandit.json
+
+┌──── ○○○ ────┐
+│ Semgrep CLI │
+└─────────────┘
+
+/Users/xue/venvs/mcp_venv/lib/python3.13/site-packages/opentelemetry/instrumentation/dependencies.py:4: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import (
+summary: pip-audit=0, bandit=0, semgrep=0
+[saved] ./security_check/security_reports/repo-fetch-20251012-085712
+[repo] fibery-mcp-server
+Found 4 known vulnerabilities in 2 packages
+[main]  INFO    profile include tests: None
+[main]  INFO    profile exclude tests: None
+[main]  INFO    cli include tests: None
+[main]  INFO    cli exclude tests: None
+[json]  INFO    JSON output written to file: ./security_check/security_reports/repo-fibery-mcp-server-20251012-085712/bandit.json
+
+┌──── ○○○ ────┐
+│ Semgrep CLI │
+└─────────────┘
+
+/Users/xue/venvs/mcp_venv/lib/python3.13/site-packages/opentelemetry/instrumentation/dependencies.py:4: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import (
+summary: pip-audit=0, bandit=4, semgrep=0
+[saved] ./security_check/security_reports/repo-fibery-mcp-server-20251012-085712
+[repo] git
+Found 4 known vulnerabilities in 2 packages
+[main]  INFO    profile include tests: None
+[main]  INFO    profile exclude tests: None
+[main]  INFO    cli include tests: None
+[main]  INFO    cli exclude tests: None
+[json]  INFO    JSON output written to file: ./security_check/security_reports/repo-git-20251012-085712/bandit.json
+
+┌──── ○○○ ────┐
+│ Semgrep CLI │
+└─────────────┘
+
+/Users/xue/venvs/mcp_venv/lib/python3.13/site-packages/opentelemetry/instrumentation/dependencies.py:4: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import (
+summary: pip-audit=0, bandit=14, semgrep=0
+[saved] ./security_check/security_reports/repo-git-20251012-085712
+[repo] kagimcp
+Found 4 known vulnerabilities in 2 packages
+[main]  INFO    profile include tests: None
+[main]  INFO    profile exclude tests: None
+[main]  INFO    cli include tests: None
+[main]  INFO    cli exclude tests: None
+[json]  INFO    JSON output written to file: ./security_check/security_reports/repo-kagimcp-20251012-085712/bandit.json
+
+┌──── ○○○ ────┐
+│ Semgrep CLI │
+└─────────────┘
+
+/Users/xue/venvs/mcp_venv/lib/python3.13/site-packages/opentelemetry/instrumentation/dependencies.py:4: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import (
+summary: pip-audit=0, bandit=0, semgrep=0
+[saved] ./security_check/security_reports/repo-kagimcp-20251012-085712
+[repo] mcp-aiven
+Found 4 known vulnerabilities in 2 packages
+[main]  INFO    profile include tests: None
+[main]  INFO    profile exclude tests: None
+[main]  INFO    cli include tests: None
+[main]  INFO    cli exclude tests: None
+Working... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:34
+[json]  INFO    JSON output written to file: ./security_check/security_reports/repo-mcp-aiven-20251012-085712/bandit.json
+
+┌──── ○○○ ────┐
+│ Semgrep CLI │
+└─────────────┘
+
+/Users/xue/venvs/mcp_venv/lib/python3.13/site-packages/opentelemetry/instrumentation/dependencies.py:4: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import (
+summary: pip-audit=0, bandit=1110, semgrep=0
+[saved] ./security_check/security_reports/repo-mcp-aiven-20251012-085712
+[repo] mcp-clickhouse
+Found 4 known vulnerabilities in 2 packages
+[main]  INFO    profile include tests: None
+[main]  INFO    profile exclude tests: None
+[main]  INFO    cli include tests: None
+[main]  INFO    cli exclude tests: None
+[json]  INFO    JSON output written to file: ./security_check/security_reports/repo-mcp-clickhouse-20251012-085712/bandit.json
+
+┌──── ○○○ ────┐
+│ Semgrep CLI │
+└─────────────┘
+
+/Users/xue/venvs/mcp_venv/lib/python3.13/site-packages/opentelemetry/instrumentation/dependencies.py:4: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import (
+summary: pip-audit=0, bandit=72, semgrep=0
+[saved] ./security_check/security_reports/repo-mcp-clickhouse-20251012-085712
+[repo] mcp-hydrolix
+Found 4 known vulnerabilities in 2 packages
+[main]  INFO    profile include tests: None
+[main]  INFO    profile exclude tests: None
+[main]  INFO    cli include tests: None
+[main]  INFO    cli exclude tests: None
+[json]  INFO    JSON output written to file: ./security_check/security_reports/repo-mcp-hydrolix-20251012-085712/bandit.json
+
+┌──── ○○○ ────┐
+│ Semgrep CLI │
+└─────────────┘
+
+/Users/xue/venvs/mcp_venv/lib/python3.13/site-packages/opentelemetry/instrumentation/dependencies.py:4: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import (
+summary: pip-audit=0, bandit=72, semgrep=0
+[saved] ./security_check/security_reports/repo-mcp-hydrolix-20251012-085712
+[repo] mcp-metricool
+Found 4 known vulnerabilities in 2 packages
+[main]  INFO    profile include tests: None
+[main]  INFO    profile exclude tests: None
+[main]  INFO    cli include tests: None
+[main]  INFO    cli exclude tests: None
+[json]  INFO    JSON output written to file: ./security_check/security_reports/repo-mcp-metricool-20251012-085712/bandit.json
+
+┌──── ○○○ ────┐
+│ Semgrep CLI │
+└─────────────┘
+
+/Users/xue/venvs/mcp_venv/lib/python3.13/site-packages/opentelemetry/instrumentation/dependencies.py:4: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import (
+summary: pip-audit=0, bandit=0, semgrep=0
+[saved] ./security_check/security_reports/repo-mcp-metricool-20251012-085712
+[repo] mcp-server-motherduck
+Found 4 known vulnerabilities in 2 packages
+[main]  INFO    profile include tests: None
+[main]  INFO    profile exclude tests: None
+[main]  INFO    cli include tests: None
+[main]  INFO    cli exclude tests: None
+[json]  INFO    JSON output written to file: ./security_check/security_reports/repo-mcp-server-motherduck-20251012-085712/bandit.json
+
+┌──── ○○○ ────┐
+│ Semgrep CLI │
+└─────────────┘
+
+/Users/xue/venvs/mcp_venv/lib/python3.13/site-packages/opentelemetry/instrumentation/dependencies.py:4: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import (
+summary: pip-audit=0, bandit=0, semgrep=0
+[saved] ./security_check/security_reports/repo-mcp-server-motherduck-20251012-085712
+[repo] mcp-server-qdrant
+Found 4 known vulnerabilities in 2 packages
+[main]  INFO    profile include tests: None
+[main]  INFO    profile exclude tests: None
+[main]  INFO    cli include tests: None
+[main]  INFO    cli exclude tests: None
+[json]  INFO    JSON output written to file: ./security_check/security_reports/repo-mcp-server-qdrant-20251012-085712/bandit.json
+
+┌──── ○○○ ────┐
+│ Semgrep CLI │
+└─────────────┘
+
+/Users/xue/venvs/mcp_venv/lib/python3.13/site-packages/opentelemetry/instrumentation/dependencies.py:4: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import (
+summary: pip-audit=0, bandit=67, semgrep=0
+[saved] ./security_check/security_reports/repo-mcp-server-qdrant-20251012-085712
+[repo] Medical_calculator_MCP
+Found 4 known vulnerabilities in 2 packages
+[main]  INFO    profile include tests: None
+[main]  INFO    profile exclude tests: None
+[main]  INFO    cli include tests: None
+[main]  INFO    cli exclude tests: None
+[json]  INFO    JSON output written to file: ./security_check/security_reports/repo-Medical_calculator_MCP-20251012-085712/bandit.json
+
+┌──── ○○○ ────┐
+│ Semgrep CLI │
+└─────────────┘
+
+/Users/xue/venvs/mcp_venv/lib/python3.13/site-packages/opentelemetry/instrumentation/dependencies.py:4: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import (
+summary: pip-audit=0, bandit=0, semgrep=0
+[saved] ./security_check/security_reports/repo-Medical_calculator_MCP-20251012-085712
+[repo] meilisearch-mcp
+Found 4 known vulnerabilities in 2 packages
+[main]  INFO    profile include tests: None
+[main]  INFO    profile exclude tests: None
+[main]  INFO    cli include tests: None
+[main]  INFO    cli exclude tests: None
+[json]  INFO    JSON output written to file: ./security_check/security_reports/repo-meilisearch-mcp-20251012-085712/bandit.json
+
+┌──── ○○○ ────┐
+│ Semgrep CLI │
+└─────────────┘
+
+/Users/xue/venvs/mcp_venv/lib/python3.13/site-packages/opentelemetry/instrumentation/dependencies.py:4: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import (
+summary: pip-audit=0, bandit=121, semgrep=0
+[saved] ./security_check/security_reports/repo-meilisearch-mcp-20251012-085712
+[repo] MiniMax-MCP
+Found 4 known vulnerabilities in 2 packages
+[main]  INFO    profile include tests: None
+[main]  INFO    profile exclude tests: None
+[main]  INFO    cli include tests: None
+[main]  INFO    cli exclude tests: None
+[json]  INFO    JSON output written to file: ./security_check/security_reports/repo-MiniMax-MCP-20251012-085712/bandit.json
+
+┌──── ○○○ ────┐
+│ Semgrep CLI │
+└─────────────┘
+
+/Users/xue/venvs/mcp_venv/lib/python3.13/site-packages/opentelemetry/instrumentation/dependencies.py:4: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import (
+summary: pip-audit=0, bandit=28, semgrep=0
+[saved] ./security_check/security_reports/repo-MiniMax-MCP-20251012-085712
+[repo] oxylabs-mcp
+Found 4 known vulnerabilities in 2 packages
+[main]  INFO    profile include tests: None
+[main]  INFO    profile exclude tests: None
+[main]  INFO    cli include tests: None
+[main]  INFO    cli exclude tests: None
+[json]  INFO    JSON output written to file: ./security_check/security_reports/repo-oxylabs-mcp-20251012-085712/bandit.json
+
+┌──── ○○○ ────┐
+│ Semgrep CLI │
+└─────────────┘
+
+/Users/xue/venvs/mcp_venv/lib/python3.13/site-packages/opentelemetry/instrumentation/dependencies.py:4: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import (
+summary: pip-audit=0, bandit=33, semgrep=0
+[saved] ./security_check/security_reports/repo-oxylabs-mcp-20251012-085712
+[repo] ProxmoxMCP
+Found 4 known vulnerabilities in 2 packages
+[main]  INFO    profile include tests: None
+[main]  INFO    profile exclude tests: None
+[main]  INFO    cli include tests: None
+[main]  INFO    cli exclude tests: None
+[json]  INFO    JSON output written to file: ./security_check/security_reports/repo-ProxmoxMCP-20251012-085712/bandit.json
+
+┌──── ○○○ ────┐
+│ Semgrep CLI │
+└─────────────┘
+
+/Users/xue/venvs/mcp_venv/lib/python3.13/site-packages/opentelemetry/instrumentation/dependencies.py:4: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import (
+summary: pip-audit=0, bandit=44, semgrep=0
+[saved] ./security_check/security_reports/repo-ProxmoxMCP-20251012-085712
+[repo] python-notebook-mcp
+No known vulnerabilities found
+[main]  INFO    profile include tests: None
+[main]  INFO    profile exclude tests: None
+[main]  INFO    cli include tests: None
+[main]  INFO    cli exclude tests: None
+[json]  INFO    JSON output written to file: ./security_check/security_reports/repo-python-notebook-mcp-20251012-085712/bandit.json
+
+┌──── ○○○ ────┐
+│ Semgrep CLI │
+└─────────────┘
+
+/Users/xue/venvs/mcp_venv/lib/python3.13/site-packages/opentelemetry/instrumentation/dependencies.py:4: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import (
+summary: pip-audit=0, bandit=0, semgrep=0
+[saved] ./security_check/security_reports/repo-python-notebook-mcp-20251012-085712
+[repo] semgrep
+Found 4 known vulnerabilities in 2 packages
+[main]  INFO    profile include tests: None
+[main]  INFO    profile exclude tests: None
+[main]  INFO    cli include tests: None
+[main]  INFO    cli exclude tests: None
+[json]  INFO    JSON output written to file: ./security_check/security_reports/repo-semgrep-20251012-085712/bandit.json
+
+┌──── ○○○ ────┐
+│ Semgrep CLI │
+└─────────────┘
+
+/Users/xue/venvs/mcp_venv/lib/python3.13/site-packages/opentelemetry/instrumentation/dependencies.py:4: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import (
+summary: pip-audit=0, bandit=24, semgrep=0
+[saved] ./security_check/security_reports/repo-semgrep-20251012-085712
+[repo] time
+Found 4 known vulnerabilities in 2 packages
+[main]  INFO    profile include tests: None
+[main]  INFO    profile exclude tests: None
+[main]  INFO    cli include tests: None
+[main]  INFO    cli exclude tests: None
+[json]  INFO    JSON output written to file: ./security_check/security_reports/repo-time-20251012-085712/bandit.json
+
+┌──── ○○○ ────┐
+│ Semgrep CLI │
+└─────────────┘
+
+/Users/xue/venvs/mcp_venv/lib/python3.13/site-packages/opentelemetry/instrumentation/dependencies.py:4: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import (
+summary: pip-audit=0, bandit=19, semgrep=0
+[saved] ./security_check/security_reports/repo-time-20251012-085712
+[repo] twolven_mcp-server-puppeteer-py
+No known vulnerabilities found
+[main]  INFO    profile include tests: None
+[main]  INFO    profile exclude tests: None
+[main]  INFO    cli include tests: None
+[main]  INFO    cli exclude tests: None
+[json]  INFO    JSON output written to file: ./security_check/security_reports/repo-twolven_mcp-server-puppeteer-py-20251012-085712/bandit.json
+
+┌──── ○○○ ────┐
+│ Semgrep CLI │
+└─────────────┘
+
+/Users/xue/venvs/mcp_venv/lib/python3.13/site-packages/opentelemetry/instrumentation/dependencies.py:4: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import (
+summary: pip-audit=0, bandit=0, semgrep=0
+[saved] ./security_check/security_reports/repo-twolven_mcp-server-puppeteer-py-20251012-085712
+[repo] web-eval-agent
+Found 11 known vulnerabilities in 9 packages
+[main]  INFO    profile include tests: None
+[main]  INFO    profile exclude tests: None
+[main]  INFO    cli include tests: None
+[main]  INFO    cli exclude tests: None
+[json]  INFO    JSON output written to file: ./security_check/security_reports/repo-web-eval-agent-20251012-085712/bandit.json
+
+┌──── ○○○ ────┐
+│ Semgrep CLI │
+└─────────────┘
+
+/Users/xue/venvs/mcp_venv/lib/python3.13/site-packages/opentelemetry/instrumentation/dependencies.py:4: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import (
+summary: pip-audit=0, bandit=41, semgrep=0
+[saved] ./security_check/security_reports/repo-web-eval-agent-20251012-085712
+ALL DONE -> ./security_check/security_reports/

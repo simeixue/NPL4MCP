@@ -1,0 +1,212 @@
+{
+  "errors": [],
+  "generated_at": "2025-10-12T00:52:47Z",
+  "metrics": {
+    "./security_check/security_reports/json-MiniMax-MCP-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__MiniMax-MCP__minimax_mcp__server.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 6,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 6,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 611,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "./security_check/security_reports/json-MiniMax-MCP-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__MiniMax-MCP__minimax_mcp__utils.py": {
+      "CONFIDENCE.HIGH": 2,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 2,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 134,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "_totals": {
+      "CONFIDENCE.HIGH": 2,
+      "CONFIDENCE.LOW": 6,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 2,
+      "SEVERITY.MEDIUM": 6,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 745,
+      "nosec": 0,
+      "skipped_tests": 0
+    }
+  },
+  "results": [
+    {
+      "code": "209             # download file from url\n210             response = requests.get(file, stream=True)\n211             response.raise_for_status()\n",
+      "col_offset": 23,
+      "end_col_offset": 54,
+      "filename": "./security_check/security_reports/json-MiniMax-MCP-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__MiniMax-MCP__minimax_mcp__server.py",
+      "issue_confidence": "LOW",
+      "issue_cwe": {
+        "id": 400,
+        "link": "https://cwe.mitre.org/data/definitions/400.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Call to requests without timeout",
+      "line_number": 210,
+      "line_range": [
+        210
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b113_request_without_timeout.html",
+      "test_id": "B113",
+      "test_name": "request_without_timeout"
+    },
+    {
+      "code": "254         with open(output_path / output_file_name, \"wb\") as f:\n255             f.write(requests.get(response_data.get(\"demo_audio\")).content)\n256 \n",
+      "col_offset": 20,
+      "end_col_offset": 65,
+      "filename": "./security_check/security_reports/json-MiniMax-MCP-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__MiniMax-MCP__minimax_mcp__server.py",
+      "issue_confidence": "LOW",
+      "issue_cwe": {
+        "id": 400,
+        "link": "https://cwe.mitre.org/data/definitions/400.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Call to requests without timeout",
+      "line_number": 255,
+      "line_range": [
+        255
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b113_request_without_timeout.html",
+      "test_id": "B113",
+      "test_name": "request_without_timeout"
+    },
+    {
+      "code": "285     if is_url:\n286         play(requests.get(input_file_path).content)\n287         return TextContent(type=\"text\", text=f\"Successfully played audio file: {input_file_path}\")\n",
+      "col_offset": 13,
+      "end_col_offset": 42,
+      "filename": "./security_check/security_reports/json-MiniMax-MCP-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__MiniMax-MCP__minimax_mcp__server.py",
+      "issue_confidence": "LOW",
+      "issue_cwe": {
+        "id": 400,
+        "link": "https://cwe.mitre.org/data/definitions/400.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Call to requests without timeout",
+      "line_number": 286,
+      "line_range": [
+        286
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b113_request_without_timeout.html",
+      "test_id": "B113",
+      "test_name": "request_without_timeout"
+    },
+    {
+      "code": "410 \n411         video_response = requests.get(download_url)\n412         video_response.raise_for_status()\n",
+      "col_offset": 25,
+      "end_col_offset": 51,
+      "filename": "./security_check/security_reports/json-MiniMax-MCP-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__MiniMax-MCP__minimax_mcp__server.py",
+      "issue_confidence": "LOW",
+      "issue_cwe": {
+        "id": 400,
+        "link": "https://cwe.mitre.org/data/definitions/400.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Call to requests without timeout",
+      "line_number": 411,
+      "line_range": [
+        411
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b113_request_without_timeout.html",
+      "test_id": "B113",
+      "test_name": "request_without_timeout"
+    },
+    {
+      "code": "480 \n481         video_response = requests.get(download_url)\n482         video_response.raise_for_status()\n",
+      "col_offset": 25,
+      "end_col_offset": 51,
+      "filename": "./security_check/security_reports/json-MiniMax-MCP-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__MiniMax-MCP__minimax_mcp__server.py",
+      "issue_confidence": "LOW",
+      "issue_cwe": {
+        "id": 400,
+        "link": "https://cwe.mitre.org/data/definitions/400.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Call to requests without timeout",
+      "line_number": 481,
+      "line_range": [
+        481
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b113_request_without_timeout.html",
+      "test_id": "B113",
+      "test_name": "request_without_timeout"
+    },
+    {
+      "code": "550             \n551             image_response = requests.get(image_url)\n552             image_response.raise_for_status()\n",
+      "col_offset": 29,
+      "end_col_offset": 52,
+      "filename": "./security_check/security_reports/json-MiniMax-MCP-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__MiniMax-MCP__minimax_mcp__server.py",
+      "issue_confidence": "LOW",
+      "issue_cwe": {
+        "id": 400,
+        "link": "https://cwe.mitre.org/data/definitions/400.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Call to requests without timeout",
+      "line_number": 551,
+      "line_range": [
+        551
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b113_request_without_timeout.html",
+      "test_id": "B113",
+      "test_name": "request_without_timeout"
+    },
+    {
+      "code": "5 import shutil\n6 import subprocess\n7 from typing import Iterator, Union\n",
+      "col_offset": 0,
+      "end_col_offset": 17,
+      "filename": "./security_check/security_reports/json-MiniMax-MCP-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__MiniMax-MCP__minimax_mcp__utils.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Consider possible security implications associated with the subprocess module.",
+      "line_number": 6,
+      "line_range": [
+        6
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/blacklists/blacklist_imports.html#b404-import-subprocess",
+      "test_id": "B404",
+      "test_name": "blacklist"
+    },
+    {
+      "code": "161     args = [\"ffplay\", \"-autoexit\", \"-\", \"-nodisp\"]\n162     proc = subprocess.Popen(\n163         args=args,\n164         stdout=subprocess.PIPE,\n165         stdin=subprocess.PIPE,\n166         stderr=subprocess.PIPE,\n167     )\n168     out, err = proc.communicate(input=audio)\n",
+      "col_offset": 11,
+      "end_col_offset": 5,
+      "filename": "./security_check/security_reports/json-MiniMax-MCP-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__MiniMax-MCP__minimax_mcp__utils.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "subprocess call - check for execution of untrusted input.",
+      "line_number": 162,
+      "line_range": [
+        162,
+        163,
+        164,
+        165,
+        166,
+        167
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b603_subprocess_without_shell_equals_true.html",
+      "test_id": "B603",
+      "test_name": "subprocess_without_shell_equals_true"
+    }
+  ]
+}

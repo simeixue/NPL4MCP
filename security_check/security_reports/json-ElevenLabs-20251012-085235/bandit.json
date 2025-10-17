@@ -1,0 +1,80 @@
+{
+  "errors": [],
+  "generated_at": "2025-10-12T00:53:12Z",
+  "metrics": {
+    "./security_check/security_reports/json-ElevenLabs-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__elevenlabs__elevenlabs_mcp__convai.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 84,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "./security_check/security_reports/json-ElevenLabs-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__elevenlabs__elevenlabs_mcp__server.py": {
+      "CONFIDENCE.HIGH": 1,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 1,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 969,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "./security_check/security_reports/json-ElevenLabs-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__elevenlabs__elevenlabs_mcp__utils.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 183,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "_totals": {
+      "CONFIDENCE.HIGH": 1,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 1,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 1236,
+      "nosec": 0,
+      "skipped_tests": 0
+    }
+  },
+  "results": [
+    {
+      "code": "854 \n855     assert voice is not None  # Type assertion for type checker\n856     file_path = handle_input_file(input_file_path)\n",
+      "col_offset": 4,
+      "end_col_offset": 28,
+      "filename": "./security_check/security_reports/json-ElevenLabs-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__elevenlabs__elevenlabs_mcp__server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 855,
+      "line_range": [
+        855
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    }
+  ]
+}

@@ -19,6 +19,10 @@ def serialize_tool(tool):
 
 config = {
     "mcpServers": {
+        "@21st-dev/magic": {
+            "command": "npx",
+            "args": ["-y", "@21st-dev/magic@latest", "API_KEY=\"68c52aff4557513401a1120a75361ad6eab2139b77c825bbb54d4d0909cd3ddd\""]
+        },
         # "fibery-mcp-server": {
         #     "command": "uv",
         #     "args": [

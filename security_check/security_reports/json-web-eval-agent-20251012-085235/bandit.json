@@ -1,0 +1,489 @@
+{
+  "errors": [],
+  "generated_at": "2025-10-12T00:52:55Z",
+  "metrics": {
+    "./security_check/security_reports/json-web-eval-agent-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__web-eval-agent__webEvalAgent__mcp_server.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 108,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "./security_check/security_reports/json-web-eval-agent-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__web-eval-agent__webEvalAgent__src__api_utils.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 22,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "./security_check/security_reports/json-web-eval-agent-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__web-eval-agent__webEvalAgent__src__browser_utils.py": {
+      "CONFIDENCE.HIGH": 6,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 6,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 937,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "./security_check/security_reports/json-web-eval-agent-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__web-eval-agent__webEvalAgent__src__env_utils.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 28,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "./security_check/security_reports/json-web-eval-agent-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__web-eval-agent__webEvalAgent__src__log_server.py": {
+      "CONFIDENCE.HIGH": 7,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 1,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 8,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 244,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "./security_check/security_reports/json-web-eval-agent-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__web-eval-agent__webEvalAgent__src__prompts.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 19,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "./security_check/security_reports/json-web-eval-agent-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__web-eval-agent__webEvalAgent__src__tool_handlers.py": {
+      "CONFIDENCE.HIGH": 4,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 4,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 496,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "_totals": {
+      "CONFIDENCE.HIGH": 17,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 1,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 18,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 1854,
+      "nosec": 0,
+      "skipped_tests": 0
+    }
+  },
+  "results": [
+    {
+      "code": "216             body_size = len(body_buffer) if body_buffer else 0\n217         except Exception:\n218             pass\n219 \n",
+      "col_offset": 8,
+      "end_col_offset": 16,
+      "filename": "./security_check/security_reports/json-web-eval-agent-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__web-eval-agent__webEvalAgent__src__browser_utils.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 217,
+      "line_range": [
+        217,
+        218
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "467         socketio.emit(\"agent_state\", {\"state\": state})\n468     except Exception:\n469         pass\n470 \n",
+      "col_offset": 4,
+      "end_col_offset": 12,
+      "filename": "./security_check/security_reports/json-web-eval-agent-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__web-eval-agent__webEvalAgent__src__browser_utils.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 468,
+      "line_range": [
+        468,
+        469
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "694                     await active_cdp_session.detach()\n695                 except Exception:\n696                     pass\n697                 active_cdp_session = None\n",
+      "col_offset": 16,
+      "end_col_offset": 24,
+      "filename": "./security_check/security_reports/json-web-eval-agent-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__web-eval-agent__webEvalAgent__src__browser_utils.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 695,
+      "line_range": [
+        695,
+        696
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "880                         await send_browser_view(image_data_url)\n881                     except Exception:\n882                         pass\n883 \n",
+      "col_offset": 20,
+      "end_col_offset": 28,
+      "filename": "./security_check/security_reports/json-web-eval-agent-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__web-eval-agent__webEvalAgent__src__browser_utils.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 881,
+      "line_range": [
+        881,
+        882
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "889                         )\n890                     except Exception:\n891                         pass\n892                 except Exception:\n",
+      "col_offset": 20,
+      "end_col_offset": 28,
+      "filename": "./security_check/security_reports/json-web-eval-agent-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__web-eval-agent__webEvalAgent__src__browser_utils.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 890,
+      "line_range": [
+        890,
+        891
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "891                         pass\n892                 except Exception:\n893                     pass\n894 \n",
+      "col_offset": 16,
+      "end_col_offset": 24,
+      "filename": "./security_check/security_reports/json-web-eval-agent-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__web-eval-agent__webEvalAgent__src__browser_utils.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 892,
+      "line_range": [
+        892,
+        893
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "32 app = Flask(__name__, template_folder=templates_dir, static_folder=os.path.join(templates_dir, 'static'))\n33 app.config['SECRET_KEY'] = 'secret!' # Replace with a proper secret if needed\n34 \n",
+      "col_offset": 11,
+      "end_col_offset": 23,
+      "filename": "./security_check/security_reports/json-web-eval-agent-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__web-eval-agent__webEvalAgent__src__log_server.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: 'secret!'",
+      "line_number": 33,
+      "line_range": [
+        33
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "109         send_log(f\"Disconnected from log server at {datetime.now().strftime('%H:%M:%S')}\", \"\u274c\", log_type='status')\n110     except Exception:\n111         pass\n112 \n",
+      "col_offset": 4,
+      "end_col_offset": 12,
+      "filename": "./security_check/security_reports/json-web-eval-agent-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__web-eval-agent__webEvalAgent__src__log_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 110,
+      "line_range": [
+        110,
+        111
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "126         socketio.emit('log_message', {'data': log_entry, 'type': log_type})\n127     except Exception:\n128         pass\n129 \n",
+      "col_offset": 4,
+      "end_col_offset": 12,
+      "filename": "./security_check/security_reports/json-web-eval-agent-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__web-eval-agent__webEvalAgent__src__log_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 127,
+      "line_range": [
+        127,
+        128
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "147         pass\n148     except Exception:\n149         pass\n150         \n",
+      "col_offset": 4,
+      "end_col_offset": 12,
+      "filename": "./security_check/security_reports/json-web-eval-agent-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__web-eval-agent__webEvalAgent__src__log_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 148,
+      "line_range": [
+        148,
+        149
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "152         socketio.emit('browser_update', {'data': image_data_url})\n153     except Exception:\n154         pass\n155 \n",
+      "col_offset": 4,
+      "end_col_offset": 12,
+      "filename": "./security_check/security_reports/json-web-eval-agent-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__web-eval-agent__webEvalAgent__src__log_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 153,
+      "line_range": [
+        153,
+        154
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "318             send_log(\"Refreshed existing dashboard tab.\", \"\ud83d\udd04\", log_type='status')\n319         except Exception:\n320             pass\n321         return\n",
+      "col_offset": 8,
+      "end_col_offset": 16,
+      "filename": "./security_check/security_reports/json-web-eval-agent-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__web-eval-agent__webEvalAgent__src__log_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 319,
+      "line_range": [
+        319,
+        320
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "328             send_log(f\"Opened new dashboard in browser at {url}.\", \"\ud83c\udf10\", log_type='status')\n329         except Exception:\n330             pass\n331     except Exception as e:\n",
+      "col_offset": 8,
+      "end_col_offset": 16,
+      "filename": "./security_check/security_reports/json-web-eval-agent-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__web-eval-agent__webEvalAgent__src__log_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 329,
+      "line_range": [
+        329,
+        330
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "333             send_log(f\"Could not open browser automatically: {e}\", \"\u26a0\ufe0f\", log_type='status')\n334         except Exception:\n335             pass\n336 \n",
+      "col_offset": 8,
+      "end_col_offset": 16,
+      "filename": "./security_check/security_reports/json-web-eval-agent-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__web-eval-agent__webEvalAgent__src__log_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 334,
+      "line_range": [
+        334,
+        335
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "64         open_log_dashboard()\n65     except Exception:\n66         pass\n67     \n",
+      "col_offset": 4,
+      "end_col_offset": 12,
+      "filename": "./security_check/security_reports/json-web-eval-agent-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__web-eval-agent__webEvalAgent__src__tool_handlers.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 65,
+      "line_range": [
+        65,
+        66
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "749                 await page.close()\n750             except Exception:\n751                 pass\n752         if context:\n",
+      "col_offset": 12,
+      "end_col_offset": 20,
+      "filename": "./security_check/security_reports/json-web-eval-agent-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__web-eval-agent__webEvalAgent__src__tool_handlers.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 750,
+      "line_range": [
+        750,
+        751
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "754                 await context.close()\n755             except Exception:\n756                 pass\n757         if playwright:\n",
+      "col_offset": 12,
+      "end_col_offset": 20,
+      "filename": "./security_check/security_reports/json-web-eval-agent-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__web-eval-agent__webEvalAgent__src__tool_handlers.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 755,
+      "line_range": [
+        755,
+        756
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "759                 await playwright.stop()\n760             except Exception:\n761                 pass\n762             \n",
+      "col_offset": 12,
+      "end_col_offset": 20,
+      "filename": "./security_check/security_reports/json-web-eval-agent-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__web-eval-agent__webEvalAgent__src__tool_handlers.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 760,
+      "line_range": [
+        760,
+        761
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    }
+  ]
+}

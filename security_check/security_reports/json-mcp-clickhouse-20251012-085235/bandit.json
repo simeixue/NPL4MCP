@@ -1,0 +1,87 @@
+{
+  "errors": [],
+  "generated_at": "2025-10-12T00:52:43Z",
+  "metrics": {
+    "./security_check/security_reports/json-mcp-clickhouse-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__mcp-clickhouse__mcp_clickhouse__mcp_env.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 216,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "./security_check/security_reports/json-mcp-clickhouse-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__mcp-clickhouse__mcp_clickhouse__mcp_server.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 2,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 2,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 289,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "_totals": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 2,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 2,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 505,
+      "nosec": 0,
+      "skipped_tests": 0
+    }
+  },
+  "results": [
+    {
+      "code": "151     client = create_clickhouse_client()\n152     query = f\"SELECT database, name, engine, create_table_query, dependencies_database, dependencies_table, engine_full, sorting_key, primary_key, total_rows, total_bytes, total_bytes_uncompressed, parts, active_parts, total_marks, comment FROM system.tables WHERE database = {format_query_value(database)}\"\n153     if like:\n",
+      "col_offset": 14,
+      "end_col_offset": 276,
+      "filename": "./security_check/security_reports/json-mcp-clickhouse-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__mcp-clickhouse__mcp_clickhouse__mcp_server.py",
+      "issue_confidence": "LOW",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 152,
+      "line_range": [
+        152
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    },
+    {
+      "code": "164     for table in tables:\n165         column_data_query = f\"SELECT database, table, name, type AS column_type, default_kind, default_expression, comment FROM system.columns WHERE database = {format_query_value(database)} AND table = {format_query_value(table.name)}\"\n166         column_data_query_result = client.query(column_data_query)\n",
+      "col_offset": 30,
+      "end_col_offset": 160,
+      "filename": "./security_check/security_reports/json-mcp-clickhouse-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__mcp-clickhouse__mcp_clickhouse__mcp_server.py",
+      "issue_confidence": "LOW",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 165,
+      "line_range": [
+        165
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    }
+  ]
+}

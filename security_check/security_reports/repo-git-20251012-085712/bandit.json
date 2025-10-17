@@ -1,0 +1,353 @@
+{
+  "errors": [],
+  "generated_at": "2025-10-12T00:58:22Z",
+  "metrics": {
+    "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/git/src/mcp_server_git/__init__.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 20,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/git/src/mcp_server_git/__main__.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 2,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/git/src/mcp_server_git/server.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 381,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/git/tests/test_server.py": {
+      "CONFIDENCE.HIGH": 14,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 14,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 68,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "_totals": {
+      "CONFIDENCE.HIGH": 14,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 14,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 471,
+      "nosec": 0,
+      "skipped_tests": 0
+    }
+  },
+  "results": [
+    {
+      "code": "23 \n24     assert \"Switched to branch 'test-branch'\" in result\n25     assert test_repository.active_branch.name == \"test-branch\"\n",
+      "col_offset": 4,
+      "end_col_offset": 55,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/git/tests/test_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 24,
+      "line_range": [
+        24
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "24     assert \"Switched to branch 'test-branch'\" in result\n25     assert test_repository.active_branch.name == \"test-branch\"\n26 \n",
+      "col_offset": 4,
+      "end_col_offset": 62,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/git/tests/test_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 25,
+      "line_range": [
+        25
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "34     result = git_branch(test_repository, \"local\")\n35     assert \"new-branch-local\" in result\n36 \n",
+      "col_offset": 4,
+      "end_col_offset": 39,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/git/tests/test_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 35,
+      "line_range": [
+        35
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "40     result = git_branch(test_repository, \"remote\")\n41     assert \"\" == result.strip()  # Should be empty if no remote branches\n42 \n",
+      "col_offset": 4,
+      "end_col_offset": 31,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/git/tests/test_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 41,
+      "line_range": [
+        41
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "45     result = git_branch(test_repository, \"all\")\n46     assert \"new-branch-all\" in result\n47 \n",
+      "col_offset": 4,
+      "end_col_offset": 37,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/git/tests/test_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 46,
+      "line_range": [
+        46
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "56     result = git_branch(test_repository, \"local\", contains=commit.hexsha)\n57     assert \"feature-branch\" in result\n58     assert \"master\" not in result\n",
+      "col_offset": 4,
+      "end_col_offset": 37,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/git/tests/test_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 57,
+      "line_range": [
+        57
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "57     assert \"feature-branch\" in result\n58     assert \"master\" not in result\n59 \n",
+      "col_offset": 4,
+      "end_col_offset": 33,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/git/tests/test_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 58,
+      "line_range": [
+        58
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "68     result = git_branch(test_repository, \"local\", not_contains=commit.hexsha)\n69     assert \"another-feature-branch\" not in result\n70     assert \"master\" in result\n",
+      "col_offset": 4,
+      "end_col_offset": 49,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/git/tests/test_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 69,
+      "line_range": [
+        69
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "69     assert \"another-feature-branch\" not in result\n70     assert \"master\" in result\n71 \n",
+      "col_offset": 4,
+      "end_col_offset": 29,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/git/tests/test_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 70,
+      "line_range": [
+        70
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "78     staged_files = [item.a_path for item in test_repository.index.diff(\"HEAD\")]\n79     assert \"all_file.txt\" in staged_files\n80     assert result == \"Files staged successfully\"\n",
+      "col_offset": 4,
+      "end_col_offset": 41,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/git/tests/test_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 79,
+      "line_range": [
+        79
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "79     assert \"all_file.txt\" in staged_files\n80     assert result == \"Files staged successfully\"\n81 \n",
+      "col_offset": 4,
+      "end_col_offset": 48,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/git/tests/test_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 80,
+      "line_range": [
+        80
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "90     staged_files = [item.a_path for item in test_repository.index.diff(\"HEAD\")]\n91     assert \"file1.txt\" in staged_files\n92     assert \"file2.txt\" not in staged_files\n",
+      "col_offset": 4,
+      "end_col_offset": 38,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/git/tests/test_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 91,
+      "line_range": [
+        91
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "91     assert \"file1.txt\" in staged_files\n92     assert \"file2.txt\" not in staged_files\n93     assert result == \"Files staged successfully\"\n",
+      "col_offset": 4,
+      "end_col_offset": 42,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/git/tests/test_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 92,
+      "line_range": [
+        92
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "92     assert \"file2.txt\" not in staged_files\n93     assert result == \"Files staged successfully\"\n",
+      "col_offset": 4,
+      "end_col_offset": 48,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/git/tests/test_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 93,
+      "line_range": [
+        93
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    }
+  ]
+}

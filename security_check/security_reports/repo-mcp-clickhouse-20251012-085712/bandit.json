@@ -1,0 +1,1585 @@
+{
+  "errors": [],
+  "generated_at": "2025-10-12T00:59:13Z",
+  "metrics": {
+    "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/mcp_clickhouse/__init__.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 18,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/mcp_clickhouse/chdb_prompt.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 99,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/mcp_clickhouse/main.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 12,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/mcp_clickhouse/mcp_env.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 216,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/mcp_clickhouse/mcp_server.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 2,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 2,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 289,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_chdb_tool.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 39,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py": {
+      "CONFIDENCE.HIGH": 56,
+      "CONFIDENCE.LOW": 11,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 56,
+      "SEVERITY.MEDIUM": 11,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 238,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_tool.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 3,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 3,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 73,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "_totals": {
+      "CONFIDENCE.HIGH": 56,
+      "CONFIDENCE.LOW": 16,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 56,
+      "SEVERITY.MEDIUM": 16,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 984,
+      "nosec": 0,
+      "skipped_tests": 0
+    }
+  },
+  "results": [
+    {
+      "code": "151     client = create_clickhouse_client()\n152     query = f\"SELECT database, name, engine, create_table_query, dependencies_database, dependencies_table, engine_full, sorting_key, primary_key, total_rows, total_bytes, total_bytes_uncompressed, parts, active_parts, total_marks, comment FROM system.tables WHERE database = {format_query_value(database)}\"\n153     if like:\n",
+      "col_offset": 14,
+      "end_col_offset": 276,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/mcp_clickhouse/mcp_server.py",
+      "issue_confidence": "LOW",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 152,
+      "line_range": [
+        152
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    },
+    {
+      "code": "164     for table in tables:\n165         column_data_query = f\"SELECT database, table, name, type AS column_type, default_kind, default_expression, comment FROM system.columns WHERE database = {format_query_value(database)} AND table = {format_query_value(table.name)}\"\n166         column_data_query_result = client.query(column_data_query)\n",
+      "col_offset": 30,
+      "end_col_offset": 160,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/mcp_clickhouse/mcp_server.py",
+      "issue_confidence": "LOW",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 165,
+      "line_range": [
+        165
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    },
+    {
+      "code": "62     # Insert test data\n63     client.command(f\"\"\"\n64         INSERT INTO {test_db}.{test_table} (id, name, age) VALUES\n65         (1, 'Alice', 30),\n66         (2, 'Bob', 25),\n67         (3, 'Charlie', 35),\n68         (4, 'Diana', 28)\n69     \"\"\")\n70 \n",
+      "col_offset": 23,
+      "end_col_offset": 20,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "LOW",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 63,
+      "line_range": [
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    },
+    {
+      "code": "70 \n71     client.command(f\"\"\"\n72         INSERT INTO {test_db}.{test_table2} (event_id, event_type, timestamp) VALUES\n73         (1001, 'login', '2024-01-01 10:00:00'),\n74         (1002, 'logout', '2024-01-01 11:00:00'),\n75         (1003, 'login', '2024-01-01 12:00:00')\n76     \"\"\")\n77 \n",
+      "col_offset": 23,
+      "end_col_offset": 20,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "LOW",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 71,
+      "line_range": [
+        71,
+        72,
+        73,
+        74,
+        75,
+        76
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    },
+    {
+      "code": "98         # The result should be a list containing at least one item\n99         assert len(result.content) >= 1\n100         assert isinstance(result.content[0].text, str)\n",
+      "col_offset": 8,
+      "end_col_offset": 39,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 99,
+      "line_range": [
+        99
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "99         assert len(result.content) >= 1\n100         assert isinstance(result.content[0].text, str)\n101 \n",
+      "col_offset": 8,
+      "end_col_offset": 54,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 100,
+      "line_range": [
+        100
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "103         databases = json.loads(result.content[0].text)\n104         assert test_db in databases\n105         assert \"system\" in databases  # System database should always exist\n",
+      "col_offset": 8,
+      "end_col_offset": 35,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 104,
+      "line_range": [
+        104
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "104         assert test_db in databases\n105         assert \"system\" in databases  # System database should always exist\n106 \n",
+      "col_offset": 8,
+      "end_col_offset": 36,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 105,
+      "line_range": [
+        105
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "115 \n116         assert len(result.content) >= 1\n117         tables = json.loads(result.content[0].text)\n",
+      "col_offset": 8,
+      "end_col_offset": 39,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 116,
+      "line_range": [
+        116
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "119         # Should have exactly 2 tables\n120         assert len(tables) == 2\n121 \n",
+      "col_offset": 8,
+      "end_col_offset": 31,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 120,
+      "line_range": [
+        120
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "123         table_names = [table[\"name\"] for table in tables]\n124         assert test_table in table_names\n125         assert test_table2 in table_names\n",
+      "col_offset": 8,
+      "end_col_offset": 40,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 124,
+      "line_range": [
+        124
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "124         assert test_table in table_names\n125         assert test_table2 in table_names\n126 \n",
+      "col_offset": 8,
+      "end_col_offset": 41,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 125,
+      "line_range": [
+        125
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "128         for table in tables:\n129             assert table[\"database\"] == test_db\n130             assert \"columns\" in table\n",
+      "col_offset": 12,
+      "end_col_offset": 47,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 129,
+      "line_range": [
+        129
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "129             assert table[\"database\"] == test_db\n130             assert \"columns\" in table\n131             assert \"total_rows\" in table\n",
+      "col_offset": 12,
+      "end_col_offset": 37,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 130,
+      "line_range": [
+        130
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "130             assert \"columns\" in table\n131             assert \"total_rows\" in table\n132             assert \"engine\" in table\n",
+      "col_offset": 12,
+      "end_col_offset": 40,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 131,
+      "line_range": [
+        131
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "131             assert \"total_rows\" in table\n132             assert \"engine\" in table\n133             assert \"comment\" in table\n",
+      "col_offset": 12,
+      "end_col_offset": 36,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 132,
+      "line_range": [
+        132
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "132             assert \"engine\" in table\n133             assert \"comment\" in table\n134 \n",
+      "col_offset": 12,
+      "end_col_offset": 37,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 133,
+      "line_range": [
+        133
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "135             # Verify column information exists\n136             assert len(table[\"columns\"]) > 0\n137             for column in table[\"columns\"]:\n",
+      "col_offset": 12,
+      "end_col_offset": 44,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 136,
+      "line_range": [
+        136
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "137             for column in table[\"columns\"]:\n138                 assert \"name\" in column\n139                 assert \"column_type\" in column\n",
+      "col_offset": 16,
+      "end_col_offset": 39,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 138,
+      "line_range": [
+        138
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "138                 assert \"name\" in column\n139                 assert \"column_type\" in column\n140                 assert \"comment\" in column\n",
+      "col_offset": 16,
+      "end_col_offset": 46,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 139,
+      "line_range": [
+        139
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "139                 assert \"column_type\" in column\n140                 assert \"comment\" in column\n141 \n",
+      "col_offset": 16,
+      "end_col_offset": 42,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 140,
+      "line_range": [
+        140
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "159 \n160         assert len(tables) == 1\n161         assert tables[0][\"name\"] == test_table\n",
+      "col_offset": 8,
+      "end_col_offset": 31,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 160,
+      "line_range": [
+        160
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "160         assert len(tables) == 1\n161         assert tables[0][\"name\"] == test_table\n162 \n",
+      "col_offset": 8,
+      "end_col_offset": 46,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 161,
+      "line_range": [
+        161
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "180 \n181         assert len(tables) == 1\n182         assert tables[0][\"name\"] == test_table2\n",
+      "col_offset": 8,
+      "end_col_offset": 31,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 181,
+      "line_range": [
+        181
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "181         assert len(tables) == 1\n182         assert tables[0][\"name\"] == test_table2\n183 \n",
+      "col_offset": 8,
+      "end_col_offset": 47,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 182,
+      "line_range": [
+        182
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "190     async with Client(mcp_server) as client:\n191         query = f\"SELECT id, name, age FROM {test_db}.{test_table} ORDER BY id\"\n192         result = await client.call_tool(\"run_select_query\", {\"query\": query})\n",
+      "col_offset": 18,
+      "end_col_offset": 44,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "LOW",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 191,
+      "line_range": [
+        191
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    },
+    {
+      "code": "196         # Check structure\n197         assert \"columns\" in query_result\n198         assert \"rows\" in query_result\n",
+      "col_offset": 8,
+      "end_col_offset": 40,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 197,
+      "line_range": [
+        197
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "197         assert \"columns\" in query_result\n198         assert \"rows\" in query_result\n199 \n",
+      "col_offset": 8,
+      "end_col_offset": 37,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 198,
+      "line_range": [
+        198
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "200         # Check columns\n201         assert query_result[\"columns\"] == [\"id\", \"name\", \"age\"]\n202 \n",
+      "col_offset": 8,
+      "end_col_offset": 63,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 201,
+      "line_range": [
+        201
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "203         # Check rows\n204         assert len(query_result[\"rows\"]) == 4\n205         assert query_result[\"rows\"][0] == [1, \"Alice\", 30]\n",
+      "col_offset": 8,
+      "end_col_offset": 45,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 204,
+      "line_range": [
+        204
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "204         assert len(query_result[\"rows\"]) == 4\n205         assert query_result[\"rows\"][0] == [1, \"Alice\", 30]\n206         assert query_result[\"rows\"][1] == [2, \"Bob\", 25]\n",
+      "col_offset": 8,
+      "end_col_offset": 58,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 205,
+      "line_range": [
+        205
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "205         assert query_result[\"rows\"][0] == [1, \"Alice\", 30]\n206         assert query_result[\"rows\"][1] == [2, \"Bob\", 25]\n207         assert query_result[\"rows\"][2] == [3, \"Charlie\", 35]\n",
+      "col_offset": 8,
+      "end_col_offset": 56,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 206,
+      "line_range": [
+        206
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "206         assert query_result[\"rows\"][1] == [2, \"Bob\", 25]\n207         assert query_result[\"rows\"][2] == [3, \"Charlie\", 35]\n208         assert query_result[\"rows\"][3] == [4, \"Diana\", 28]\n",
+      "col_offset": 8,
+      "end_col_offset": 60,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 207,
+      "line_range": [
+        207
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "207         assert query_result[\"rows\"][2] == [3, \"Charlie\", 35]\n208         assert query_result[\"rows\"][3] == [4, \"Diana\", 28]\n209 \n",
+      "col_offset": 8,
+      "end_col_offset": 58,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 208,
+      "line_range": [
+        208
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "216     async with Client(mcp_server) as client:\n217         query = f\"SELECT COUNT(*) as count, AVG(age) as avg_age FROM {test_db}.{test_table}\"\n218         result = await client.call_tool(\"run_select_query\", {\"query\": query})\n",
+      "col_offset": 18,
+      "end_col_offset": 69,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "LOW",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 217,
+      "line_range": [
+        217
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    },
+    {
+      "code": "221 \n222         assert query_result[\"columns\"] == [\"count\", \"avg_age\"]\n223         assert len(query_result[\"rows\"]) == 1\n",
+      "col_offset": 8,
+      "end_col_offset": 62,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 222,
+      "line_range": [
+        222
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "222         assert query_result[\"columns\"] == [\"count\", \"avg_age\"]\n223         assert len(query_result[\"rows\"]) == 1\n224         assert query_result[\"rows\"][0][0] == 4  # count\n",
+      "col_offset": 8,
+      "end_col_offset": 45,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 223,
+      "line_range": [
+        223
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "223         assert len(query_result[\"rows\"]) == 1\n224         assert query_result[\"rows\"][0][0] == 4  # count\n225         assert query_result[\"rows\"][0][1] == 29.5  # average age\n",
+      "col_offset": 8,
+      "end_col_offset": 46,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 224,
+      "line_range": [
+        224
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "224         assert query_result[\"rows\"][0][0] == 4  # count\n225         assert query_result[\"rows\"][0][1] == 29.5  # average age\n226 \n",
+      "col_offset": 8,
+      "end_col_offset": 49,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 225,
+      "line_range": [
+        225
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "235         client_direct = create_clickhouse_client()\n236         client_direct.command(f\"\"\"\n237             INSERT INTO {test_db}.{test_table2} (event_id, event_type, timestamp) VALUES\n238             (2001, 'purchase', '2024-01-01 14:00:00')\n239         \"\"\")\n240 \n",
+      "col_offset": 34,
+      "end_col_offset": 24,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "LOW",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 236,
+      "line_range": [
+        236,
+        237,
+        238,
+        239
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    },
+    {
+      "code": "240 \n241         query = f\"\"\"\n242         SELECT\n243             COUNT(DISTINCT event_type) as event_types_count\n244         FROM {test_db}.{test_table2}\n245         \"\"\"\n246         result = await client.call_tool(\"run_select_query\", {\"query\": query})\n",
+      "col_offset": 20,
+      "end_col_offset": 13,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "LOW",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 241,
+      "line_range": [
+        241,
+        242,
+        243,
+        244,
+        245
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    },
+    {
+      "code": "248         query_result = json.loads(result.content[0].text)\n249         assert query_result[\"rows\"][0][0] == 3  # login, logout, purchase\n250 \n",
+      "col_offset": 8,
+      "end_col_offset": 46,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 249,
+      "line_range": [
+        249
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "258         # Query non-existent table\n259         query = f\"SELECT * FROM {test_db}.non_existent_table\"\n260 \n",
+      "col_offset": 18,
+      "end_col_offset": 32,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "LOW",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 259,
+      "line_range": [
+        259
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    },
+    {
+      "code": "264 \n265         assert \"Query execution failed\" in str(exc_info.value)\n266 \n",
+      "col_offset": 8,
+      "end_col_offset": 62,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 265,
+      "line_range": [
+        265
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "278 \n279         assert \"Query execution failed\" in str(exc_info.value)\n280 \n",
+      "col_offset": 8,
+      "end_col_offset": 62,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 279,
+      "line_range": [
+        279
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "294         # Check table comment\n295         assert test_table_info[\"comment\"] == \"Test table for MCP server testing\"\n296 \n",
+      "col_offset": 8,
+      "end_col_offset": 80,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 295,
+      "line_range": [
+        295
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "297         # Check engine info\n298         assert test_table_info[\"engine\"] == \"MergeTree\"\n299         assert \"MergeTree\" in test_table_info[\"engine_full\"]\n",
+      "col_offset": 8,
+      "end_col_offset": 55,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 298,
+      "line_range": [
+        298
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "298         assert test_table_info[\"engine\"] == \"MergeTree\"\n299         assert \"MergeTree\" in test_table_info[\"engine_full\"]\n300 \n",
+      "col_offset": 8,
+      "end_col_offset": 60,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 299,
+      "line_range": [
+        299
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "301         # Check row count\n302         assert test_table_info[\"total_rows\"] == 4\n303 \n",
+      "col_offset": 8,
+      "end_col_offset": 49,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 302,
+      "line_range": [
+        302
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "306 \n307         assert columns_by_name[\"id\"][\"comment\"] == \"Primary identifier\"\n308         assert columns_by_name[\"id\"][\"column_type\"] == \"UInt32\"\n",
+      "col_offset": 8,
+      "end_col_offset": 71,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 307,
+      "line_range": [
+        307
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "307         assert columns_by_name[\"id\"][\"comment\"] == \"Primary identifier\"\n308         assert columns_by_name[\"id\"][\"column_type\"] == \"UInt32\"\n309 \n",
+      "col_offset": 8,
+      "end_col_offset": 63,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 308,
+      "line_range": [
+        308
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "309 \n310         assert columns_by_name[\"name\"][\"comment\"] == \"User name field\"\n311         assert columns_by_name[\"name\"][\"column_type\"] == \"String\"\n",
+      "col_offset": 8,
+      "end_col_offset": 70,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 310,
+      "line_range": [
+        310
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "310         assert columns_by_name[\"name\"][\"comment\"] == \"User name field\"\n311         assert columns_by_name[\"name\"][\"column_type\"] == \"String\"\n312 \n",
+      "col_offset": 8,
+      "end_col_offset": 65,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 311,
+      "line_range": [
+        311
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "312 \n313         assert columns_by_name[\"age\"][\"comment\"] == \"User age\"\n314         assert columns_by_name[\"age\"][\"column_type\"] == \"UInt8\"\n",
+      "col_offset": 8,
+      "end_col_offset": 62,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 313,
+      "line_range": [
+        313
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "313         assert columns_by_name[\"age\"][\"comment\"] == \"User age\"\n314         assert columns_by_name[\"age\"][\"column_type\"] == \"UInt8\"\n315 \n",
+      "col_offset": 8,
+      "end_col_offset": 63,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 314,
+      "line_range": [
+        314
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "315 \n316         assert columns_by_name[\"created_at\"][\"comment\"] == \"Record creation timestamp\"\n317         assert columns_by_name[\"created_at\"][\"column_type\"] == \"DateTime\"\n",
+      "col_offset": 8,
+      "end_col_offset": 86,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 316,
+      "line_range": [
+        316
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "316         assert columns_by_name[\"created_at\"][\"comment\"] == \"Record creation timestamp\"\n317         assert columns_by_name[\"created_at\"][\"column_type\"] == \"DateTime\"\n318         assert columns_by_name[\"created_at\"][\"default_expression\"] == \"now()\"\n",
+      "col_offset": 8,
+      "end_col_offset": 73,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 317,
+      "line_range": [
+        317
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "317         assert columns_by_name[\"created_at\"][\"column_type\"] == \"DateTime\"\n318         assert columns_by_name[\"created_at\"][\"default_expression\"] == \"now()\"\n319 \n",
+      "col_offset": 8,
+      "end_col_offset": 77,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 318,
+      "line_range": [
+        318
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "329         # System database should have many tables\n330         assert len(tables) > 10\n331 \n",
+      "col_offset": 8,
+      "end_col_offset": 31,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 330,
+      "line_range": [
+        330
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "333         table_names = [t[\"name\"] for t in tables]\n334         assert \"tables\" in table_names\n335         assert \"columns\" in table_names\n",
+      "col_offset": 8,
+      "end_col_offset": 38,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 334,
+      "line_range": [
+        334
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "334         assert \"tables\" in table_names\n335         assert \"columns\" in table_names\n336         assert \"databases\" in table_names\n",
+      "col_offset": 8,
+      "end_col_offset": 39,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 335,
+      "line_range": [
+        335
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "335         assert \"columns\" in table_names\n336         assert \"databases\" in table_names\n337 \n",
+      "col_offset": 8,
+      "end_col_offset": 41,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 336,
+      "line_range": [
+        336
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "346         queries = [\n347             f\"SELECT COUNT(*) FROM {test_db}.{test_table}\",\n348             f\"SELECT COUNT(*) FROM {test_db}.{test_table2}\",\n",
+      "col_offset": 14,
+      "end_col_offset": 35,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "LOW",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 347,
+      "line_range": [
+        347
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    },
+    {
+      "code": "347             f\"SELECT COUNT(*) FROM {test_db}.{test_table}\",\n348             f\"SELECT COUNT(*) FROM {test_db}.{test_table2}\",\n349             f\"SELECT MAX(id) FROM {test_db}.{test_table}\",\n",
+      "col_offset": 14,
+      "end_col_offset": 35,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "LOW",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 348,
+      "line_range": [
+        348
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    },
+    {
+      "code": "348             f\"SELECT COUNT(*) FROM {test_db}.{test_table2}\",\n349             f\"SELECT MAX(id) FROM {test_db}.{test_table}\",\n350             f\"SELECT MIN(event_id) FROM {test_db}.{test_table2}\",\n",
+      "col_offset": 14,
+      "end_col_offset": 34,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "LOW",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 349,
+      "line_range": [
+        349
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    },
+    {
+      "code": "349             f\"SELECT MAX(id) FROM {test_db}.{test_table}\",\n350             f\"SELECT MIN(event_id) FROM {test_db}.{test_table2}\",\n351         ]\n",
+      "col_offset": 14,
+      "end_col_offset": 40,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "LOW",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 350,
+      "line_range": [
+        350
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    },
+    {
+      "code": "358         # Verify all queries succeeded\n359         assert len(results) == 4\n360 \n",
+      "col_offset": 8,
+      "end_col_offset": 32,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 359,
+      "line_range": [
+        359
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "363             query_result = json.loads(result.content[0].text)\n364             assert \"rows\" in query_result\n365             assert len(query_result[\"rows\"]) == 1\n",
+      "col_offset": 12,
+      "end_col_offset": 41,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 364,
+      "line_range": [
+        364
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "364             assert \"rows\" in query_result\n365             assert len(query_result[\"rows\"]) == 1\n",
+      "col_offset": 12,
+      "end_col_offset": 49,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_mcp_server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 365,
+      "line_range": [
+        365
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "34         \"\"\")\n35         cls.client.command(f\"\"\"\n36             INSERT INTO {cls.test_db}.{cls.test_table} (id, name) VALUES (1, 'Alice'), (2, 'Bob')\n37         \"\"\")\n38 \n",
+      "col_offset": 31,
+      "end_col_offset": 24,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_tool.py",
+      "issue_confidence": "LOW",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 35,
+      "line_range": [
+        35,
+        36,
+        37
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    },
+    {
+      "code": "66         \"\"\"Test running a SELECT query successfully.\"\"\"\n67         query = f\"SELECT * FROM {self.test_db}.{self.test_table}\"\n68         result = run_select_query(query)\n",
+      "col_offset": 18,
+      "end_col_offset": 32,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_tool.py",
+      "issue_confidence": "LOW",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 67,
+      "line_range": [
+        67
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    },
+    {
+      "code": "75         \"\"\"Test running a SELECT query with an error.\"\"\"\n76         query = f\"SELECT * FROM {self.test_db}.non_existent_table\"\n77 \n",
+      "col_offset": 18,
+      "end_col_offset": 32,
+      "filename": "/Users/xue/workspace/mcp_project/mcp_server_pyrepos/mcp-clickhouse/tests/test_tool.py",
+      "issue_confidence": "LOW",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 76,
+      "line_range": [
+        76
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    }
+  ]
+}

@@ -1,0 +1,85 @@
+{
+  "errors": [],
+  "generated_at": "2025-10-12T00:53:09Z",
+  "metrics": {
+    "./security_check/security_reports/json-alibaba-cloud-ops-mcp-server-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__alibaba-cloud-ops-mcp-server__src__alibaba_cloud_ops_mcp_server__alibabacloud__utils.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 41,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "./security_check/security_reports/json-alibaba-cloud-ops-mcp-server-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__alibaba-cloud-ops-mcp-server__src__alibaba_cloud_ops_mcp_server__tools__api_tools.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 217,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "./security_check/security_reports/json-alibaba-cloud-ops-mcp-server-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__alibaba-cloud-ops-mcp-server__src__alibaba_cloud_ops_mcp_server__tools__cms_tools.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 93,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "./security_check/security_reports/json-alibaba-cloud-ops-mcp-server-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__alibaba-cloud-ops-mcp-server__src__alibaba_cloud_ops_mcp_server__tools__oos_tools.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 218,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "./security_check/security_reports/json-alibaba-cloud-ops-mcp-server-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__alibaba-cloud-ops-mcp-server__src__alibaba_cloud_ops_mcp_server__tools__oss_tools.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 98,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "_totals": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 667,
+      "nosec": 0,
+      "skipped_tests": 0
+    }
+  },
+  "results": []
+}

@@ -190,6 +190,11 @@ config = {
         # },
 
 # ---------------- 需要配置的server ----------------
+        "magic-mcp": {
+            "command": "npx",
+            "args": ["--directory",
+             f"{REPO_BASE}/magic-mcp", "API_KEY=\"68c52aff4557513401a1120a75361ad6eab2139b77c825bbb54d4d0909cd3ddd\""]
+        },
         # "web-eval-agent": {
         #     "command": "uvx",
         #     "args": [

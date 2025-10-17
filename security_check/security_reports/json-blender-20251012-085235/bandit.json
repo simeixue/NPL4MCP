@@ -1,0 +1,742 @@
+{
+  "errors": [],
+  "generated_at": "2025-10-12T00:54:54Z",
+  "metrics": {
+    "./security_check/security_reports/json-blender-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__blender__addon.py": {
+      "CONFIDENCE.HIGH": 16,
+      "CONFIDENCE.LOW": 15,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 15,
+      "SEVERITY.MEDIUM": 16,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 1371,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "./security_check/security_reports/json-blender-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__blender__src__blender_mcp__server.py": {
+      "CONFIDENCE.HIGH": 1,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 1,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 764,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "_totals": {
+      "CONFIDENCE.HIGH": 17,
+      "CONFIDENCE.LOW": 15,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 16,
+      "SEVERITY.MEDIUM": 16,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 2135,
+      "nosec": 0,
+      "skipped_tests": 0
+    }
+  },
+  "results": [
+    {
+      "code": "73                 self.socket.close()\n74             except:\n75                 pass\n76             self.socket = None\n",
+      "col_offset": 12,
+      "end_col_offset": 20,
+      "filename": "./security_check/security_reports/json-blender-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__blender__addon.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 74,
+      "line_range": [
+        74,
+        75
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "82                     self.server_thread.join(timeout=1.0)\n83             except:\n84                 pass\n85             self.server_thread = None\n",
+      "col_offset": 12,
+      "end_col_offset": 20,
+      "filename": "./security_check/security_reports/json-blender-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__blender__addon.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 83,
+      "line_range": [
+        83,
+        84
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "160                                     client.sendall(json.dumps(error_response).encode('utf-8'))\n161                                 except:\n162                                     pass\n163                             return None\n",
+      "col_offset": 32,
+      "end_col_offset": 40,
+      "filename": "./security_check/security_reports/json-blender-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__blender__addon.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 161,
+      "line_range": [
+        161,
+        162
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "177                 client.close()\n178             except:\n179                 pass\n180             print(\"Client handler stopped\")\n",
+      "col_offset": 12,
+      "end_col_offset": 20,
+      "filename": "./security_check/security_reports/json-blender-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__blender__addon.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 178,
+      "line_range": [
+        178,
+        179
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "414             with redirect_stdout(capture_buffer):\n415                 exec(code, namespace)\n416 \n",
+      "col_offset": 16,
+      "end_col_offset": 37,
+      "filename": "./security_check/security_reports/json-blender-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__blender__addon.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Use of exec detected.",
+      "line_number": 415,
+      "line_range": [
+        415
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b102_exec_used.html",
+      "test_id": "B102",
+      "test_name": "exec_used"
+    },
+    {
+      "code": "429 \n430             response = requests.get(f\"https://api.polyhaven.com/categories/{asset_type}\", headers=REQ_HEADERS)\n431             if response.status_code == 200:\n",
+      "col_offset": 23,
+      "end_col_offset": 110,
+      "filename": "./security_check/security_reports/json-blender-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__blender__addon.py",
+      "issue_confidence": "LOW",
+      "issue_cwe": {
+        "id": 400,
+        "link": "https://cwe.mitre.org/data/definitions/400.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Call to requests without timeout",
+      "line_number": 430,
+      "line_range": [
+        430
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b113_request_without_timeout.html",
+      "test_id": "B113",
+      "test_name": "request_without_timeout"
+    },
+    {
+      "code": "451 \n452             response = requests.get(url, params=params, headers=REQ_HEADERS)\n453             if response.status_code == 200:\n",
+      "col_offset": 23,
+      "end_col_offset": 76,
+      "filename": "./security_check/security_reports/json-blender-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__blender__addon.py",
+      "issue_confidence": "LOW",
+      "issue_cwe": {
+        "id": 400,
+        "link": "https://cwe.mitre.org/data/definitions/400.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Call to requests without timeout",
+      "line_number": 452,
+      "line_range": [
+        452
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b113_request_without_timeout.html",
+      "test_id": "B113",
+      "test_name": "request_without_timeout"
+    },
+    {
+      "code": "471             # First get the files information\n472             files_response = requests.get(f\"https://api.polyhaven.com/files/{asset_id}\", headers=REQ_HEADERS)\n473             if files_response.status_code != 200:\n",
+      "col_offset": 29,
+      "end_col_offset": 109,
+      "filename": "./security_check/security_reports/json-blender-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__blender__addon.py",
+      "issue_confidence": "LOW",
+      "issue_cwe": {
+        "id": 400,
+        "link": "https://cwe.mitre.org/data/definitions/400.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Call to requests without timeout",
+      "line_number": 472,
+      "line_range": [
+        472
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b113_request_without_timeout.html",
+      "test_id": "B113",
+      "test_name": "request_without_timeout"
+    },
+    {
+      "code": "491                         # Download the file\n492                         response = requests.get(file_url, headers=REQ_HEADERS)\n493                         if response.status_code != 200:\n",
+      "col_offset": 35,
+      "end_col_offset": 78,
+      "filename": "./security_check/security_reports/json-blender-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__blender__addon.py",
+      "issue_confidence": "LOW",
+      "issue_cwe": {
+        "id": 400,
+        "link": "https://cwe.mitre.org/data/definitions/400.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Call to requests without timeout",
+      "line_number": 492,
+      "line_range": [
+        492
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b113_request_without_timeout.html",
+      "test_id": "B113",
+      "test_name": "request_without_timeout"
+    },
+    {
+      "code": "537                                     break  # Stop if we successfully set a color space\n538                                 except:\n539                                     continue\n540 \n",
+      "col_offset": 32,
+      "end_col_offset": 44,
+      "filename": "./security_check/security_reports/json-blender-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__blender__addon.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Continue detected.",
+      "line_number": 538,
+      "line_range": [
+        538,
+        539
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b112_try_except_continue.html",
+      "test_id": "B112",
+      "test_name": "try_except_continue"
+    },
+    {
+      "code": "558                             tempfile._cleanup()  # This will clean up all temporary files\n559                         except:\n560                             pass\n561 \n",
+      "col_offset": 24,
+      "end_col_offset": 32,
+      "filename": "./security_check/security_reports/json-blender-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__blender__addon.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 559,
+      "line_range": [
+        559,
+        560
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "587                                     # Download the file\n588                                     response = requests.get(file_url, headers=REQ_HEADERS)\n589                                     if response.status_code == 200:\n",
+      "col_offset": 47,
+      "end_col_offset": 90,
+      "filename": "./security_check/security_reports/json-blender-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__blender__addon.py",
+      "issue_confidence": "LOW",
+      "issue_cwe": {
+        "id": 400,
+        "link": "https://cwe.mitre.org/data/definitions/400.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Call to requests without timeout",
+      "line_number": 588,
+      "line_range": [
+        588
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b113_request_without_timeout.html",
+      "test_id": "B113",
+      "test_name": "request_without_timeout"
+    },
+    {
+      "code": "603                                                 image.colorspace_settings.name = 'sRGB'\n604                                             except:\n605                                                 pass\n606                                         else:\n",
+      "col_offset": 44,
+      "end_col_offset": 52,
+      "filename": "./security_check/security_reports/json-blender-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__blender__addon.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 604,
+      "line_range": [
+        604,
+        605
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "608                                                 image.colorspace_settings.name = 'Non-Color'\n609                                             except:\n610                                                 pass\n611 \n",
+      "col_offset": 44,
+      "end_col_offset": 52,
+      "filename": "./security_check/security_reports/json-blender-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__blender__addon.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 609,
+      "line_range": [
+        609,
+        610
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "616                                             os.unlink(tmp_path)\n617                                         except:\n618                                             pass\n619 \n",
+      "col_offset": 40,
+      "end_col_offset": 48,
+      "filename": "./security_check/security_reports/json-blender-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__blender__addon.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 617,
+      "line_range": [
+        617,
+        618
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "664                                 tex_node.image.colorspace_settings.name = 'sRGB'\n665                             except:\n666                                 pass  # Use default if sRGB not available\n667                         else:\n",
+      "col_offset": 28,
+      "end_col_offset": 36,
+      "filename": "./security_check/security_reports/json-blender-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__blender__addon.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 665,
+      "line_range": [
+        665,
+        666
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "669                                 tex_node.image.colorspace_settings.name = 'Non-Color'\n670                             except:\n671                                 pass  # Use default if Non-Color not available\n672 \n",
+      "col_offset": 28,
+      "end_col_offset": 36,
+      "filename": "./security_check/security_reports/json-blender-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__blender__addon.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 670,
+      "line_range": [
+        670,
+        671
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "724 \n725                         response = requests.get(file_url, headers=REQ_HEADERS)\n726                         if response.status_code != 200:\n",
+      "col_offset": 35,
+      "end_col_offset": 78,
+      "filename": "./security_check/security_reports/json-blender-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__blender__addon.py",
+      "issue_confidence": "LOW",
+      "issue_cwe": {
+        "id": 400,
+        "link": "https://cwe.mitre.org/data/definitions/400.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Call to requests without timeout",
+      "line_number": 725,
+      "line_range": [
+        725
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b113_request_without_timeout.html",
+      "test_id": "B113",
+      "test_name": "request_without_timeout"
+    },
+    {
+      "code": "742                                 # Download the included file\n743                                 include_response = requests.get(include_url, headers=REQ_HEADERS)\n744                                 if include_response.status_code == 200:\n",
+      "col_offset": 51,
+      "end_col_offset": 97,
+      "filename": "./security_check/security_reports/json-blender-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__blender__addon.py",
+      "issue_confidence": "LOW",
+      "issue_cwe": {
+        "id": 400,
+        "link": "https://cwe.mitre.org/data/definitions/400.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Call to requests without timeout",
+      "line_number": 743,
+      "line_range": [
+        743
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b113_request_without_timeout.html",
+      "test_id": "B113",
+      "test_name": "request_without_timeout"
+    },
+    {
+      "code": "817                             img.colorspace_settings.name = 'sRGB'\n818                         except:\n819                             pass\n820                     else:\n",
+      "col_offset": 24,
+      "end_col_offset": 32,
+      "filename": "./security_check/security_reports/json-blender-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__blender__addon.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 818,
+      "line_range": [
+        818,
+        819
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "822                             img.colorspace_settings.name = 'Non-Color'\n823                         except:\n824                             pass\n825 \n",
+      "col_offset": 24,
+      "end_col_offset": 32,
+      "filename": "./security_check/security_reports/json-blender-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__blender__addon.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 823,
+      "line_range": [
+        823,
+        824
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "891                         tex_node.image.colorspace_settings.name = 'sRGB'\n892                     except:\n893                         pass  # Use default if sRGB not available\n894                 else:\n",
+      "col_offset": 20,
+      "end_col_offset": 28,
+      "filename": "./security_check/security_reports/json-blender-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__blender__addon.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 892,
+      "line_range": [
+        892,
+        893
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "896                         tex_node.image.colorspace_settings.name = 'Non-Color'\n897                     except:\n898                         pass  # Use default if Non-Color not available\n899 \n",
+      "col_offset": 20,
+      "end_col_offset": 28,
+      "filename": "./security_check/security_reports/json-blender-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__blender__addon.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 897,
+      "line_range": [
+        897,
+        898
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "1167                 files.append((\"bbox_condition\", (None, json.dumps(bbox_condition))))\n1168             response = requests.post(\n1169                 \"https://hyperhuman.deemos.com/api/v2/rodin\",\n1170                 headers={\n1171                     \"Authorization\": f\"Bearer {bpy.context.scene.blendermcp_hyper3d_api_key}\",\n1172                 },\n1173                 files=files\n1174             )\n1175             data = response.json()\n",
+      "col_offset": 23,
+      "end_col_offset": 13,
+      "filename": "./security_check/security_reports/json-blender-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__blender__addon.py",
+      "issue_confidence": "LOW",
+      "issue_cwe": {
+        "id": 400,
+        "link": "https://cwe.mitre.org/data/definitions/400.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Call to requests without timeout",
+      "line_number": 1168,
+      "line_range": [
+        1168,
+        1169,
+        1170,
+        1171,
+        1172,
+        1173,
+        1174
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b113_request_without_timeout.html",
+      "test_id": "B113",
+      "test_name": "request_without_timeout"
+    },
+    {
+      "code": "1195                 req_data[\"bbox_condition\"] = bbox_condition\n1196             response = requests.post(\n1197                 \"https://queue.fal.run/fal-ai/hyper3d/rodin\",\n1198                 headers={\n1199                     \"Authorization\": f\"Key {bpy.context.scene.blendermcp_hyper3d_api_key}\",\n1200                     \"Content-Type\": \"application/json\",\n1201                 },\n1202                 json=req_data\n1203             )\n1204             data = response.json()\n",
+      "col_offset": 23,
+      "end_col_offset": 13,
+      "filename": "./security_check/security_reports/json-blender-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__blender__addon.py",
+      "issue_confidence": "LOW",
+      "issue_cwe": {
+        "id": 400,
+        "link": "https://cwe.mitre.org/data/definitions/400.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Call to requests without timeout",
+      "line_number": 1196,
+      "line_range": [
+        1196,
+        1197,
+        1198,
+        1199,
+        1200,
+        1201,
+        1202,
+        1203
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b113_request_without_timeout.html",
+      "test_id": "B113",
+      "test_name": "request_without_timeout"
+    },
+    {
+      "code": "1219         \"\"\"Call the job status API to get the job status\"\"\"\n1220         response = requests.post(\n1221             \"https://hyperhuman.deemos.com/api/v2/status\",\n1222             headers={\n1223                 \"Authorization\": f\"Bearer {bpy.context.scene.blendermcp_hyper3d_api_key}\",\n1224             },\n1225             json={\n1226                 \"subscription_key\": subscription_key,\n1227             },\n1228         )\n1229         data = response.json()\n",
+      "col_offset": 19,
+      "end_col_offset": 9,
+      "filename": "./security_check/security_reports/json-blender-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__blender__addon.py",
+      "issue_confidence": "LOW",
+      "issue_cwe": {
+        "id": 400,
+        "link": "https://cwe.mitre.org/data/definitions/400.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Call to requests without timeout",
+      "line_number": 1220,
+      "line_range": [
+        1220,
+        1221,
+        1222,
+        1223,
+        1224,
+        1225,
+        1226,
+        1227,
+        1228
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b113_request_without_timeout.html",
+      "test_id": "B113",
+      "test_name": "request_without_timeout"
+    },
+    {
+      "code": "1235         \"\"\"Call the job status API to get the job status\"\"\"\n1236         response = requests.get(\n1237             f\"https://queue.fal.run/fal-ai/hyper3d/requests/{request_id}/status\",\n1238             headers={\n1239                 \"Authorization\": f\"KEY {bpy.context.scene.blendermcp_hyper3d_api_key}\",\n1240             },\n1241         )\n1242         data = response.json()\n",
+      "col_offset": 19,
+      "end_col_offset": 9,
+      "filename": "./security_check/security_reports/json-blender-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__blender__addon.py",
+      "issue_confidence": "LOW",
+      "issue_cwe": {
+        "id": 400,
+        "link": "https://cwe.mitre.org/data/definitions/400.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Call to requests without timeout",
+      "line_number": 1236,
+      "line_range": [
+        1236,
+        1237,
+        1238,
+        1239,
+        1240,
+        1241
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b113_request_without_timeout.html",
+      "test_id": "B113",
+      "test_name": "request_without_timeout"
+    },
+    {
+      "code": "1322         \"\"\"Fetch the generated asset, import into blender\"\"\"\n1323         response = requests.post(\n1324             \"https://hyperhuman.deemos.com/api/v2/download\",\n1325             headers={\n1326                 \"Authorization\": f\"Bearer {bpy.context.scene.blendermcp_hyper3d_api_key}\",\n1327             },\n1328             json={\n1329                 'task_uuid': task_uuid\n1330             }\n1331         )\n1332         data_ = response.json()\n",
+      "col_offset": 19,
+      "end_col_offset": 9,
+      "filename": "./security_check/security_reports/json-blender-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__blender__addon.py",
+      "issue_confidence": "LOW",
+      "issue_cwe": {
+        "id": 400,
+        "link": "https://cwe.mitre.org/data/definitions/400.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Call to requests without timeout",
+      "line_number": 1323,
+      "line_range": [
+        1323,
+        1324,
+        1325,
+        1326,
+        1327,
+        1328,
+        1329,
+        1330,
+        1331
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b113_request_without_timeout.html",
+      "test_id": "B113",
+      "test_name": "request_without_timeout"
+    },
+    {
+      "code": "1343                     # Download the content\n1344                     response = requests.get(i[\"url\"], stream=True)\n1345                     response.raise_for_status()  # Raise an exception for HTTP errors\n",
+      "col_offset": 31,
+      "end_col_offset": 66,
+      "filename": "./security_check/security_reports/json-blender-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__blender__addon.py",
+      "issue_confidence": "LOW",
+      "issue_cwe": {
+        "id": 400,
+        "link": "https://cwe.mitre.org/data/definitions/400.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Call to requests without timeout",
+      "line_number": 1344,
+      "line_range": [
+        1344
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b113_request_without_timeout.html",
+      "test_id": "B113",
+      "test_name": "request_without_timeout"
+    },
+    {
+      "code": "1388         \"\"\"Fetch the generated asset, import into blender\"\"\"\n1389         response = requests.get(\n1390             f\"https://queue.fal.run/fal-ai/hyper3d/requests/{request_id}\",\n1391             headers={\n1392                 \"Authorization\": f\"Key {bpy.context.scene.blendermcp_hyper3d_api_key}\",\n1393             }\n1394         )\n1395         data_ = response.json()\n",
+      "col_offset": 19,
+      "end_col_offset": 9,
+      "filename": "./security_check/security_reports/json-blender-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__blender__addon.py",
+      "issue_confidence": "LOW",
+      "issue_cwe": {
+        "id": 400,
+        "link": "https://cwe.mitre.org/data/definitions/400.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Call to requests without timeout",
+      "line_number": 1389,
+      "line_range": [
+        1389,
+        1390,
+        1391,
+        1392,
+        1393,
+        1394
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b113_request_without_timeout.html",
+      "test_id": "B113",
+      "test_name": "request_without_timeout"
+    },
+    {
+      "code": "1405             # Download the content\n1406             response = requests.get(data_[\"model_mesh\"][\"url\"], stream=True)\n1407             response.raise_for_status()  # Raise an exception for HTTP errors\n",
+      "col_offset": 23,
+      "end_col_offset": 76,
+      "filename": "./security_check/security_reports/json-blender-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__blender__addon.py",
+      "issue_confidence": "LOW",
+      "issue_cwe": {
+        "id": 400,
+        "link": "https://cwe.mitre.org/data/definitions/400.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Call to requests without timeout",
+      "line_number": 1406,
+      "line_range": [
+        1406
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b113_request_without_timeout.html",
+      "test_id": "B113",
+      "test_name": "request_without_timeout"
+    },
+    {
+      "code": "225                 _blender_connection.disconnect()\n226             except:\n227                 pass\n228             _blender_connection = None\n",
+      "col_offset": 12,
+      "end_col_offset": 20,
+      "filename": "./security_check/security_reports/json-blender-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__blender__src__blender_mcp__server.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 226,
+      "line_range": [
+        226,
+        227
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    }
+  ]
+}

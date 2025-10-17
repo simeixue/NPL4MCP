@@ -1,0 +1,72 @@
+{
+  "errors": [],
+  "generated_at": "2025-10-12T00:52:51Z",
+  "metrics": {
+    "./security_check/security_reports/json-oxylabs-mcp-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__oxylabs-mcp__src__oxylabs_mcp__tools__ai_studio.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 284,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "./security_check/security_reports/json-oxylabs-mcp-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__oxylabs-mcp__src__oxylabs_mcp__tools__scraper.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 187,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "./security_check/security_reports/json-oxylabs-mcp-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__oxylabs-mcp__src__oxylabs_mcp__utils.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 230,
+      "nosec": 3,
+      "skipped_tests": 0
+    },
+    "./security_check/security_reports/json-oxylabs-mcp-20251012-085235/src/__Users__xue__workspace__mcp_project__mcp_server_pyrepos__oxylabs-mcp__tests__conftest.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 87,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "_totals": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 788,
+      "nosec": 3,
+      "skipped_tests": 0
+    }
+  },
+  "results": []
+}
